@@ -12,9 +12,13 @@ export default function JobsPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
-  const { data: jobsResponse, isLoading } = useQuery({
+  const { data: jobsResponse, isLoading, isError, error } = useQuery({
     queryKey: ['jobs', page, search],
-    queryFn: () => jobService.getJobs(page, 10),
+    queryFn: () => jobService.getJobsPaged({
+      PageNumber: page,
+      PageSize: 10,
+      Title: search || undefined
+    }),
   });
 
   return (
@@ -37,12 +41,18 @@ export default function JobsPage() {
         </div>
       </header>
 
+      {isError && (
+        <div className="border border-destructive/50 bg-destructive/10 text-destructive p-4 text-sm font-bold">
+          [!] SYS_ERR: FAILED TO FETCH JOB DATABASE: {(error as any)?.message || 'Unknown Error'}
+        </div>
+      )}
+
       <div className="grid gap-6">
         {isLoading ? (
           [1, 2, 3, 4, 5].map(i => (
             <Card key={i} className="animate-pulse border-primary/10 h-32" />
           ))
-        ) : jobsResponse?.items.length ? (
+        ) : jobsResponse?.items?.length ? (
           jobsResponse.items.map((job) => (
             <Card key={job.id} className="group hover:border-primary transition-all">
               <CardContent className="p-6">
@@ -53,22 +63,27 @@ export default function JobsPage() {
                         {job.title.toUpperCase()}
                       </h2>
                       <span className="text-[10px] bg-primary/10 px-2 py-0.5 border border-primary/20">
-                        {job.type}
+                        {job.jobType}
+                      </span>
+                      <span className="text-[10px] bg-secondary/10 px-2 py-0.5 border border-secondary/20">
+                        {job.experienceLevel}
                       </span>
                     </div>
                     <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                       <span className="flex items-center">
-                        <Briefcase className="mr-1 size-3" /> {job.companyName.toUpperCase()}
+                        <Briefcase className="mr-1 size-3" /> ORG_ID: {job.organizationId}
                       </span>
                       <span className="flex items-center">
                         <MapPin className="mr-1 size-3" /> {job.location.toUpperCase()}
                       </span>
-                      <span className="flex items-center">
-                        <Clock className="mr-1 size-3" /> {new Date(job.postedDate).toLocaleDateString()}
-                      </span>
+                      {job.salaryMin > 0 && job.salaryMax > 0 && (
+                        <span className="flex items-center text-primary font-bold">
+                          ${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 shrink-0">
                     <Button variant="outline" size="sm">DETAILS</Button>
                     <Button size="sm">APPLY_NOW</Button>
                   </div>
@@ -76,7 +91,7 @@ export default function JobsPage() {
               </CardContent>
             </Card>
           ))
-        ) : (
+        ) : !isError && (
           <div className="text-center py-20 border border-dashed border-primary/20">
             <p className="text-xs text-muted-foreground">NO MATCHING RECORDS FOUND</p>
           </div>
