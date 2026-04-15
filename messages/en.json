@@ -1,5 +1,111 @@
 {
   "HomePage": {
-    "title": "Hello world!"
+    "title": "Welcome to AIJOB",
+    "hero": {
+      "badge": "SYSTEM ONLINE // AIJOB v2",
+      "headline1": "Find your next",
+      "headline2": "mission",
+      "description": "The ultimate protocol for modern professionals. Connect with top-tier organizations, analyze your skills via AI, and secure your career trajectory.",
+      "cta_browse": "Browse Jobs",
+      "cta_register": "Get Started"
+    },
+    "features": {
+      "ai_title": "AI Co-Processor",
+      "ai_desc": "Upload your CV and let our neural networks analyze your skill gaps, generate cover letters, and match you with the perfect role.",
+      "network_title": "Global Network",
+      "network_desc": "Access to opportunities across sectors with full multilingual support and a real-time social activity feed.",
+      "secure_title": "Secure Comms",
+      "secure_desc": "Direct, encrypted message channels between candidates and organizations."
+    },
+    "stats": {
+      "candidates": "Candidates",
+      "organizations": "Organizations",
+      "languages": "Languages"
+    },
+    "capabilities": "Platform Capabilities",
+    "built_for_pro": "Built for professionals",
+    "cta_ready": "Ready to connect?",
+    "cta_desc": "Join thousands of professionals already using AIJOB to accelerate their careers."
+  },
+  "Nav": {
+    "jobs": "Jobs",
+    "feed": "Feed",
+    "ai_tools": "AI Tools",
+    "messages": "Messages",
+    "portal": "Portal",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "theme_system": "System"
+  },
+  "Footer": {
+    "tagline": "The professional network for the next generation.",
+    "platform": "Platform",
+    "jobs": "Browse Jobs",
+    "feed": "Activity Feed",
+    "ai_tools": "AI Tools",
+    "company": "Company",
+    "about": "About",
+    "contact": "Contact",
+    "status": "System Status",
+    "legal": "Legal",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "rights": "All rights reserved."
+  },
+  "Auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email Address",
+    "password": "Password",
+    "signIn": "Sign In",
+    "createNewAccount": "Create Account",
+    "authRequired": "Authentication Required",
+    "candidate": "Candidate",
+    "organization": "Organization",
+    "forgotPassword": "Forgot Password?",
+    "terminalAccess": "Welcome Back"
+  },
+  "Dashboard": {
+    "welcome": "Welcome",
+    "system_status": "SYSTEM STATUS: OPERATIONAL",
+    "role_candidate": "ROLE: CANDIDATE_PRO",
+    "role_org": "MANAGEMENT CONSOLE | STATUS: ACTIVE",
+    "applications": "APPLICATIONS",
+    "connections": "CONNECTIONS",
+    "notifications": "NOTIFICATIONS",
+    "recent_stats": "RECENT STATS",
+    "recommended_opps": "RECOMMENDED OPPORTUNITIES",
+    "view_all": "VIEW ALL",
+    "apply": "APPLY",
+    "post_new": "POST NEW VACANCY",
+    "active_vacancies": "ACTIVE VACANCIES",
+    "quick_commands": "QUICK COMMANDS",
+    "total_listings": "TOTAL LISTINGS",
+    "pending_apps": "PENDING APPS",
+    "active_offers": "ACTIVE OFFERS",
+    "system_health": "SYSTEM HEALTH",
+    "manage_team": "MANAGE TEAM MEMBERS",
+    "analytics": "ANALYTICS REPORT",
+    "settings": "ORG SETTINGS"
+  },
+  "Job": {
+    "title": "Title",
+    "location": "Location",
+    "applicants": "Applicants",
+    "status": "Status",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "apply_now": "Apply Now",
+    "full_time": "Full Time",
+    "part_time": "Part Time",
+    "remote": "Remote",
+    "hybrid": "Hybrid",
+    "junior": "Junior",
+    "middle": "Middle",
+    "senior": "Senior"
   }
 }
