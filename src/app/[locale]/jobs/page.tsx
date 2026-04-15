@@ -1,25 +1,19 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { jobService } from '@/src/services/job.service';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
+import { useJobStore } from '@/src/store/jobStore';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, MapPin, Briefcase, Clock, Filter } from 'lucide-react';
-import { useState } from 'react';
+import { Search, MapPin, Briefcase, Filter } from 'lucide-react';
+import { useRouter, useParams } from 'next/navigation';
 
 export default function JobsPage() {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-
-  const { data: jobsResponse, isLoading, isError, error } = useQuery({
-    queryKey: ['jobs', page, search],
-    queryFn: () => jobService.getJobsPaged({
-      PageNumber: page,
-      PageSize: 10,
-      Title: search || undefined
-    }),
-  });
+  const { filters, setFilter, setPage } = useJobStore();
+  const { useJobs } = useJobQueries();
+  const { data: jobsResponse, isLoading, isError, error } = useJobs();
+  const router = useRouter();
+  const { locale } = useParams();
 
   return (
     <div className="space-y-8">
@@ -31,8 +25,8 @@ export default function JobsPage() {
             <Input 
               placeholder="SEARCH_DATABASE..." 
               className="pl-10" 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={filters.title}
+              onChange={(e) => setFilter('title', e.target.value)}
             />
           </div>
           <Button variant="outline" className="md:w-32">
@@ -84,8 +78,8 @@ export default function JobsPage() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2 shrink-0">
-                    <Button variant="outline" size="sm">DETAILS</Button>
-                    <Button size="sm">APPLY_NOW</Button>
+                    <Button variant="outline" size="sm" onClick={() => router.push(`/${locale}/jobs/${job.id}`)}>DETAILS</Button>
+                    <Button size="sm" onClick={() => router.push(`/${locale}/jobs/${job.id}`)}>APPLY_NOW</Button>
                   </div>
                 </div>
               </CardContent>
@@ -105,18 +99,18 @@ export default function JobsPage() {
             variant="outline" 
             size="sm" 
             disabled={!jobsResponse.hasPrevious}
-            onClick={() => setPage(p => p - 1)}
+            onClick={() => setPage(jobsResponse.pageNumber - 1)}
           >
             PREV
           </Button>
           <div className="flex items-center px-4 text-xs font-bold border border-primary/20">
-            {jobsResponse.page} / {jobsResponse.totalPages}
+            {jobsResponse.pageNumber} / {jobsResponse.totalPages}
           </div>
           <Button 
             variant="outline" 
             size="sm" 
             disabled={!jobsResponse.hasNext}
-            onClick={() => setPage(p => p + 1)}
+            onClick={() => setPage(jobsResponse.pageNumber + 1)}
           >
             NEXT
           </Button>

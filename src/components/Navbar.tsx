@@ -1,13 +1,13 @@
 'use client';
 
-import { useAuth } from '@/src/context/AuthContext';
+import { useAuthStore } from '@/src/store/authStore';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Briefcase, Rss, Sparkles, MessageSquare,
-  Globe, Sun, Moon, User, LogOut, ChevronDown,
+  Globe, Sun, Moon, User, LogOut, ChevronDown, Bell, Network
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import {
@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { useNotifications } from '@/src/hooks/useNotifications';
 
 const NavLink = ({ href, icon: Icon, label, pathname }: {
   href: string; icon: React.ElementType; label: string; pathname: string;
@@ -40,12 +41,16 @@ const NavLink = ({ href, icon: Icon, label, pathname }: {
 };
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthStore();
+  const { useGetNotifications } = useNotifications();
   const t = useTranslations('Nav');
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const { setTheme, theme } = useTheme();
+
+  const { data: notifications } = useGetNotifications();
+  const unreadCount = notifications?.items.filter(n => !n.isRead).length || 0;
 
   const changeLocale = (newLocale: string) => {
     const newPath = pathname.replace(`/${locale}`, `/${newLocale}`);
@@ -55,6 +60,7 @@ export default function Navbar() {
   const navLinks = [
     { href: `/${locale}/jobs`, icon: Briefcase, label: t('jobs') },
     { href: `/${locale}/feed`, icon: Rss, label: t('feed') },
+    { href: `/${locale}/networking`, icon: Network, label: 'NET' },
     { href: `/${locale}/ai/tools`, icon: Sparkles, label: t('ai_tools') },
     { href: `/${locale}/messages`, icon: MessageSquare, label: t('messages') },
   ];
@@ -85,6 +91,16 @@ export default function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-1.5 shrink-0">
+          {/* Notifications */}
+          <div className="relative mr-1">
+            <Button variant="ghost" size="icon" className="size-8" onClick={() => router.push(`/${locale}/notifications`)}>
+              <Bell className="size-4" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 size-2 bg-primary animate-pulse rounded-full border border-background"></span>
+              )}
+            </Button>
+          </div>
+
           {/* Theme Toggle */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

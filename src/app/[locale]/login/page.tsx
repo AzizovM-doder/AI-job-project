@@ -1,59 +1,59 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/src/store/authStore';
 import { useTranslations, useLocale } from 'next-intl';
-import { authService } from '@/src/services/auth.service';
-import { LoginCredentials } from '@/src/types/auth';
-import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { useAuth } from '@/src/context/AuthContext';
+import { LoginCredentials } from '@/src/types/auth';
+import axios from 'axios';
+import { useState } from 'react';
 
 export default function LoginPage() {
   const t = useTranslations('Auth');
-  const router = useRouter();
   const locale = useLocale();
-  const { login } = useAuth();
-
+  const router = useRouter();
+  const { login } = useAuthStore();
   const { register, handleSubmit } = useForm<LoginCredentials>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const loginMutation = useMutation({
-    mutationFn: authService.login,
-    onSuccess: (data) => {
-      // data = { token, refreshToken } — flat response, no .data wrapper
-      login(data);
-
-      // Decode role from JWT to redirect correctly
-      const payload = data.token.split('.')[1];
-      const claims = JSON.parse(atob(payload));
-      const role = claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+  const onSubmit = async (data: LoginCredentials) => {
+    setIsSubmitting(true);
+    try {
+      await login(data);
+      
+      // We can get the refreshed state safely now
+      const user = useAuthStore.getState().user;
 
       toast.success('System Access Granted', {
         description: 'Identity verified. Redirecting to portal...'
       });
 
-      if (role === 'Organization') {
+      if (user?.role === 'Organization') {
         router.push(`/${locale}/organization/dashboard`);
       } else {
         router.push(`/${locale}/candidate/dashboard`);
       }
-    },
-    onError: (err: unknown) => {
+    } catch (err: unknown) {
       const msg = axios.isAxiosError(err)
         ? err.response?.data?.message || err.response?.data?.description?.[0] || 'Authentication failed'
         : 'Authentication failed';
       toast.error('System Access Denied', {
         description: msg
       });
+    } finally {
+      setIsSubmitting(false);
     }
-  });
-
-  const onSubmit = (data: LoginCredentials) => {
-    loginMutation.mutate(data);
   };
 
   return (
@@ -75,7 +75,7 @@ export default function LoginPage() {
                 {...register('email', { required: true })}
                 type="email"
                 placeholder="you@example.com"
-                disabled={loginMutation.isPending}
+                disabled={isSubmitting}
               />
             </div>
             <div className="space-y-2">
@@ -86,16 +86,16 @@ export default function LoginPage() {
                 {...register('password', { required: true })}
                 type="password"
                 placeholder="********"
-                disabled={loginMutation.isPending}
+                disabled={isSubmitting}
               />
             </div>
 
             <Button
               type="submit"
               className="w-full"
-              disabled={loginMutation.isPending}
+              disabled={isSubmitting}
             >
-              {loginMutation.isPending ? 'PROCESSING...' : t('signIn')}
+              {isSubmitting ? 'PROCESSING...' : t('signIn')}
             </Button>
           </form>
         </CardContent>

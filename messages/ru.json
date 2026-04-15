@@ -107,5 +107,41 @@
     "junior": "Младший",
     "middle": "Средний",
     "senior": "Старший"
+  },
+  "Profile": {
+    "title_prefix": "Профиль пользователя",
+    "status_verified": "Статус: Подтвержден",
+    "manual_override": "Редактировать профиль",
+    "cancel_override": "Отмена",
+    "core_metrics": "Основная информация",
+    "first_name": "Имя",
+    "last_name": "Фамилия",
+    "professional_title": "Профессиональный заголовок",
+    "biography": "Биография",
+    "comms_link": "Контактные данные",
+    "execute_sync": "Сохранить изменения",
+    "skill_stack": "Навыки",
+    "add_skill": "Добавить навык",
+    "language_protocols": "Языки",
+    "language_name": "Язык",
+    "employment_history": "Опыт работы",
+    "academic_records": "Образование",
+    "present": "Настоящее время",
+    "no_records": "Записи не найдены"
+  },
+  "Organization": {
+    "settings": "Настройки организации",
+    "create": "Создать организацию",
+    "edit_profile": "Редактировать профиль",
+    "cancel": "Отмена",
+    "identity": "Профиль организации",
+    "name": "Название организации",
+    "industry": "Отрасль",
+    "team_size": "Размер команды",
+    "contact": "Контактные данные",
+    "website": "Веб-сайт",
+    "location": "Локация",
+    "mission": "Миссия и ценности",
+    "save": "Сохранить изменения"
   }
 }

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 const api = axios.create({
   baseURL: '/api',
@@ -9,7 +10,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    const { token } = useAuthStore.getState();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -27,21 +28,33 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post(`${api.defaults.baseURL}/auth/refresh`, { refreshToken });
+        const { refreshToken, setTokens, logout } = useAuthStore.getState();
         
-        const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-        
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', newRefreshToken);
+        if (!refreshToken) throw new Error('No refresh token available');
 
-        api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        return api(originalRequest);
+        // Use standard axios to avoid recursion
+        const response = await axios.post(`${api.defaults.baseURL}/Auth/refresh-token`, { refreshToken });
+        
+        const { token: newToken, refreshToken: newRefreshToken } = response.data.data;
+        
+        setTokens(newToken, newRefreshToken);
+
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return axios(originalRequest);
       } catch (refreshError) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        useAuthStore.getState().logout();
+        
+        // Use window.location as absolute fallback, but try to preserve locale if possible
         if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+          const path = window.location.pathname;
+          const isAuthPage = path.includes('/login') || path.includes('/register');
+          
+          // ONLY redirect if we are not already on an auth page to prevent loop
+          if (!isAuthPage) {
+            const pathParts = path.split('/');
+            const locale = ['en', 'ru', 'tj'].includes(pathParts[1]) ? pathParts[1] : 'tj';
+            window.location.href = `/${locale}/login`;
+          }
         }
         return Promise.reject(refreshError);
       }

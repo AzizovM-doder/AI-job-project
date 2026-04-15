@@ -1,27 +1,42 @@
 'use client';
 
-import { useAuth } from '@/src/context/AuthContext';
+import { useAuthStore } from '@/src/store/authStore';
 import ProtectedRoute from '@/src/components/ProtectedRoute';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useMutation } from '@tanstack/react-query';
-import { aiService } from '@/src/services/ai.service';
+import { useAI } from '@/src/hooks/useAI';
 import { Button } from '@/components/ui/button';
 import { Brain, FileSearch, Target, FileText, Sparkles, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AIToolsPage() {
-  const { role } = useAuth();
+  const { user } = useAuthStore();
+  const role = user?.role;
+  const { useAnalyzeCV, useDraftCoverLetter, useImproveJob, useAskAI } = useAI();
   const [result, setResult] = useState<string | null>(null);
 
-  const cvMutation = useMutation({
-    mutationFn: aiService.analyzeCV,
-    onSuccess: (data) => setResult(JSON.stringify(data.data, null, 2)),
-  });
+  const cvMutation = useAnalyzeCV();
+  const draftMutation = useDraftCoverLetter();
+  const improveMutation = useImproveJob();
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      cvMutation.mutate(file);
+      cvMutation.mutate(file, {
+        onSuccess: (data) => setResult(data.data ? JSON.stringify(data.data, null, 2) : data.description[0])
+      });
+    }
+  };
+
+  const handleDraft = () => {
+    if (role === 'Candidate' && user?.userId) {
+      // For demonstration, use a dummy jobId or let user pick. Using 1 as placeholder.
+      draftMutation.mutate({ jobId: 1, userId: Number(user.userId) }, {
+        onSuccess: (data) => setResult(data.data || data.description[0])
+      });
+    } else if (role === 'Organization') {
+      improveMutation.mutate({ jobTitle: 'Senior Dev', currentDescription: 'Need a good dev' }, {
+        onSuccess: (data) => setResult(data.data || data.description[0])
+      });
     }
   };
 
@@ -31,7 +46,7 @@ export default function AIToolsPage() {
         <header className="space-y-1">
           <div className="flex items-center space-x-2">
             <Brain className="size-8 text-primary animate-pulse" />
-            <h1 className="text-3xl font-black terminal-glow uppercase">AI_COPROCESSOR_v4</h1>
+            <h1 className="text-3xl font-black terminal-glow uppercase">AI_COPROCESSOR_v4.5</h1>
           </div>
           <p className="text-xs text-muted-foreground tracking-[0.3em]">ENHANCING HUMAN POTENTIAL VIA NEURAL INTERFACE</p>
         </header>
@@ -67,23 +82,7 @@ export default function AIToolsPage() {
             </CardContent>
           </Card>
 
-          {/* Tool 2: Skill Gap (Candidate only) */}
-          {role === 'Candidate' && (
-            <Card className="border-primary/30 bg-primary/5 hover:border-primary transition-all">
-              <CardHeader>
-                <CardTitle className="flex items-center text-sm">
-                  <Target className="mr-2 size-4" /> SKILL_GAP_ANALYZER
-                </CardTitle>
-                <CardDescription className="text-[10px]">COMPARE PROFILE WITH JOB REQUIREMENTS</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-[10px] text-muted-foreground">SELECT A SAVED VACANCY TO ANALYZE</p>
-                <Button variant="outline" className="w-full">INITIALIZE_SCAN</Button>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Tool 3: Content Gen (Both) */}
+          {/* Tool 2: Neural Drafting (Both) */}
           <Card className="border-primary/30 bg-primary/5 hover:border-primary transition-all">
             <CardHeader>
               <CardTitle className="flex items-center text-sm">
@@ -92,20 +91,46 @@ export default function AIToolsPage() {
               <CardDescription className="text-[10px]">GENERATE COVER LETTERS OR JOB DESCRIPTIONS</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button variant="outline" className="w-full">
-                {role === 'Organization' ? 'IMPROVE_JOB_DESC' : 'GENERATE_COVER_LETTER'}
+              <p className="text-[10px] text-muted-foreground uppercase">
+                {role === 'Organization' ? 'REFINE_EXISTING_DESCRIPTION' : 'GENERATE_APPLICATION_LETTER'}
+              </p>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={handleDraft}
+                disabled={draftMutation.isPending || improveMutation.isPending}
+              >
+                {draftMutation.isPending || improveMutation.isPending ? <Loader2 className="animate-spin" /> : 'INITIALIZE_DRAFT'}
               </Button>
             </CardContent>
           </Card>
+
+          {/* Tool 3: Skill Gap (Candidate only) */}
+          {role === 'Candidate' && (
+            <Card className="md:col-span-2 border-primary/30 bg-primary/5 hover:border-primary transition-all">
+              <CardHeader>
+                <CardTitle className="flex items-center text-sm">
+                  <Target className="mr-2 size-4" /> SKILL_GAP_ANALYZER_v2
+                </CardTitle>
+                <CardDescription className="text-[10px]">COMPARE PROFILE WITH JOB REQUIREMENTS</CardDescription>
+              </CardHeader>
+              <CardContent className="flex items-center justify-between gap-8">
+                <p className="text-[10px] text-muted-foreground max-w-md">
+                  AUTOMATED COMPARISON OF YOUR REGISTERED SKILLSET AGAINST TARGET VACANCY REQUIREMENTS.
+                </p>
+                <Button variant="outline" className="shrink-0">SCAN_ACTIVE_VACANCIES</Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Console Result Area */}
         {result && (
-          <Card className="border-primary bg-background shadow-lg">
-            <CardHeader className="border-b border-primary/20">
-              <CardTitle className="text-xs">SYSTEM_OUTPUT</CardTitle>
+          <Card className="border-primary bg-background shadow-lg overflow-hidden">
+            <CardHeader className="border-b border-primary/20 bg-primary/5">
+              <CardTitle className="text-xs">SYSTEM_OUTPUT_LOG</CardTitle>
             </CardHeader>
-            <CardContent className="p-4">
+            <CardContent className="p-4 max-h-[400px] overflow-auto">
               <pre className="text-[10px] font-mono whitespace-pre-wrap text-primary/80 lowercase">
                 {result}
               </pre>

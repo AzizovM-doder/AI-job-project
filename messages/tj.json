@@ -107,5 +107,41 @@
     "junior": "Ҷавон",
     "middle": "Миёна",
     "senior": "Калон"
+  },
+  "Profile": {
+    "title_prefix": "Профили корбар",
+    "status_verified": "Ҳолат: Тасдиқшуда",
+    "manual_override": "Таҳрири профил",
+    "cancel_override": "Бекор кардан",
+    "core_metrics": "Маълумоти асосӣ",
+    "first_name": "Ном",
+    "last_name": "Насаб",
+    "professional_title": "Унвони касбӣ",
+    "biography": "Зиндагинома",
+    "comms_link": "Маълумоти тамос",
+    "execute_sync": "Сабти тағйирот",
+    "skill_stack": "Малакаҳо",
+    "add_skill": "Иловаи малака",
+    "language_protocols": "Забонҳо",
+    "language_name": "Забон",
+    "employment_history": "Таҷрибаи корӣ",
+    "academic_records": "Маълумот",
+    "present": "То ҳол",
+    "no_records": "Сабт ёфт нашуд"
+  },
+  "Organization": {
+    "settings": "Танзимоти ташкилот",
+    "create": "Эҷоди ташкилот",
+    "edit_profile": "Таҳрири профил",
+    "cancel": "Бекор кардан",
+    "identity": "Профили ташкилот",
+    "name": "Номи ташкилот",
+    "industry": "Соҳа",
+    "team_size": "Андозаи гурӯҳ",
+    "contact": "Маълумоти тамос",
+    "website": "Вебсайт",
+    "location": "Макон",
+    "mission": "Вазифа ва арзишҳо",
+    "save": "Сабти тағйирот"
   }
 }

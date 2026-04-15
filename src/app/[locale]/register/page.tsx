@@ -1,10 +1,9 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
-import { authService } from '@/src/services/auth.service';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/src/store/authStore';
 import { RegisterCredentials } from '@/src/types/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +17,8 @@ export default function RegisterPage() {
   const t = useTranslations('Auth');
   const router = useRouter();
   const locale = useLocale();
+  const { register: authRegister, login: authLogin } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<RegisterCredentials>({
     defaultValues: { role: 'Candidate' }
@@ -25,34 +26,25 @@ export default function RegisterPage() {
 
   const selectedRole = watch('role');
 
-  const registerMutation = useMutation({
-    mutationFn: authService.register,
-    onSuccess: (data) => {
-      localStorage.setItem('accessToken', data.data.accessToken);
-      localStorage.setItem('refreshToken', data.data.refreshToken);
+  const onSubmit = async (data: RegisterCredentials) => {
+    setIsSubmitting(true);
+    try {
+      await authRegister(data);
+      await authLogin({ email: data.email, password: data.password });
       
       toast.success('Registration Successful', {
-        description: 'Identity created. Welcome to the network.'
+        description: 'Identity created and authenticated.'
       });
 
-      if (data.data.role === 'Organization') {
-        router.push(`/${locale}/organization/dashboard`);
-      } else {
-        router.push(`/${locale}/candidate/dashboard`);
-      }
-    },
-    onError: (err: any) => {
-      // Backend returns { message: "..." } on 400
+      router.push(`/${locale}/${data.role === 'Organization' ? 'organization' : 'candidate'}/dashboard`);
+    } catch (err: any) {
       const msg = err.response?.data?.message || err.response?.data?.description?.[0] || 'Registration failed. Please try again.';
       toast.error('Registration Failed', {
         description: msg
       });
+    } finally {
+      setIsSubmitting(false);
     }
-  });
-
-  const onSubmit = (data: RegisterCredentials) => {
-    setError(null);
-    registerMutation.mutate(data);
   };
 
   return (
@@ -95,13 +87,17 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            {/* Full Name */}
+            {/* Dynamic Identity Field (Name or Org Name) */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider">Full Name</label>
+              <label className="text-xs font-bold uppercase tracking-wider">
+                {selectedRole === 'Organization' ? 'Organization Name' : 'Full Name'}
+              </label>
               <Input
-                {...register('fullName', { required: 'Full name is required' })}
-                placeholder="John Doe"
-                disabled={registerMutation.isPending}
+                {...register('fullName', { 
+                  required: selectedRole === 'Organization' ? 'Organization name is required' : 'Full name is required' 
+                })}
+                placeholder={selectedRole === 'Organization' ? 'Cyberdyne Systems Inc.' : 'John Doe'}
+                disabled={isSubmitting}
               />
               {errors.fullName && <p className="text-destructive text-xs">{errors.fullName.message}</p>}
             </div>
@@ -113,7 +109,7 @@ export default function RegisterPage() {
                 {...register('email', { required: 'Email is required' })}
                 type="email"
                 placeholder="you@example.com"
-                disabled={registerMutation.isPending}
+                disabled={isSubmitting}
               />
               {errors.email && <p className="text-destructive text-xs">{errors.email.message}</p>}
             </div>
@@ -125,7 +121,7 @@ export default function RegisterPage() {
                 {...register('phoneNumber')}
                 type="tel"
                 placeholder="+992 00 000 0000"
-                disabled={registerMutation.isPending}
+                disabled={isSubmitting}
               />
             </div>
 
@@ -136,13 +132,13 @@ export default function RegisterPage() {
                 {...register('password', { required: 'Password is required' })}
                 type="password"
                 placeholder="Min. 1 uppercase, 1 digit, 1 special char"
-                disabled={registerMutation.isPending}
+                disabled={isSubmitting}
               />
               {errors.password && <p className="text-destructive text-xs">{errors.password.message}</p>}
             </div>
 
-            <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
-              {registerMutation.isPending ? (
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
                 <><Loader2 className="mr-2 size-4 animate-spin" /> Creating account...</>
               ) : (
                 t('register')

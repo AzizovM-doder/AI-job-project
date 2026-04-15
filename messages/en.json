@@ -107,5 +107,41 @@
     "junior": "Junior",
     "middle": "Middle",
     "senior": "Senior"
+  },
+  "Profile": {
+    "title_prefix": "User Profile",
+    "status_verified": "Status: Verified",
+    "manual_override": "Edit Profile",
+    "cancel_override": "Cancel",
+    "core_metrics": "Core Information",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "professional_title": "Professional Title",
+    "biography": "Biography",
+    "comms_link": "Contact Info",
+    "execute_sync": "Save Changes",
+    "skill_stack": "Skills",
+    "add_skill": "Add Skill",
+    "language_protocols": "Languages",
+    "language_name": "Language",
+    "employment_history": "Experience",
+    "academic_records": "Education",
+    "present": "Present",
+    "no_records": "No records found"
+  },
+  "Organization": {
+    "settings": "Organization Settings",
+    "create": "Create Organization",
+    "edit_profile": "Edit Profile",
+    "cancel": "Cancel",
+    "identity": "Organization Identity",
+    "name": "Organization Name",
+    "industry": "Industry",
+    "team_size": "Team Size",
+    "contact": "Contact Info",
+    "website": "Website",
+    "location": "Location",
+    "mission": "Mission Statement",
+    "save": "Save Changes"
   }
 }

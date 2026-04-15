@@ -1,7 +1,6 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { messageService, Conversation, Message } from '@/src/services/message.service';
+import { useMessages } from '@/src/hooks/useMessages';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,31 +10,14 @@ import ProtectedRoute from '@/src/components/ProtectedRoute';
 import { cn } from '@/lib/utils';
 
 export default function MessagesPage() {
-  const [activeConvId, setActiveConvId] = useState<string | null>(null);
-  const queryClient = useQueryClient();
+  const [activeConvId, setActiveConvId] = useState<number | null>(null);
+  const { useGetConversations, useGetMessages, useSendMessage } = useMessages();
   const [messageInput, setMessageInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { data: conversations, isLoading: convsLoading } = useQuery({
-    queryKey: ['conversations'],
-    queryFn: messageService.getConversations,
-  });
-
-  const { data: messages, isLoading: messagesLoading } = useQuery({
-    queryKey: ['messages', activeConvId],
-    queryFn: () => messageService.getMessages(activeConvId!),
-    enabled: !!activeConvId,
-    refetchInterval: 3000, // Polling for "real-time" updates as requested for terminal aesthetic
-  });
-
-  const sendMutation = useMutation({
-    mutationFn: ({ convId, content }: { convId: string; content: string }) => 
-      messageService.sendMessage(convId, content),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages', activeConvId] });
-      setMessageInput('');
-    },
-  });
+  const { data: conversations, isLoading: convsLoading } = useGetConversations();
+  const { data: messages, isLoading: messagesLoading } = useGetMessages(activeConvId);
+  const sendMutation = useSendMessage(activeConvId);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -46,7 +28,9 @@ export default function MessagesPage() {
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (activeConvId && messageInput.trim()) {
-      sendMutation.mutate({ convId: activeConvId, content: messageInput });
+      sendMutation.mutate(messageInput, {
+        onSuccess: () => setMessageInput(''),
+      });
     }
   };
 

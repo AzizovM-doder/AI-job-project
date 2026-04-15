@@ -1,45 +1,40 @@
 'use client';
 
-import { useAuth } from '@/src/context/AuthContext';
+import { useAuthStore } from '@/src/store/authStore';
 import ProtectedRoute from '@/src/components/ProtectedRoute';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { postService } from '@/src/services/post.service';
+import { useFeed } from '@/src/hooks/useFeed';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Heart, MessageSquare, Share2, Send, Terminal } from 'lucide-react';
+import { Heart, MessageSquare, Share2, Send, Terminal, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { Post } from '@/src/types/post';
 
 export default function ActivityFeed() {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  const { useGetFeed, useCreatePost, useLikePost } = useFeed();
   const { register, handleSubmit, reset } = useForm<{ content: string }>();
 
-  const { data: feedData, isLoading } = useQuery({
-    queryKey: ['feed'],
-    queryFn: () => postService.getFeed(1, 10),
-  });
-
-  const createPostMutation = useMutation({
-    mutationFn: (content: string) => postService.createPost(content),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['feed'] });
-      reset();
-    },
-  });
+  const { data: posts, isLoading } = useGetFeed();
+  const createPostMutation = useCreatePost();
+  const likeMutation = useLikePost();
 
   const onPostSubmit = (data: { content: string }) => {
     if (data.content.trim()) {
-      createPostMutation.mutate(data.content);
+      createPostMutation.mutate(data.content, {
+        onSuccess: () => reset()
+      });
     }
+  };
+
+  const handleLike = (postId: number) => {
+    likeMutation.mutate(postId);
   };
 
   return (
     <ProtectedRoute>
       <div className="max-w-2xl mx-auto space-y-8">
         <header className="space-y-1">
-          <h1 className="text-2xl font-black terminal-glow uppercase">GLOBAL_FEED_v2.1</h1>
+          <h1 className="text-2xl font-black terminal-glow uppercase">GLOBAL_FEED_v2.2</h1>
           <p className="text-xs text-muted-foreground tracking-[0.2em]">BROADCASTING TO NETWORK...</p>
         </header>
 
@@ -64,7 +59,8 @@ export default function ActivityFeed() {
                   disabled={createPostMutation.isPending}
                   className="terminal-glow"
                 >
-                  <Send className="mr-2 size-3" /> TRANSMIT
+                  {createPostMutation.isPending ? <Loader2 className="animate-spin mr-2 size-3" /> : <Send className="mr-2 size-3" />} 
+                  TRANSMIT
                 </Button>
               </div>
             </form>
@@ -75,12 +71,10 @@ export default function ActivityFeed() {
         <div className="space-y-6">
           {isLoading ? (
             [1, 2, 3].map(i => (
-              <Card key={i} className="animate-pulse border-primary/10">
-                <div className="h-40" />
-              </Card>
+              <Card key={i} className="animate-pulse border-primary/10 h-40 bg-primary/5" />
             ))
-          ) : feedData?.items?.length ? (
-            feedData.items.map((post: any) => (
+          ) : posts?.length ? (
+            posts.map((post: Post) => (
               <Card key={post.id} className="border-primary/20 hover:border-primary/40 transition-colors">
                 <CardHeader className="pb-2 flex flex-row items-center space-x-3">
                   <div className="size-8 bg-primary/10 border border-primary/30 flex items-center justify-center font-bold text-xs">
@@ -91,12 +85,16 @@ export default function ActivityFeed() {
                     <p className="text-[10px] text-muted-foreground">{new Date(post.createdAt).toLocaleString()}</p>
                   </div>
                 </CardHeader>
-                <CardContent className="py-2">
-                  <p className="text-sm leading-relaxed">{post.content}</p>
+                <CardContent className="py-4">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{post.content}</p>
                 </CardContent>
                 <CardFooter className="pt-2 border-t border-primary/10 flex items-center space-x-6">
-                  <button className="flex items-center text-[10px] hover:text-primary transition-colors">
-                    <Heart className="size-3 mr-1" /> {post.likesCount || 0} LIKES
+                  <button 
+                    onClick={() => handleLike(post.id)}
+                    className={`flex items-center text-[10px] hover:text-primary transition-colors ${post.isLikedByMe ? 'text-primary' : ''}`}
+                  >
+                    <Heart className={`size-3 mr-1 ${post.isLikedByMe ? 'fill-current' : ''}`} /> 
+                    {post.likesCount || 0} LIKES
                   </button>
                   <button className="flex items-center text-[10px] hover:text-primary transition-colors">
                     <MessageSquare className="size-3 mr-1" /> {post.commentsCount || 0} COMMENTS
@@ -108,8 +106,8 @@ export default function ActivityFeed() {
               </Card>
             ))
           ) : (
-            <div className="text-center p-20 border border-dashed border-primary/20">
-              <p className="text-xs text-muted-foreground tracking-widest">NO BROADCASTS DETECTED IN THIS SECTOR</p>
+            <div className="text-center p-20 border border-dashed border-primary/20 bg-primary/5">
+              <p className="text-xs text-muted-foreground tracking-widest uppercase">NO BROADCASTS DETECTED IN THIS SECTOR</p>
             </div>
           )}
         </div>
