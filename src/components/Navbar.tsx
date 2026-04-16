@@ -6,8 +6,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
-  Briefcase, Rss, Sparkles, MessageSquare,
-  Globe, Sun, Moon, User, LogOut, ChevronDown, Bell, Network
+  Briefcase, Home, MessageSquare,
+  Globe, Sun, Moon, User, LogOut, ChevronDown, Bell, Network, Search
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import {
@@ -18,39 +18,55 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { useNotifications } from '@/src/hooks/useNotifications';
+import { useNotificationQueries } from '@/src/hooks/queries/useNotificationQueries';
+import { useMessageQueries } from '@/src/hooks/queries/useMessageQueries';
 
-const NavLink = ({ href, icon: Icon, label, pathname }: {
-  href: string; icon: React.ElementType; label: string; pathname: string;
+const NavLink = ({ href, icon: Icon, label, pathname, badge }: {
+  href: string; icon: React.ElementType; label: string; pathname: string; badge?: number;
 }) => {
   const isActive = pathname === href || pathname.startsWith(href + '/');
   return (
     <Link
       href={href}
       className={cn(
-        'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all',
+        'group relative flex flex-col items-center justify-center min-w-[64px] h-[52px] border-b-2 transition-all',
         isActive
-          ? 'bg-primary/10 text-primary'
-          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+          ? 'border-foreground text-foreground'
+          : 'border-transparent text-muted-foreground hover:text-foreground'
       )}
     >
-      <Icon className="size-3.5" />
-      {label}
+      <div className="relative">
+        <Icon className={cn("size-6 transition-transform group-active:scale-95")} strokeWidth={isActive ? 2.5 : 2} />
+        {badge !== undefined && badge > 0 && (
+          <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] flex items-center justify-center bg-destructive text-[10px] font-bold text-destructive-foreground rounded-full px-1 border-2 border-background">
+            {badge > 9 ? '9+' : badge}
+          </span>
+        )}
+      </div>
+      <span className="text-[0.75rem] font-medium leading-[1] mt-1 hidden lg:block">
+        {label}
+      </span>
     </Link>
   );
 };
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
-  const { useGetNotifications } = useNotifications();
+  const { useGetNotificationsPaged } = useNotificationQueries();
+  const { useGetConversations } = useMessageQueries();
+  
   const t = useTranslations('Nav');
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const { setTheme, theme } = useTheme();
 
-  const { data: notifications } = useGetNotifications();
-  const unreadCount = notifications?.items.filter(n => !n.isRead).length || 0;
+  // Badge data
+  const { data: notificationsPaged } = useGetNotificationsPaged({ PageSize: 10 });
+  const unreadNotifications = notificationsPaged?.items.filter(n => !n.isRead).length || 0;
+  
+  const { data: conversations } = useGetConversations();
+  const unreadMessages = conversations?.reduce((acc, conv) => acc + (conv.unreadCount || 0), 0) || 0;
 
   const changeLocale = (newLocale: string) => {
     const newPath = pathname.replace(`/${locale}`, `/${newLocale}`);
@@ -58,138 +74,133 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { href: `/${locale}/jobs`, icon: Briefcase, label: t('jobs') },
-    { href: `/${locale}/feed`, icon: Rss, label: t('feed') },
-    { href: `/${locale}/networking`, icon: Network, label: 'NET' },
-    { href: `/${locale}/ai/tools`, icon: Sparkles, label: t('ai_tools') },
-    { href: `/${locale}/messages`, icon: MessageSquare, label: t('messages') },
+    { href: `/${locale}/feed`, icon: Home, label: t('feed'), badge: 0 },
+    { href: `/${locale}/networking`, icon: Network, label: 'Network', badge: 0 },
+    { href: `/${locale}/jobs`, icon: Briefcase, label: t('jobs'), badge: 0 },
+    { href: `/${locale}/messages`, icon: MessageSquare, label: t('messages'), badge: unreadMessages },
+    { href: `/${locale}/notifications`, icon: Bell, label: 'Notifications', badge: unreadNotifications },
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b glass">
-      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="max-w-7xl mx-auto px-4 h-[52px] flex items-center gap-2 sm:gap-4">
 
-        {/* Logo */}
-        <Link
-          href={`/${locale}`}
-          className="flex items-center gap-2 shrink-0 group"
-        >
-          <div className="size-7 rounded-md bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-black text-xs">ai</span>
+        {/* Logo & Search */}
+        <div className="flex items-center gap-2 flex-1 max-w-[400px]">
+          <Link
+            href={`/${locale}`}
+            className="flex items-center group mr-1"
+          >
+            <div className="size-8 rounded-sm bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-black text-lg">ai</span>
+            </div>
+          </Link>
+
+          <div className="relative hidden sm:block flex-1 group">
+            <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
+            <input
+              type="text"
+              placeholder="Search jobs, people, feed..."
+              className="w-full bg-[#edf3f8] dark:bg-muted h-[34px] pl-10 pr-4 rounded-md text-sm border-none focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted-foreground/70"
+            />
           </div>
-          <span className="font-black tracking-tight text-sm hidden sm:block">
-            AIJOB<span className="text-primary">_SYS</span>
-          </span>
-        </Link>
+          
+          <Button variant="ghost" size="icon" className="sm:hidden size-9">
+            <Search className="size-5" />
+          </Button>
+        </div>
 
-        {/* Center Nav Links */}
-        <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => (
-            <NavLink key={link.href} {...link} pathname={pathname} />
-          ))}
-        </nav>
-
-        {/* Right Controls */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          {/* Notifications */}
-          <div className="relative mr-1">
-            <Button variant="ghost" size="icon" className="size-8" onClick={() => router.push(`/${locale}/notifications`)}>
-              <Bell className="size-4" />
-              {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 size-2 bg-primary animate-pulse rounded-full border border-background"></span>
-              )}
-            </Button>
+        {/* Navigation Grid (Center/Right) */}
+        <nav className="flex items-center justify-end flex-1 sm:flex-none">
+          <div className="flex items-center">
+            {navLinks.map((link) => (
+              <NavLink key={link.href} {...link} pathname={pathname} />
+            ))}
           </div>
 
-          {/* Theme Toggle */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="size-8">
-                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="text-xs font-mono min-w-[120px]">
-              <DropdownMenuItem onClick={() => setTheme('light')} className={theme === 'light' ? 'text-primary font-bold' : ''}>
-                <Sun className="mr-2 size-3.5" /> {t('theme_light')}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme('dark')} className={theme === 'dark' ? 'text-primary font-bold' : ''}>
-                <Moon className="mr-2 size-3.5" /> {t('theme_dark')}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setTheme('system')}>{t('theme_system')}</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Language Toggle */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-1 h-8 px-2 text-xs font-bold">
-                <Globe className="size-3.5" />
-                {locale.toUpperCase()}
-                <ChevronDown className="size-3 opacity-60" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="text-xs font-mono min-w-[140px]">
-              <DropdownMenuItem onClick={() => changeLocale('en')} className={locale === 'en' ? 'text-primary font-bold' : ''}>EN — English</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLocale('ru')} className={locale === 'ru' ? 'text-primary font-bold' : ''}>RU — Русский</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLocale('tj')} className={locale === 'tj' ? 'text-primary font-bold' : ''}>TJ — Тоҷикӣ</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Auth Controls */}
-          <div className="flex items-center gap-1.5 pl-1.5 ml-1 border-l border-border">
+          {/* User Menu */}
+          <div className="flex items-center border-l ml-2 pl-2 gap-1 h-[52px]">
             {user ? (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 text-xs font-bold gap-1.5"
-                  onClick={() => router.push(user.role === 'Organization' ? `/${locale}/organization/dashboard` : `/${locale}/candidate/dashboard`)}
-                >
-                  <User className="size-3.5" />
-                  <span className="hidden sm:inline">{t('portal')}</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 text-muted-foreground hover:text-destructive"
-                  onClick={logout}
-                  title={t('logout')}
-                >
-                  <LogOut className="size-3.5" />
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex flex-col items-center justify-center min-w-[64px] h-[52px] group hover:text-foreground text-muted-foreground transition-colors">
+                    <div className="size-6 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border">
+                      {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt="Me" className="size-full object-cover" />
+                      ) : (
+                        <User className="size-4" />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-0.5 mt-1 hidden lg:flex">
+                      <span className="text-[0.75rem] font-medium leading-[1]">Me</span>
+                      <ChevronDown className="size-3 opacity-60" />
+                    </div>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 mt-1">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-bold truncate">{user.fullName || user.userName}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{user.role}</p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => router.push(`/${locale}/profile`)}>
+                    View Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push(user.role === 'Organization' ? `/${locale}/organization/dashboard` : `/${locale}/candidate/dashboard`)}>
+                    Manage Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  
+                  {/* Appearance Submenu */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="w-full">
+                      <div className="flex items-center justify-between w-full px-2 py-1.5 text-sm hover:bg-muted rounded-sm cursor-default">
+                        <div className="flex items-center">
+                          {theme === 'dark' ? <Moon className="mr-2 size-4" /> : <Sun className="mr-2 size-4" />}
+                          Appearance
+                        </div>
+                        <ChevronDown className="size-3 -rotate-90" />
+                      </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="left" className="w-40 mr-1">
+                      <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {/* Language Submenu */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="w-full">
+                      <div className="flex items-center justify-between w-full px-2 py-1.5 text-sm hover:bg-muted rounded-sm cursor-default">
+                        <div className="flex items-center">
+                          <Globe className="mr-2 size-4" />
+                          Language
+                        </div>
+                        <ChevronDown className="size-3 -rotate-90" />
+                      </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="left" className="w-44 mr-1">
+                      <DropdownMenuItem onClick={() => changeLocale('en')}>English</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => changeLocale('ru')}>Русский</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => changeLocale('tj')}>Тоҷикӣ</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
+                    <LogOut className="mr-2 size-4" /> Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 text-xs font-bold"
-                  onClick={() => router.push(`/${locale}/login`)}
-                >
-                  {t('login')}
-                </Button>
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="h-8 text-xs font-bold"
-                  onClick={() => router.push(`/${locale}/register`)}
-                >
-                  {t('register')}
-                </Button>
-              </>
+              <div className="flex items-center gap-2 px-2">
+                <Button variant="ghost" size="sm" onClick={() => router.push(`/${locale}/login`)}>Join Now</Button>
+                <Button variant="outline" size="sm" onClick={() => router.push(`/${locale}/register`)}>Sign In</Button>
+              </div>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* Mobile Nav */}
-      <div className="md:hidden flex items-center gap-1 overflow-x-auto px-4 pb-2 scrollbar-none">
-        {navLinks.map((link) => (
-          <NavLink key={link.href} {...link} pathname={pathname} />
-        ))}
+        </nav>
       </div>
     </header>
   );

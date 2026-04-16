@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProtectedRoute from '@/src/components/ProtectedRoute';
 import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
 import { useMetadataQueries } from '@/src/hooks/queries/useMetadataQueries';
+import { useOrganizationQueries } from '@/src/hooks/queries/useOrganizationQueries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Loader2, Sparkles, AlertTriangle } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { CreateJobDto, JobType, ExperienceLevel } from '@/src/types/job';
 import { useAI } from '@/src/hooks/useAI';
@@ -17,11 +18,13 @@ export default function NewJobPage() {
   const { locale } = useParams();
   const { useCreateJob } = useJobQueries();
   const { useJobCategories } = useMetadataQueries();
+  const { useMyOrganizations } = useOrganizationQueries();
   const { useImproveJob } = useAI();
 
   const createJob = useCreateJob();
   const improveJob = useImproveJob();
   const { data: categories } = useJobCategories();
+  const { data: myOrgs, isLoading: orgsLoading } = useMyOrganizations();
 
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<CreateJobDto>({
     defaultValues: {
@@ -31,6 +34,13 @@ export default function NewJobPage() {
       salaryMax: 0,
     },
   });
+
+  // Auto-set organizationId from the user's first organization
+  useEffect(() => {
+    if (myOrgs?.length) {
+      setValue('organizationId', myOrgs[0].id);
+    }
+  }, [myOrgs, setValue]);
 
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
 
@@ -81,6 +91,40 @@ export default function NewJobPage() {
             <h1 className="text-3xl font-black tracking-tighter terminal-glow">POST_JOB_LISTING</h1>
           </div>
         </header>
+
+        {/* No organization warning */}
+        {!orgsLoading && !myOrgs?.length && (
+          <div className="flex items-center gap-3 border border-destructive/40 bg-destructive/10 p-4 text-destructive">
+            <AlertTriangle className="size-4 shrink-0" />
+            <p className="text-[11px] font-bold tracking-widest uppercase">
+              NO_ORGANIZATION_FOUND — Please create an organization first from{' '}
+              <button
+                className="underline hover:opacity-70"
+                onClick={() => router.push(`/${locale}/organization/profile`)}
+              >
+                ORG_SETTINGS
+              </button>
+            </p>
+          </div>
+        )}
+
+        {/* Organization selector (if user has multiple orgs) */}
+        {myOrgs && myOrgs.length > 1 && (
+          <div className="border border-primary/20 p-4 bg-primary/5 space-y-2">
+            <label className="text-[10px] text-muted-foreground uppercase tracking-widest block mb-1">
+              POST_AS_ORGANIZATION
+            </label>
+            <select
+              className="rounded-none bg-background border border-primary/20 focus:border-primary w-full px-3 py-2 text-sm appearance-none"
+              onChange={(e) => setValue('organizationId', Number(e.target.value))}
+              defaultValue={myOrgs[0].id}
+            >
+              {myOrgs.map((org) => (
+                <option key={org.id} value={org.id}>{org.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Basic Info */}
@@ -246,7 +290,7 @@ export default function NewJobPage() {
             <Button
               type="submit"
               className="rounded-none terminal-glow px-8"
-              disabled={createJob.isPending}
+              disabled={createJob.isPending || !myOrgs?.length}
             >
               {createJob.isPending ? (
                 <Loader2 className="animate-spin mr-2 size-4" />

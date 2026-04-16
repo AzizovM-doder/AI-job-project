@@ -1,24 +1,29 @@
 export enum ConnectionStatus {
   Pending = 'Pending',
   Accepted = 'Accepted',
-  Rejected = 'Rejected',
-  Blocked = 'Blocked'
+  Declined = 'Declined'
 }
 
 export interface Connection {
   id: number;
-  addresseeId: number;
-  addresseeName: string;
-  addresseeAvatar?: string;
   requesterId: number;
-  requesterName: string;
-  requesterAvatar?: string;
+  addresseeId: number;
   status: ConnectionStatus;
   createdAt: string;
+  requesterName?: string;
+  addresseeName?: string;
+}
+
+export interface SendConnectionByEmailDto {
+  email: string | null;
+}
+
+export interface UpdateConnectionDto {
+  isAccepted: boolean;
 }
 
 export interface ConnectionListResponse {
   statusCode: number;
-  description: string[];
+  description: string[] | null;
   data: Connection[];
 }

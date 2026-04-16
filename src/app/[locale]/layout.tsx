@@ -1,5 +1,4 @@
-import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
@@ -10,10 +9,11 @@ import { ThemeProvider } from "@/src/components/ThemeProvider";
 import Navbar from "@/src/components/Navbar";
 import Footer from "@/src/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
+import { Metadata } from "next";
 
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
@@ -36,10 +36,10 @@ export default async function LocaleLayout({children, params}: Props) {
   return (
     <html
       lang={locale}
-      className={cn("h-full", "antialiased", geistMono.variable)}
+      className={cn("h-full", "antialiased", inter.variable)}
       suppressHydrationWarning
     >
-      <body className="min-h-screen flex flex-col font-mono overflow-x-hidden text-sm">
+      <body className="min-h-screen flex flex-col font-sans overflow-x-hidden text-[0.9375rem] leading-normal">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <Providers>
             <NextIntlClientProvider locale={locale}>

@@ -2,84 +2,83 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/src/lib/api';
-import { useJobStore } from '@/src/store/jobStore';
-import { Job, JobPagedResult, CreateJobDto, UpdateJobDto } from '@/src/types/job';
-import { JobSkill, CreateJobSkillDto } from '@/src/types/skill';
+import { 
+  Job, 
+  JobPagedResult, 
+  CreateJobDto, 
+  UpdateJobDto, 
+  JobApplication, 
+  JobApplicationPagedResult, 
+  CreateJobApplicationDto,
+  UpdateJobApplicationDto,
+  JobWithMatchDto,
+  JobWithMatchDtoPagedResult,
+  ApplicantWithMatchDtoPagedResult,
+  JobCategory,
+  CreateJobCategoryDto,
+  JobSkill,
+  CreateJobSkillDto
+} from '@/src/types/job';
 
 export const useJobQueries = () => {
   const queryClient = useQueryClient();
-  const { filters } = useJobStore();
 
-  const useJobs = (params?: { PageNumber?: number; PageSize?: number; SearchTerm?: string }) => {
-    const queryParams = {
-      Title: params?.SearchTerm || filters.title || undefined,
-      SalaryMin: (filters as any).minSalary,
-      SalaryMax: (filters as any).maxSalary,
-      JobType: filters.jobType,
-      ExperienceLevel: filters.experienceLevel,
-      PageNumber: params?.PageNumber || filters.page,
-      PageSize: params?.PageSize || filters.pageSize,
-    };
+  // --- JOB MANAGEMENT ---
 
+  const useJobs = (params?: { 
+    SearchTerm?: string; 
+    Location?: string; 
+    JobType?: string; 
+    ExperienceLevel?: string; 
+    PageNumber?: number; 
+    PageSize?: number; 
+  }) => {
     return useQuery<JobPagedResult>({
-      queryKey: ['jobs', queryParams],
+      queryKey: ['jobs', 'paged', params],
       queryFn: async () => {
-        const response = await api.get('/Job/paged', { params: queryParams });
-        return response.data.data ?? response.data ?? null;
+        const res = await api.get('/Job/paged', { params });
+        return res.data?.data ?? res.data;
       },
-      staleTime: 60 * 1000,
     });
   };
 
-  const useJobDetail = (id: number | string | null) => {
+  const useGetJob = (id: number) => {
     return useQuery<Job>({
-      queryKey: ['job', id],
+      queryKey: ['jobs', id],
       queryFn: async () => {
-        const response = await api.get(`/Job/${id}`);
-        return response.data.data ?? response.data ?? null;
+        const res = await api.get(`/Job/${id}`);
+        return res.data?.data ?? res.data;
       },
       enabled: !!id,
     });
   };
 
-  const useMyJobs = () => {
+  const useGetMyJobs = () => {
     return useQuery<Job[]>({
       queryKey: ['jobs', 'mine'],
       queryFn: async () => {
-        const response = await api.get('/Job/mine');
-        return response.data.data ?? response.data ?? null;
+        const res = await api.get('/Job/mine');
+        return res.data?.data ?? res.data ?? [];
       },
     });
   };
 
-  const useJobsByOrganization = (organizationId: number | null) => {
+  const useGetJobsByOrganization = (organizationId: number) => {
     return useQuery<Job[]>({
-      queryKey: ['jobs', 'by-org', organizationId],
+      queryKey: ['jobs', 'organization', organizationId],
       queryFn: async () => {
-        const response = await api.get(`/Job/by-organization/${organizationId}`);
-        return response.data.data ?? response.data ?? null;
+        const res = await api.get(`/Job/by-organization/${organizationId}`);
+        return res.data?.data ?? res.data ?? [];
       },
       enabled: !!organizationId,
     });
   };
 
-  // GET /api/JobApplication/paged — candidate's own applications
-  const useMyApplications = () => {
-    return useQuery({
-      queryKey: ['jobApplications', 'mine'],
-      queryFn: async () => {
-        const response = await api.get('/JobApplication/paged');
-        return response.data.data?.items ?? response.data?.items ?? response.data ?? null;
-      },
-    });
-  };
-
-  // POST /api/Job
   const useCreateJob = () => {
-    return useMutation({
-      mutationFn: async (data: CreateJobDto) => {
-        const response = await api.post('/Job', data);
-        return response.data;
+    return useMutation<Job, Error, CreateJobDto>({
+      mutationFn: async (data) => {
+        const res = await api.post('/Job', data);
+        return res.data?.data ?? res.data;
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['jobs'] });
@@ -87,26 +86,24 @@ export const useJobQueries = () => {
     });
   };
 
-  // PUT /api/Job/:id
-  const useUpdateJob = () => {
-    return useMutation({
-      mutationFn: async ({ id, data }: { id: number; data: UpdateJobDto }) => {
-        const response = await api.put(`/Job/${id}`, data);
-        return response.data;
+  const useUpdateJob = (id: number) => {
+    return useMutation<Job, Error, UpdateJobDto>({
+      mutationFn: async (data) => {
+        const res = await api.put(`/Job/${id}`, data);
+        return res.data?.data ?? res.data;
       },
-      onSuccess: (_data, variables) => {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['jobs', id] });
         queryClient.invalidateQueries({ queryKey: ['jobs'] });
-        queryClient.invalidateQueries({ queryKey: ['job', variables.id] });
       },
     });
   };
 
-  // DELETE /api/Job/:id
   const useDeleteJob = () => {
-    return useMutation({
-      mutationFn: async (id: number) => {
-        const response = await api.delete(`/Job/${id}`);
-        return response.data;
+    return useMutation<void, Error, number>({
+      mutationFn: async (id) => {
+        const res = await api.delete(`/Job/${id}`);
+        return res.data;
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['jobs'] });
@@ -114,55 +111,114 @@ export const useJobQueries = () => {
     });
   };
 
-  // GET /api/JobSkill/by-job/:jobId
-  const useJobSkills = (jobId: number | null) => {
-    return useQuery<JobSkill[]>({
-      queryKey: ['jobSkills', jobId],
+  // --- APPLICATIONS ---
+
+  const useGetApplicationsPaged = (params?: { PageNumber?: number; PageSize?: number }) => {
+    return useQuery<JobApplicationPagedResult>({
+      queryKey: ['applications', 'paged', params],
       queryFn: async () => {
-        const response = await api.get(`/JobSkill/by-job/${jobId}`);
-        return response.data.data ?? response.data ?? null;
+        const res = await api.get('/JobApplication/paged', { params });
+        return res.data?.data ?? res.data;
+      },
+    });
+  };
+
+  const useMyApplications = () => {
+    return useQuery<JobApplication[]>({
+      queryKey: ['applications', 'mine'],
+      queryFn: async () => {
+        const res = await api.get('/JobApplication');
+        return res.data?.data ?? res.data ?? [];
+      },
+    });
+  };
+
+  const useApplyToJob = () => {
+    return useMutation<JobApplication, Error, CreateJobApplicationDto>({
+      mutationFn: async (data) => {
+        const res = await api.post('/JobApplication', data);
+        return res.data?.data ?? res.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['applications'] });
+      },
+    });
+  };
+
+  const useUpdateApplication = (id: number) => {
+    return useMutation<JobApplication, Error, UpdateJobApplicationDto>({
+      mutationFn: async (data) => {
+        const res = await api.put(`/JobApplication/${id}`, data);
+        return res.data?.data ?? res.data;
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['applications'] });
+      },
+    });
+  };
+
+  // --- MATCHING ---
+
+  const useGetMatchesForJob = (jobId: number, params?: { PageNumber?: number; PageSize?: number }) => {
+    return useQuery<ApplicantWithMatchDtoPagedResult>({
+      queryKey: ['matching', 'job', jobId, params],
+      queryFn: async () => {
+        const res = await api.get(`/JobMatching/match-for-job/${jobId}`, { params });
+        return res.data?.data ?? res.data;
       },
       enabled: !!jobId,
     });
   };
 
-  // POST /api/JobSkill
-  const useAddJobSkill = () => {
-    return useMutation({
-      mutationFn: async (data: CreateJobSkillDto) => {
-        const response = await api.post('/JobSkill', data);
-        return response.data;
+  const useGetMatchesForUser = (userId: number, params?: { PageNumber?: number; PageSize?: number }) => {
+    return useQuery<JobWithMatchDtoPagedResult>({
+      queryKey: ['matching', 'user', userId, params],
+      queryFn: async () => {
+        const res = await api.get(`/JobMatching/match-for-user/${userId}`, { params });
+        return res.data?.data ?? res.data;
       },
-      onSuccess: (_data, variables) => {
-        queryClient.invalidateQueries({ queryKey: ['jobSkills', variables.jobId] });
+      enabled: !!userId,
+    });
+  };
+
+  // --- UTILITIES ---
+
+  const useGetCategories = () => {
+    return useQuery<JobCategory[]>({
+      queryKey: ['jobCategories'],
+      queryFn: async () => {
+        const res = await api.get('/JobCategory');
+        return res.data?.data ?? res.data ?? [];
       },
     });
   };
 
-  // DELETE /api/JobSkill/:id
-  const useDeleteJobSkill = () => {
-    return useMutation({
-      mutationFn: async (id: number) => {
-        const response = await api.delete(`/JobSkill/${id}`);
-        return response.data;
+  const useGetJobSkills = (jobId: number) => {
+    return useQuery<JobSkill[]>({
+      queryKey: ['jobSkills', jobId],
+      queryFn: async () => {
+        const res = await api.get(`/JobSkill/by-job/${jobId}`);
+        return res.data?.data ?? res.data ?? [];
       },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['jobSkills'] });
-      },
+      enabled: !!jobId,
     });
   };
 
   return {
     useJobs,
-    useJobDetail,
-    useMyJobs,
-    useJobsByOrganization,
-    useMyApplications,
+    useGetJob,
+    useGetMyJobs,
+    useGetJobsByOrganization,
     useCreateJob,
     useUpdateJob,
     useDeleteJob,
-    useJobSkills,
-    useAddJobSkill,
-    useDeleteJobSkill,
+    useGetApplicationsPaged,
+    useMyApplications,
+    useApplyToJob,
+    useUpdateApplication,
+    useGetMatchesForJob,
+    useGetMatchesForUser,
+    useGetCategories,
+    useGetJobSkills,
   };
 };

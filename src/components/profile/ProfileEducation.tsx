@@ -1,0 +1,66 @@
+'use client';
+
+import { Education } from '@/src/types/profile';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Plus, Pencil, GraduationCap } from 'lucide-react';
+import { format } from 'date-fns';
+
+interface ProfileEducationProps {
+  educations: Education[];
+  isOwnProfile: boolean;
+  onAdd: () => void;
+  onEdit: (edu: Education) => void;
+}
+
+export default function ProfileEducation({ educations, isOwnProfile, onAdd, onEdit }: ProfileEducationProps) {
+  return (
+    <Card className="shadow-sm border-border/60">
+      <CardHeader className="flex flex-row items-center justify-between p-6 pb-2">
+        <CardTitle className="text-xl font-bold">Education</CardTitle>
+        {isOwnProfile && (
+          <Button variant="ghost" size="icon" className="rounded-full size-9" onClick={onAdd}>
+            <Plus className="size-5" />
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent className="px-6 pb-6 pt-2 space-y-6">
+        {educations && educations.length > 0 ? (
+          educations.sort((a,b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()).map((edu, idx) => (
+            <div key={edu.id} className="flex gap-3 group relative">
+              <div className="size-12 rounded-sm bg-muted flex items-center justify-center border shrink-0">
+                <GraduationCap className="size-6 text-muted-foreground/60" />
+              </div>
+              <div className="flex-1 space-y-1">
+                <div className="flex items-start justify-between">
+                  <h3 className="text-[14px] font-bold leading-tight group-hover:text-primary transition-colors cursor-pointer">
+                    {edu.school}
+                  </h3>
+                  {isOwnProfile && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="size-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => onEdit(edu)}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                  )}
+                </div>
+                <p className="text-[14px] leading-tight">{edu.degree}, {edu.fieldOfStudy}</p>
+                <p className="text-[12px] text-muted-foreground">
+                  {format(new Date(edu.startDate), 'yyyy')} – {edu.endDate ? format(new Date(edu.endDate), 'yyyy') : 'Present'}
+                </p>
+              </div>
+              {idx !== educations.length - 1 && (
+                <div className="absolute left-[23px] top-12 bottom-[-24px] w-[1px] bg-border/40" />
+              )}
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-muted-foreground italic">No education records found.</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

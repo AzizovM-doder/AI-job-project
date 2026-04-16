@@ -1,138 +1,136 @@
 'use client';
 
 import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { useConnections } from '@/src/hooks/useConnections';
+import { PageTransition } from '@/src/components/PageTransition';
+import { useConnectionQueries } from '@/src/hooks/queries/useConnectionQueries';
+import { useUserQueries } from '@/src/hooks/queries/useUserQueries';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import ManageNetworkSidebar from '@/src/components/networking/ManageNetworkSidebar';
+import InvitationCard from '@/src/components/networking/InvitationCard';
+import { UserPlus, User, Building2, MoreHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Users, UserPlus, Check, X, ShieldAlert, Loader2, Globe } from 'lucide-react';
 
 export default function NetworkingPage() {
-  const { useGetMyConnections, useGetPendingRequests, useRespondRequest, useDeleteConnection } = useConnections();
+  const { useGetPendingConnections } = useConnectionQueries();
+  const { useGetDirectory } = useUserQueries();
 
-  const { data: connections, isLoading: loadingConnections } = useGetMyConnections();
-  const { data: pending, isLoading: loadingPending } = useGetPendingRequests();
-  const respondMutation = useRespondRequest();
-  const deleteMutation = useDeleteConnection();
-
-  const handleResponse = (requestId: number, accept: boolean) => {
-    respondMutation.mutate({ requestId, accept });
-  };
-
-  const handleDelete = (id: number) => {
-    if (confirm('TERMINATE_CONNECTION_CONFIRME?')) {
-      deleteMutation.mutate(id);
-    }
-  };
+  const { data: invitations, isLoading: loadingInvs } = useGetPendingConnections();
+  const { data: directory, isLoading: loadingDir } = useGetDirectory();
 
   return (
     <ProtectedRoute>
-      <div className="max-w-5xl mx-auto space-y-8">
-        <header className="space-y-1">
-          <div className="flex items-center space-x-2">
-            <Globe className="size-6 text-primary animate-pulse" />
-            <h1 className="text-3xl font-black terminal-glow uppercase">NEURAL_NETWORK_v4.0</h1>
-          </div>
-          <p className="text-xs text-muted-foreground tracking-[0.3em]">MANAGING INTER-ENTITY CONNECTIONS AND NODE LINKS</p>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Pending Invitations */}
-          <div className="lg:col-span-1 space-y-6">
-            <h2 className="text-sm font-bold flex items-center border-b border-primary/20 pb-2">
-              <ShieldAlert className="mr-2 size-4 text-primary" /> PENDING_LINK_REQUESTS
-            </h2>
+      <PageTransition>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 items-start pb-12">
+          
+          {/* Left Sidebar */}
+          <aside className="md:col-span-4 lg:col-span-3 space-y-4 sticky top-[72px]">
+            <ManageNetworkSidebar />
             
-            {loadingPending ? (
-              <div className="animate-pulse space-y-4">
-                <div className="h-20 bg-primary/5 border border-primary/10" />
-                <div className="h-20 bg-primary/5 border border-primary/10" />
+            <Card className="shadow-sm border-border/60 overflow-hidden hidden md:block">
+              <div className="p-4 bg-muted/30 flex items-center justify-between border-b border-border/60">
+                <span className="text-[14px] font-bold">Add personal contacts</span>
               </div>
-            ) : pending?.length ? (
-              pending.map((req) => (
-                <Card key={req.id} className="border-primary/30 bg-primary/5">
-                  <CardContent className="p-4 flex flex-col space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="size-8 bg-primary/20 flex items-center justify-center font-bold text-xs border border-primary/40">
-                        {req.requesterName[0].toUpperCase()}
-                      </div>
-                      <div className="flex-1 overflow-hidden">
-                        <p className="text-xs font-bold truncate">{req.requesterName.toUpperCase()}</p>
-                        <p className="text-[9px] text-muted-foreground">REQUEST_INCOMING</p>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button 
-                        size="sm" 
-                        className="flex-1 h-7 text-[10px]"
-                        onClick={() => handleResponse(req.id, true)}
-                        disabled={respondMutation.isPending}
-                      >
-                        <Check className="mr-1 size-3" /> ACCEPT
-                      </Button>
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
-                        className="flex-1 h-7 text-[10px]"
-                        onClick={() => handleResponse(req.id, false)}
-                        disabled={respondMutation.isPending}
-                      >
-                        <X className="mr-1 size-3" /> DECLINE
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <p className="text-[10px] text-muted-foreground uppercase opacity-50 italic">NO_PENDING_INTRUSIONS</p>
-            )}
-          </div>
+              <CardContent className="p-4 space-y-3">
+                <p className="text-[12px] text-muted-foreground leading-relaxed">
+                  We’ll import your address book to suggest people you know on AI-JOB.
+                </p>
+                <input 
+                  type="email" 
+                  placeholder="name@example.com" 
+                  className="w-full bg-background border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                />
+                <Button className="w-full rounded-full h-8 font-bold text-xs" variant="outline">
+                  Continue
+                </Button>
+              </CardContent>
+            </Card>
+          </aside>
 
-          {/* Established Connections */}
-          <div className="lg:col-span-2 space-y-6">
-            <h2 className="text-sm font-bold flex items-center border-b border-primary/20 pb-2">
-              <Users className="mr-2 size-4 text-primary" /> ACTIVE_SYNAPSE_LINKS
-            </h2>
+          {/* Main Content */}
+          <div className="md:col-span-8 lg:col-span-9 space-y-6">
+            
+            {/* Pending Invitations Section */}
+            {(invitations && invitations.length > 0) || loadingInvs ? (
+               <Card className="shadow-sm border-border/60">
+                 <CardHeader className="p-4 border-b border-border/60 flex flex-row items-center justify-between">
+                   <CardTitle className="text-base font-normal">Invitations</CardTitle>
+                   <Button variant="ghost" size="sm" className="text-muted-foreground font-bold hover:bg-black/5 rounded-sm">See all {invitations?.length || 0}</Button>
+                 </CardHeader>
+                 <CardContent className="p-0">
+                    {loadingInvs ? (
+                      <div className="p-4 space-y-4">
+                        <Skeleton className="h-16 w-full" />
+                        <Skeleton className="h-16 w-full" />
+                      </div>
+                    ) : (
+                      invitations?.map((inv) => (
+                        <InvitationCard key={inv.id} invitation={inv} />
+                      ))
+                    )}
+                 </CardContent>
+               </Card>
+            ) : null}
 
-            {loadingConnections ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="h-24 bg-primary/5 border border-primary/10 animate-pulse" />
-                ))}
-              </div>
-            ) : connections?.length ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {connections.map((conn) => (
-                  <Card key={conn.id} className="border-primary/10 hover:border-primary/40 transition-colors group">
-                    <CardContent className="p-4 flex items-center space-x-4">
-                      <div className="size-10 bg-primary/5 border border-primary/20 flex items-center justify-center font-bold">
-                        {conn.addresseeName[0].toUpperCase()}
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-bold truncate">{conn.addresseeName.toUpperCase()}</p>
-                        <p className="text-[10px] text-muted-foreground">LINK_ESTABLISHED: {new Date(conn.createdAt).toLocaleDateString()}</p>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive"
-                        onClick={() => handleDelete(conn.id)}
-                      >
-                        <X className="size-4" />
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center p-20 border border-dashed border-primary/10 bg-primary/5">
-                <Users className="size-12 mx-auto mb-4 opacity-10" />
-                <p className="text-xs text-muted-foreground uppercase tracking-widest">ISOLATED_NODE: NO_CONNECTIONS_DETECTED</p>
-                <Button variant="outline" className="mt-6 text-[10px]">SCAN_FOR_ENTITIES</Button>
-              </div>
-            )}
+            {/* Directory / Suggestions Grid */}
+            <Card className="shadow-sm border-border/60">
+              <CardHeader className="p-4 flex flex-row items-center justify-between">
+                <CardTitle className="text-base font-normal">People you may know based on your activity</CardTitle>
+                <button className="text-[14px] font-bold text-muted-foreground hover:bg-black/5 p-1 rounded transition-colors">See all</button>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                 {loadingDir ? (
+                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                     {[1, 2, 3, 4, 5, 6, 7, 8].map(i => <Skeleton key={i} className="h-64 w-full rounded-xl" />)}
+                   </div>
+                 ) : (
+                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                     {directory?.map((person) => (
+                       <Card key={person.userId} className="overflow-hidden border-border/60 shadow-sm flex flex-col items-center text-center relative hover:shadow-md transition-shadow group">
+                          <button className="absolute top-2 right-2 size-7 bg-black/40 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <X className="size-4" />
+                          </button>
+                          
+                          <div className="h-20 w-full bg-gradient-to-r from-primary/10 to-accent/10" />
+                          
+                          <CardContent className="p-4 pt-0 -mt-10 flex flex-col items-center flex-1 w-full">
+                            <div className="size-20 rounded-full border-2 border-background bg-muted overflow-hidden shrink-0">
+                               {person.avatarUrl ? (
+                                 <img src={person.avatarUrl} alt="User" className="size-full object-cover" />
+                               ) : (
+                                 <div className="size-full flex items-center justify-center font-bold text-2xl text-muted-foreground/40 bg-muted uppercase">
+                                   {person.fullName?.[0] || 'U'}
+                                 </div>
+                               )}
+                            </div>
+                            <p className="mt-3 text-[14px] font-bold line-clamp-1 hover:underline cursor-pointer">{person.fullName}</p>
+                            <p className="text-[12px] text-muted-foreground line-clamp-2 min-h-[32px] mt-1">{person.title || 'Professional at AI-JOB'}</p>
+                            
+                            <div className="flex items-center gap-1 mt-4 text-[11px] text-muted-foreground">
+                               <Users className="size-3" />
+                               <span>14 mutual connections</span>
+                            </div>
+                            
+                            <div className="mt-auto w-full pt-4">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="w-full rounded-full border-primary text-primary font-bold hover:bg-primary/5 h-8"
+                              >
+                                <UserPlus className="size-4 mr-1.5" /> Connect
+                              </Button>
+                            </div>
+                          </CardContent>
+                       </Card>
+                     ))}
+                   </div>
+                 )}
+              </CardContent>
+            </Card>
+
           </div>
         </div>
-      </div>
+      </PageTransition>
     </ProtectedRoute>
   );
 }

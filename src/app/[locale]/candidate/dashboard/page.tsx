@@ -2,200 +2,202 @@
 
 import { useAuthStore } from '@/src/store/authStore';
 import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageTransition } from '@/src/components/PageTransition';
 import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
 import { useJobMatchingQueries } from '@/src/hooks/queries/useJobMatchingQueries';
-import { useConnections } from '@/src/hooks/useConnections';
-import { useNotifications } from '@/src/hooks/useNotifications';
+import { useConnectionQueries } from '@/src/hooks/queries/useConnectionQueries';
+import { useNotificationQueries } from '@/src/hooks/queries/useNotificationQueries';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Users, Bell, ArrowRight, Star, MapPin, Loader2 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { useRouter, useParams } from 'next/navigation';
+import { Briefcase, Users, Bell, ArrowRight, Star, MapPin, Eye, GraduationCap, ChevronRight, User } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 export default function CandidateDashboard() {
   const { user } = useAuthStore();
   const t = useTranslations('Dashboard');
+  const locale = useLocale();
   const router = useRouter();
-  const { locale } = useParams();
+
   const { useMyApplications } = useJobQueries();
-  const { useGetMyConnections } = useConnections();
-  const { useGetNotifications } = useNotifications();
+  const { useGetMyConnections } = useConnectionQueries();
+  const { useGetNotificationsPaged } = useNotificationQueries();
   const { useRecommendedJobs } = useJobMatchingQueries();
 
   const { data: applications, isLoading: appsLoading } = useMyApplications();
   const { data: connections } = useGetMyConnections();
-  const { data: notifications } = useGetNotifications(1, 20);
-  const userId = user?.userId ? Number(user.userId) : null;
-  const { data: recommended, isLoading: matchLoading } = useRecommendedJobs(userId, { PageSize: 5 });
+  const { data: notifications } = useGetNotificationsPaged({ PageSize: 5 });
+  const { data: recommended, isLoading: matchLoading } = useRecommendedJobs(user?.userId ? Number(user.userId) : undefined, { PageSize: 5 });
 
-  const unreadNotifs = notifications?.items?.filter((n: any) => !n.isRead)?.length ?? 0;
+  const unreadNotifs = notifications?.items?.filter(n => !n.isRead)?.length ?? 0;
 
-  const stats = [
-    { label: 'applications', icon: Briefcase, value: applications?.length ?? 0, trend: 'TOTAL_SUBMITTED' },
-    { label: 'connections', icon: Users, value: connections?.length ?? 0, trend: 'ACTIVE_LINKS' },
-    { label: 'notifications', icon: Bell, value: unreadNotifs, trend: 'UNREAD_ALERTS' },
+  const highlights = [
+     { label: 'Profile views', value: 142, icon: Eye, color: 'text-blue-600' },
+     { label: 'Post impressions', value: '1.2K', icon: Star, color: 'text-yellow-600' },
+     { label: 'Search appearances', value: 28, icon: Briefcase, color: 'text-emerald-600' },
   ];
 
   return (
     <ProtectedRoute allowedRoles={['Candidate']}>
-      <div className="space-y-10">
-        <header className="flex flex-col space-y-4 border-b border-primary/20 pb-8">
-          <div className="flex items-center gap-2 text-primary">
-            <div className="h-1 w-12 bg-primary rounded-full" />
-            <span className="text-sm font-semibold text-muted-foreground">{t('system_status')}</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold">
-            {t('welcome')}, {user?.fullName || 'User'}
-          </h1>
-          <p className="text-muted-foreground text-sm font-medium">
-            {t('role_candidate')} | UID: {user?.userId?.slice(0, 8) || 'External'}
-          </p>
-        </header>
+      <PageTransition className="space-y-8 pb-12">
+        
+        {/* Analytics Header */}
+        <section className="space-y-4">
+           <h1 className="text-2xl font-bold">Candidate Analytics</h1>
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {highlights.map((h, i) => (
+                <Card key={i} className="shadow-sm border-border/60 hover:shadow-md transition-shadow cursor-pointer">
+                  <CardContent className="p-5">
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{h.label}</p>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className={cn("text-2xl font-bold", h.color)}>{h.value}</span>
+                      <h.icon className="size-5 text-muted-foreground/40" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+           </div>
+        </section>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {stats.map((stat) => (
-            <Card key={stat.label} className="border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all group overflow-hidden relative">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <stat.icon className="size-16" />
-              </div>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold text-muted-foreground">
-                  {t(stat.label)}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold mb-1">{stat.value}</div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Applications */}
-          <section className="space-y-6">
-            <div className="flex items-end justify-between border-b border-primary/10 pb-4">
-              <div>
-                <h2 className="text-2xl font-bold">{t('applications')}</h2>
-                <p className="text-muted-foreground text-sm">{t('recent_stats')} deployments</p>
-              </div>
-              <Button
-                variant="link"
-                size="sm"
-                className="text-sm h-auto p-0 hover:text-primary"
-                onClick={() => router.push(`/${locale}/jobs`)}
-              >
-                {t('view_all')} <ArrowRight className="ml-1 h-4 w-4" />
-              </Button>
-            </div>
-            <div className="grid gap-3">
-              {appsLoading ? (
-                [1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 bg-primary/5 animate-pulse border border-primary/10 rounded-md" />
-                ))
-              ) : applications?.length ? (
-                applications.slice(0, 5).map((app: any) => (
-                  <Card
-                    key={app.id}
-                    className="hover:border-primary transition-all cursor-pointer group bg-card/50"
-                    onClick={() => router.push(`/${locale}/jobs/${app.jobId}`)}
-                  >
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div className="space-y-1">
-                        <h3 className="font-semibold text-base group-hover:text-primary transition-colors">
-                          {app.jobTitle || `Job #${app.jobId}`}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {app.organizationName || '—'} •{' '}
-                          {new Date(app.appliedAt || Date.now()).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <span className={`text-xs px-2 py-1 font-medium rounded-full border ${
-                        app.status === 'Accepted' ? 'border-green-500/40 text-green-500 bg-green-500/10' :
-                        app.status === 'Rejected' ? 'border-red-500/40 text-red-500 bg-red-500/10' :
-                        'border-yellow-500/40 text-yellow-500 bg-yellow-500/10'
-                      }`}>
-                        {app.status || 'Pending'}
-                      </span>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <div className="text-center py-16 border border-dashed border-primary/20 rounded-md">
-                  <p className="text-muted-foreground text-sm">No applications yet</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-4"
-                    onClick={() => router.push(`/${locale}/jobs`)}
-                  >
-                    Browse Opportunities
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+           {/* Left/Main Column */}
+           <div className="lg:col-span-8 space-y-6">
+              
+              {/* Recent Applications */}
+              <Card className="shadow-sm border-border/60">
+                <CardHeader className="flex flex-row items-center justify-between p-5 border-b border-border/60">
+                  <CardTitle className="text-lg font-bold">Recent Applications</CardTitle>
+                  <Button variant="ghost" size="sm" className="text-primary font-bold" onClick={() => router.push(`/${locale}/jobs`)}>
+                    Browse more jobs
                   </Button>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Recommended Jobs */}
-          <section className="space-y-6">
-            <div className="flex items-end justify-between border-b border-primary/10 pb-4">
-              <div>
-                <h2 className="text-2xl font-bold">{t('recommended_opps')}</h2>
-                <p className="text-muted-foreground text-sm">Personalized for you</p>
-              </div>
-            </div>
-            <div className="grid gap-3">
-              {matchLoading ? (
-                [1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 bg-primary/5 animate-pulse border border-primary/10 rounded-md" />
-                ))
-              ) : recommended?.items?.length ? (
-                recommended.items.map((job) => (
-                  <Card
-                    key={job.id}
-                    className="hover:border-primary transition-all cursor-pointer group bg-card/50"
-                    onClick={() => router.push(`/${locale}/jobs/${job.id}`)}
-                  >
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div className="space-y-1 flex-1 min-w-0">
-                        <h3 className="font-semibold text-base group-hover:text-primary transition-colors truncate">
-                          {job.title}
-                        </h3>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="size-3.5" /> {job.location}
-                          </span>
-                          <span>{job.jobType}</span>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {appsLoading ? (
+                    <div className="p-5 space-y-4">
+                      <Skeleton className="h-16 w-full" />
+                      <Skeleton className="h-16 w-full" />
+                    </div>
+                  ) : applications?.length ? (
+                    applications.slice(0, 3).map((app) => (
+                      <div key={app.id} className="p-5 border-b border-border/40 last:border-0 hover:bg-muted/30 transition-colors flex items-center justify-between group">
+                        <div className="flex gap-3">
+                           <div className="size-12 bg-muted rounded border flex items-center justify-center shrink-0">
+                             <Briefcase className="size-6 text-muted-foreground/40" />
+                           </div>
+                           <div>
+                             <h4 className="font-bold text-[14px] group-hover:text-primary transition-colors cursor-pointer">{app.jobTitle}</h4>
+                             <p className="text-[12px] text-muted-foreground">Applied {new Date(app.appliedAt).toLocaleDateString()}</p>
+                           </div>
+                        </div>
+                        <div className={cn(
+                          "px-3 py-1 rounded-full text-[11px] font-bold border",
+                          app.status === 'Accepted' ? "bg-emerald-50 text-emerald-600 border-emerald-200" :
+                          app.status === 'Rejected' ? "bg-red-50 text-red-600 border-red-200" :
+                          "bg-orange-50 text-orange-600 border-orange-200"
+                        )}>
+                          {app.status}
                         </div>
                       </div>
-                      <div className="ml-3 shrink-0 flex items-center gap-1.5 text-sm font-bold bg-primary/5 px-2 py-1 rounded-md">
-                        <Star className="size-4 text-yellow-500" />
-                        <span className={job.matchPercentage >= 70 ? 'text-green-500' : job.matchPercentage >= 40 ? 'text-yellow-500' : 'text-muted-foreground'}>
-                          {job.matchPercentage}% Match
-                        </span>
+                    ))
+                  ) : (
+                    <div className="p-10 text-center text-muted-foreground">
+                      No recent applications.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* AI Matches */}
+              <Card className="shadow-sm border-border/60">
+                <CardHeader className="p-5 border-b border-border/60">
+                  <CardTitle className="text-lg font-bold">Top AI Matches</CardTitle>
+                  <p className="text-sm text-muted-foreground">Based on your decoded skill stack</p>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {matchLoading ? (
+                    <div className="p-5 space-y-4">
+                      <Skeleton className="h-16 w-full" />
+                    </div>
+                  ) : recommended?.items?.length ? (
+                    recommended.items.slice(0, 3).map((job) => (
+                      <div key={job.id} className="p-5 border-b border-border/40 last:border-0 hover:bg-muted/30 transition-colors flex items-center justify-between group">
+                        <div className="flex gap-3 min-w-0">
+                           <div className="size-12 bg-muted rounded border flex items-center justify-center shrink-0">
+                             <Star className="size-6 text-yellow-500 fill-current" />
+                           </div>
+                           <div className="min-w-0">
+                             <h4 className="font-bold text-[14px] truncate group-hover:text-primary transition-colors cursor-pointer">{job.title}</h4>
+                             <p className="text-[12px] text-muted-foreground">{job.location} • {job.jobType}</p>
+                           </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold shrink-0">
+                           {job.matchScore || job.matchPercentage}% Match
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <div className="text-center py-16 border border-dashed border-primary/20 rounded-md">
-                  <p className="text-muted-foreground text-sm">
-                    Complete profile for AI matches
-                  </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-4"
-                    onClick={() => router.push(`/${locale}/profile`)}
-                  >
-                    Update Profile
-                  </Button>
-                </div>
-              )}
-            </div>
-          </section>
+                    ))
+                  ) : (
+                    <div className="p-10 text-center text-muted-foreground">
+                       Update your skills for better job matches.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+           </div>
+
+           {/* Sidebar Column */}
+           <div className="lg:col-span-4 space-y-6">
+              
+              {/* Quick Actions */}
+              <Card className="shadow-sm border-border/60">
+                 <CardHeader className="p-5 border-b border-border/60">
+                   <CardTitle className="text-[14px] font-bold">Quick Actions</CardTitle>
+                 </CardHeader>
+                 <CardContent className="p-0">
+                    <button onClick={() => router.push(`/${locale}/profile`)} className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors border-b last:border-0 border-border/40">
+                      <div className="flex items-center gap-3">
+                        <User className="size-5 text-muted-foreground" />
+                        <span className="text-[14px] font-medium font-sans">Update Profile</span>
+                      </div>
+                      <ChevronRight className="size-4 text-muted-foreground" />
+                    </button>
+                    <button onClick={() => router.push(`/${locale}/networking`)} className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors border-b last:border-0 border-border/40">
+                      <div className="flex items-center gap-3">
+                        <Users className="size-5 text-muted-foreground" />
+                        <span className="text-[14px] font-medium">Manage Network</span>
+                      </div>
+                      <ChevronRight className="size-4 text-muted-foreground" />
+                    </button>
+                    <button onClick={() => router.push(`/${locale}/notifications`)} className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors border-b last:border-0 border-border/40">
+                      <div className="flex items-center gap-3 relative">
+                        <Bell className="size-5 text-muted-foreground" />
+                        {unreadNotifs > 0 && <span className="absolute -top-1 -right-1 size-2 bg-primary rounded-full" />}
+                        <span className="text-[14px] font-medium">Notifications</span>
+                      </div>
+                      <ChevronRight className="size-4 text-muted-foreground" />
+                    </button>
+                 </CardContent>
+              </Card>
+
+              {/* Career Goal Card */}
+              <Card className="shadow-sm border-border/60 bg-primary/5 border-primary/20">
+                 <CardContent className="p-5 space-y-3">
+                    <h3 className="font-bold text-sm">Improve your career matches</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Candidates with education history are 3x more likely to be matched with senior roles.
+                    </p>
+                    <Button variant="outline" size="sm" className="w-full rounded-full font-bold border-primary text-primary hover:bg-primary/10">
+                      <GraduationCap className="size-4 mr-2" /> Add education
+                    </Button>
+                 </CardContent>
+              </Card>
+
+           </div>
         </div>
-      </div>
+
+      </PageTransition>
     </ProtectedRoute>
   );
 }

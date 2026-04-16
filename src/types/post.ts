@@ -1,20 +1,69 @@
 export interface Post {
   id: number;
-  content: string;
-  authorId: number;
-  authorName: string;
-  authorAvatar?: string;
+  userId: number;
+  content: string | null;
+  imageUrl: string | null;
   createdAt: string;
-  likesCount: number;
-  commentsCount: number;
-  isLikedByMe: boolean;
+  repostOfPostId: number | null;
 }
 
-export interface PostComment {
+export interface PostFeedItemDto {
+  id: number;
+  userId: number;
+  content: string | null;
+  imageUrl: string | null;
+  createdAt: string;
+  repostOfPostId: number | null;
+  repostSourceUserId: number | null;
+  likeCount: number;
+  likedByMe: boolean;
+  repostCount: number;
+  authorName?: string;
+  authorAvatar?: string | null;
+  commentsCount?: number;
+}
+
+export interface PostCommentDto {
   id: number;
   postId: number;
-  content: string;
-  authorId: number;
-  authorName: string;
+  userId: number;
+  content: string | null;
   createdAt: string;
+  authorName?: string;
+}
+
+export interface PostLikeStateDto {
+  postId: number;
+  likeCount: number;
+  likedByMe: boolean;
+}
+
+export interface CreatePostDto {
+  content: string | null;
+  imageUrl: string | null;
+}
+
+export interface UpdatePostDto {
+  content: string | null;
+  imageUrl: string | null;
+}
+
+export interface CreatePostCommentDto {
+  content: string | null;
+}
+
+export interface PostFeedItemDtoPagedResult {
+  items: PostFeedItemDto[];
+  pageNumber: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  hasPrevious: boolean;
+  hasNext: boolean;
+}
+
+export interface PostResponse {
+  statusCode: number;
+  description: string[] | null;
+  data: Post;
 }

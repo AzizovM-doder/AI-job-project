@@ -1,32 +1,7 @@
-export interface Organization {
-  id: number;
-  userId: number;
-  name: string;
-  description?: string;
-  website?: string;
-  industry?: string;
-  size?: string;
-  location?: string;
-  logoUrl?: string;
-  createdAt: string;
-}
-
-export interface CreateOrganizationDto {
-  name: string;
-  description?: string;
-  website?: string;
-  industry?: string;
-  size?: string;
-  location?: string;
-}
-
-export interface UpdateOrganizationDto {
-  name?: string;
-  description?: string;
-  website?: string;
-  industry?: string;
-  size?: string;
-  location?: string;
+export enum OrganizationType {
+  Startup = 'Startup',
+  Company = 'Company',
+  Agency = 'Agency'
 }
 
 export enum OrganizationMemberRole {
@@ -36,26 +11,28 @@ export enum OrganizationMemberRole {
   Recruiter = 'Recruiter'
 }
 
+export interface Organization {
+  id: number;
+  name: string | null;
+  description: string | null;
+  type: OrganizationType;
+  location: string | null;
+  logoUrl: string | null;
+}
+
 export interface OrganizationMember {
   id: number;
   organizationId: number;
   userId: number;
-  role: OrganizationMemberRole;
-  fullName?: string;
-  email?: string;
-  joinedAt?: string;
-  invitedAt?: string;
-  status?: string;
+  role: string | null;
 }
 
-export interface CreateOrganizationMemberDto {
-  organizationId: number;
-  email: string;
-  role: OrganizationMemberRole;
-}
-
-export interface UpdateOrganizationMemberDto {
-  role: OrganizationMemberRole;
+export interface MemberDirectoryEntryDto {
+  id: number;
+  fullName: string | null;
+  userName: string | null;
+  email: string | null;
+  role: string | null;
 }
 
 export interface OrganizationPagedResult {
@@ -66,4 +43,39 @@ export interface OrganizationPagedResult {
   totalPages: number;
   hasPrevious: boolean;
   hasNext: boolean;
+}
+
+// DTOs for Mutations
+export interface CreateOrganizationDto {
+  name: string | null;
+  description: string | null;
+  type: string | null;
+  location: string | null;
+  logoUrl: string | null;
+}
+
+export interface UpdateOrganizationDto {
+  id: number;
+  name: string | null;
+  description: string | null;
+  type: string | null;
+  location: string | null;
+  logoUrl: string | null;
+}
+
+export interface CreateOrganizationMemberDto {
+  organizationId: number;
+  userId: number;
+  role: string | null;
+}
+
+export interface UpdateOrganizationMemberDto {
+  id: number;
+  organizationId: number;
+  userId: number;
+  role: string | null;
+}
+
+export interface OrganizationMemberInviteRespondDto {
+  isAccepted: boolean;
 }

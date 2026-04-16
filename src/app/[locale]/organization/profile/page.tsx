@@ -10,9 +10,12 @@ import { useForm } from 'react-hook-form';
 import { Building2, Globe, MapPin, Users, Save, Loader2, Edit2, X } from 'lucide-react';
 import { Organization, UpdateOrganizationDto } from '@/src/types/organization';
 import { useTranslations } from 'next-intl';
+import { useRouter, useParams } from 'next/navigation';
 
 export default function OrganizationProfilePage() {
   const t = useTranslations('Organization');
+  const router = useRouter();
+  const { locale } = useParams();
   const { useMyOrganizations, useCreateOrganization, useUpdateOrganization } = useOrganizationQueries();
   const { data: orgs, isLoading } = useMyOrganizations();
   const createOrg = useCreateOrganization();
@@ -29,7 +32,12 @@ export default function OrganizationProfilePage() {
     if (org) {
       updateOrg.mutate({ id: org.id, data }, { onSuccess: () => setIsEditing(false) });
     } else {
-      createOrg.mutate(data as any, { onSuccess: () => setIsEditing(false) });
+      createOrg.mutate(data as any, { 
+        onSuccess: () => {
+          setIsEditing(false);
+          router.push(`/${locale}/organization/dashboard`);
+        } 
+      });
     }
   };
 

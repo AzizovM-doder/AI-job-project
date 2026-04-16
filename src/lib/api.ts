@@ -65,3 +65,10 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+export const customInstance = async <T>(config: import('axios').AxiosRequestConfig): Promise<T> => {
+  const promise = api({ ...config });
+  const response = await promise;
+  // Fallback unpacking from nest response architectures
+  return response.data?.data ?? response.data;
+};
