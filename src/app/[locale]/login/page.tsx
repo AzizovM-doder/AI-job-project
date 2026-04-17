@@ -1,10 +1,11 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { useAuthStore } from '@/src/store/authStore';
+import { useAuth } from '@/src/hooks/useAuth';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import Link from 'next/link';
 import {
   Card,
   CardContent,
@@ -23,7 +24,7 @@ export default function LoginPage() {
   const t = useTranslations('Auth');
   const locale = useLocale();
   const router = useRouter();
-  const { login } = useAuthStore();
+  const { login } = useAuth();
   const { register, handleSubmit } = useForm<LoginCredentials>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,26 +32,8 @@ export default function LoginPage() {
     setIsSubmitting(true);
     try {
       await login(data);
-      
-      // We can get the refreshed state safely now
-      const user = useAuthStore.getState().user;
-
-      toast.success('System Access Granted', {
-        description: 'Identity verified. Redirecting to portal...'
-      });
-
-      if (user?.role === 'Organization') {
-        router.push(`/${locale}/organization/dashboard`);
-      } else {
-        router.push(`/${locale}/candidate/dashboard`);
-      }
     } catch (err: unknown) {
-      const msg = axios.isAxiosError(err)
-        ? err.response?.data?.message || err.response?.data?.description?.[0] || 'Authentication failed'
-        : 'Authentication failed';
-      toast.error('System Access Denied', {
-        description: msg
-      });
+      // Error handling is inside useAuth
     } finally {
       setIsSubmitting(false);
     }
@@ -100,9 +83,9 @@ export default function LoginPage() {
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-2 text-xs text-center border-t border-primary/20 pt-4">
-          <a href="#" className="hover:text-primary transition-colors">
+          <Link href={`/${locale}/forgot-password`} className="hover:text-primary transition-colors">
             {t('forgotPassword')}
-          </a>
+          </Link>
           <button
             onClick={() => router.push(`/${locale}/register`)}
             className="hover:text-primary transition-colors"

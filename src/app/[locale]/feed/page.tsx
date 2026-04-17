@@ -11,6 +11,8 @@ import { useFeedQueries } from '@/src/hooks/queries/useFeedQueries';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
 
+import { Container } from '@/src/components/ui/Container';
+
 export default function FeedPage() {
   const { useGetFeed } = useFeedQueries();
   const { data: posts, isLoading, isError } = useGetFeed();
@@ -18,7 +20,7 @@ export default function FeedPage() {
   const FeedContent = (
     <div className="space-y-3">
       <StartPostBox />
-      
+
       {/* Feed Divider / Sort */}
       <div className="flex items-center gap-2 py-1">
         <hr className="flex-1 border-muted-foreground/20" />
@@ -37,7 +39,16 @@ export default function FeedPage() {
                 <Skeleton className="h-3 w-48" />
               </div>
             </div>
-            <Skeleton className="h-32 w-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-[90%]" />
+            </div>
+            <Skeleton className="h-48 w-full rounded-lg" />
+            <div className="flex justify-between border-t pt-2">
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-8 w-20" />
+            </div>
           </Card>
         ))
       ) : isError ? (
@@ -60,14 +71,14 @@ export default function FeedPage() {
 
   return (
     <ProtectedRoute>
-      <PageTransition>
-        <div className="w-full">
-           <ThreeColumnLayout 
-             left={<FeedIdentityCard />}
-             main={FeedContent}
-             right={<FeedSuggestionsCard />}
-           />
-        </div>
+      <PageTransition className="py-6">
+        <Container>
+          <ThreeColumnLayout
+            left={<FeedIdentityCard />}
+            main={FeedContent}
+            right={<FeedSuggestionsCard />}
+          />
+        </Container>
       </PageTransition>
     </ProtectedRoute>
   );

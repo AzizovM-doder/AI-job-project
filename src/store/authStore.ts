@@ -22,7 +22,7 @@ interface AuthState {
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (credentials: RegisterCredentials) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   setLoading: (loading: boolean) => void;
   setTokens: (token: string, refreshToken: string) => void;
 }
@@ -88,19 +88,35 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: () => {
-        set({
-          user: null,
-          token: null,
-          refreshToken: null,
-          isAuthenticated: false,
-          isLoading: false,
-        });
+      logout: async () => {
+        const { refreshToken } = get();
+        try {
+          if (refreshToken) {
+            // Non-blocking logout call — if it fails, we still want to log out locally
+            await api.post('/Auth/logout', { refreshToken }).catch(() => {});
+          }
+        } finally {
+          set({
+            user: null,
+            token: null,
+            refreshToken: null,
+            isAuthenticated: false,
+            isLoading: false,
+          });
+          // Final safety clear of persisted storage
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('aijob-auth-storage');
+          }
+        }
       },
 
       setLoading: (isLoading) => set({ isLoading }),
 
-      setTokens: (token, refreshToken) => set({ token, refreshToken, isAuthenticated: true }),
+      setTokens: (token, refreshToken) => set({ 
+        token, 
+        refreshToken: refreshToken || get().refreshToken, // Preserve old refresh if new one not provided
+        isAuthenticated: true 
+      }),
     }),
     {
       name: 'aijob-auth-storage',

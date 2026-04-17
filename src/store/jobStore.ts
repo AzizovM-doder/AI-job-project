@@ -13,7 +13,7 @@ interface JobFilters {
 
 interface JobState {
   filters: JobFilters;
-  setFilter: (key: keyof JobFilters, value: any) => void;
+  setFilter: (key: keyof JobFilters, value: string | number | undefined) => void;
   resetFilters: () => void;
   setPage: (page: number) => void;
 }

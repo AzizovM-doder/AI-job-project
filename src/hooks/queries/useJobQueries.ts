@@ -145,10 +145,21 @@ export const useJobQueries = () => {
     });
   };
 
-  const useUpdateApplication = (id: number) => {
+  const useGetApplicationsByJob = (jobId: number) => {
+    return useQuery<JobApplication[]>({
+      queryKey: ['applications', 'by-job', jobId],
+      queryFn: async () => {
+        const res = await api.get(`/JobApplication/by-job/${jobId}`);
+        return res.data?.data ?? res.data ?? [];
+      },
+      enabled: !!jobId,
+    });
+  };
+
+  const useUpdateApplication = () => {
     return useMutation<JobApplication, Error, UpdateJobApplicationDto>({
       mutationFn: async (data) => {
-        const res = await api.put(`/JobApplication/${id}`, data);
+        const res = await api.put(`/JobApplication/${data.id}`, data);
         return res.data?.data ?? res.data;
       },
       onSuccess: () => {
@@ -204,6 +215,16 @@ export const useJobQueries = () => {
     });
   };
 
+  const useSearchJobs = (params?: { SearchTerm?: string; PageNumber?: number; PageSize?: number }) => {
+    return useQuery<JobPagedResult>({
+      queryKey: ['jobs', 'search', params],
+      queryFn: async () => {
+        const res = await api.get('/Job/search', { params });
+        return res.data?.data ?? res.data;
+      },
+    });
+  };
+
   return {
     useJobs,
     useGetJob,
@@ -216,9 +237,11 @@ export const useJobQueries = () => {
     useMyApplications,
     useApplyToJob,
     useUpdateApplication,
+    useGetApplicationsByJob,
     useGetMatchesForJob,
     useGetMatchesForUser,
     useGetCategories,
     useGetJobSkills,
+    useSearchJobs,
   };
 };

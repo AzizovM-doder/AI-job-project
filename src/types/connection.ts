@@ -19,7 +19,7 @@ export interface SendConnectionByEmailDto {
 }
 
 export interface UpdateConnectionDto {
-  isAccepted: boolean;
+  status: ConnectionStatus;
 }
 
 export interface ConnectionListResponse {

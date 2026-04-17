@@ -18,13 +18,13 @@ export default function NewJobPage() {
   const { locale } = useParams();
   const { useCreateJob } = useJobQueries();
   const { useJobCategories } = useMetadataQueries();
-  const { useMyOrganizations } = useOrganizationQueries();
+  const { useGetMyOrganizations } = useOrganizationQueries();
   const { useImproveJob } = useAI();
 
   const createJob = useCreateJob();
   const improveJob = useImproveJob();
   const { data: categories } = useJobCategories();
-  const { data: myOrgs, isLoading: orgsLoading } = useMyOrganizations();
+  const { data: myOrgs, isLoading: orgsLoading } = useGetMyOrganizations();
 
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<CreateJobDto>({
     defaultValues: {

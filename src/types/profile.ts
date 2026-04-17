@@ -17,44 +17,42 @@ export interface UserProfile {
   userId: number;
   firstName: string | null;
   lastName: string | null;
+  headline?: string | null;
+  about?: string | null;
+  location?: string | null;
+  photoUrl?: string | null;
+  backgroundPhotoUrl?: string | null;
+  birthDate?: string | null;
+  createdAt?: string;
+}
+
+export interface UserCandidateProfile {
+  id: number;
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
   aboutMe: string | null;
   experienceYears: number;
   expectedSalary: number;
   cvFileUrl: string | null;
 }
 
-export interface MemberProfileDto {
-  userId: number;
-  firstName: string | null;
-  lastName: string | null;
-  fullName: string | null;
-  aboutMe: string | null;
-  experienceYears: number;
-}
-
 export interface Education {
   id: number;
-  profileId: number;
-  schoolName: string | null;
+  userId: number;
+  institution: string | null;
   degree: string | null;
-  fieldOfStudy: string | null;
-  startDate: string;
-  endDate: string;
-  grade: string | null;
-  createdAt: string;
-  updatedAt: string;
+  startYear: number;
+  endYear: number;
 }
 
 export interface Experience {
   id: number;
-  profileId: number;
+  userId: number;
   companyName: string | null;
   position: string | null;
-  description: string | null;
   startDate: string;
   endDate: string | null;
-  isCurrent: boolean;
-  location: string | null;
 }
 
 export interface Skill {
@@ -67,23 +65,8 @@ export interface ProfileSkill {
   id: number;
   profileId: number;
   skillId: number;
-  skillName: string | null;
-  endorsementCount: number;
-}
-
-export interface Endorsement {
-  id: number;
-  endorserId: number;
-  profileSkillId: number;
-  createdAt: string;
-}
-
-export interface Recommendation {
-  id: number;
-  authorId: number;
-  recipientId: number;
-  content: string | null;
-  createdAt: string;
+  skillName?: string | null;
+  endorsementsCount: number;
 }
 
 export interface ProfileLanguage {
@@ -94,19 +77,39 @@ export interface ProfileLanguage {
   level: LanguageLevel;
 }
 
-// DTOs for Mutations
-export interface CreateUserProfileDto {
-  userId: number;
-  firstName: string | null;
-  lastName: string | null;
-  aboutMe: string | null;
-  experienceYears: number;
-  expectedSalary: number;
-  cvFileUrl: string | null;
-}
-
-export interface UpdateUserProfileDto {
+export interface Recommendation {
   id: number;
+  authorId: number;
+  recipientId: number;
+  content: string | null;
+  createdAt: string;
+}
+
+// DTOs for Mutations
+export interface CreateProfileDto {
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
+  headline: string | null;
+  about: string | null;
+  location: string | null;
+  photoUrl: string | null;
+  backgroundPhotoUrl: string | null;
+  birthDate: string | null;
+}
+
+export interface UpdateProfileDto {
+  id: number;
+  firstName: string | null;
+  lastName: string | null;
+  headline: string | null;
+  about: string | null;
+  location: string | null;
+  photoUrl: string | null;
+  backgroundPhotoUrl: string | null;
+}
+
+export interface CreateCandidateProfileDto {
   userId: number;
   firstName: string | null;
   lastName: string | null;
@@ -116,7 +119,7 @@ export interface UpdateUserProfileDto {
   cvFileUrl: string | null;
 }
 
-export interface CreateUserEducationDto {
+export interface CreateEducationDto {
   userId: number;
   institution: string | null;
   degree: string | null;
@@ -124,7 +127,7 @@ export interface CreateUserEducationDto {
   endYear: number;
 }
 
-export interface CreateUserExperienceDto {
+export interface CreateExperienceDto {
   userId: number;
   companyName: string | null;
   position: string | null;
@@ -134,21 +137,17 @@ export interface CreateUserExperienceDto {
 
 export interface CreateProfileSkillDto {
   profileId: number;
-  skillId?: number;
-  skillName?: string;
-}
-
-export interface CreateEndorsementDto {
-  profileSkillId: number;
-}
-
-export interface CreateRecommendationDto {
-  recipientId: number;
-  content: string | null;
+  skillId: number;
+  endorsementsCount?: number;
 }
 
 export interface CreateProfileLanguageDto {
   profileId: number;
   languageId: number;
   level: LanguageLevel;
+}
+
+export interface CreateRecommendationDto {
+  recipientId: number;
+  content: string | null;
 }

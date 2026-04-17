@@ -16,7 +16,7 @@ export default function StartPostBox() {
 
   const onSubmit = (data: { content: string }) => {
     if (!data.content.trim()) return;
-    
+
     createPostMutation.mutate({ content: data.content, imageUrl: null }, {
       onSuccess: () => {
         reset();
@@ -48,7 +48,7 @@ export default function StartPostBox() {
               placeholder="Start a post..."
             />
           </div>
-          
+
           <div className="flex items-center justify-between pb-1">
             <div className="flex items-center gap-1 sm:gap-2">
               <Button variant="ghost" size="sm" type="button" className="text-muted-foreground hover:bg-primary/10 hover:text-primary h-12 flex-1 sm:flex-none">
@@ -64,10 +64,10 @@ export default function StartPostBox() {
                 <span className="text-xs font-semibold">Write article</span>
               </Button>
             </div>
-            
-            <Button 
-              type="submit" 
-              size="sm" 
+
+            <Button
+              type="submit"
+              size="sm"
               disabled={createPostMutation.isPending}
               className="rounded-full px-4 h-8 font-bold"
             >

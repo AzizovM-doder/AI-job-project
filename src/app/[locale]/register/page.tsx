@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/src/store/authStore';
+import { useAuth } from '@/src/hooks/useAuth';
 import { RegisterCredentials } from '@/src/types/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,7 @@ export default function RegisterPage() {
   const t = useTranslations('Auth');
   const router = useRouter();
   const locale = useLocale();
-  const { register: authRegister, login: authLogin } = useAuthStore();
+  const { register: authRegister, login: authLogin, register: registerAction } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<RegisterCredentials>({
@@ -29,19 +29,9 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterCredentials) => {
     setIsSubmitting(true);
     try {
-      await authRegister(data);
-      await authLogin({ email: data.email, password: data.password });
-      
-      toast.success('Registration Successful', {
-        description: 'Identity created and authenticated.'
-      });
-
-      router.push(`/${locale}/${data.role === 'Organization' ? 'organization' : 'candidate'}/dashboard`);
+      await registerAction(data);
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.response?.data?.description?.[0] || 'Registration failed. Please try again.';
-      toast.error('Registration Failed', {
-        description: msg
-      });
+      // Error handling is inside useAuth
     } finally {
       setIsSubmitting(false);
     }

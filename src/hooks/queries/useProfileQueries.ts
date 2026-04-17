@@ -24,11 +24,11 @@ import {
 export const useProfileQueries = () => {
   const queryClient = useQueryClient();
 
-  // --- CORE PROFILE ---
+  // --- CORE PROFILE (Identity) ---
 
   const useGetProfile = (id: number) => {
     return useQuery<UserProfile>({
-      queryKey: ['profiles', id],
+      queryKey: ['profiles', 'basic', id],
       queryFn: async () => {
         const res = await api.get(`/Profile/${id}`);
         return res.data?.data ?? res.data;
@@ -38,73 +38,99 @@ export const useProfileQueries = () => {
   };
 
   const useGetProfileByUserId = (userId: number) => {
-    return useQuery<UserProfile>({
-      queryKey: ['profiles', 'user', userId],
+    return useQuery<UserProfile | null>({
+      queryKey: ['profiles', 'basic', 'user', userId],
       queryFn: async () => {
         const res = await api.get(`/Profile/by-user/${userId}`);
+        const data = res.data?.data ?? res.data;
+        // If the backend returns an envelope with 404 but 200 OK at HTTP level
+        if (res.data?.statusCode === 404 || !data || data.statusCode === 404) {
+          return null;
+        }
+        return data;
+      },
+      enabled: !!userId,
+    });
+  };
+
+  const useUpdateProfile = () => {
+    return useMutation<UserProfile, Error, UpdateProfileDto>({
+      mutationFn: async (data) => {
+        // Fallback to POST if ID is 0 or missing
+        if (!data.id || data.id === 0) {
+          const res = await api.post('/Profile', data);
+          return res.data?.data ?? res.data;
+        }
+        const res = await api.put(`/Profile/${data.id}`, data);
+        return res.data?.data ?? res.data;
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: ['profiles', 'basic'] });
+        queryClient.invalidateQueries({ queryKey: ['profiles', 'basic', 'user'] });
+      },
+    });
+  };
+
+  // --- CANDIDATE PROFILE (Detailed) ---
+
+  const useGetCandidateProfile = (userId: number) => {
+    return useQuery<UserCandidateProfile>({
+      queryKey: ['profiles', 'candidate', userId],
+      queryFn: async () => {
+        const res = await api.get(`/UserProfile/by-user/${userId}`);
         return res.data?.data ?? res.data;
       },
       enabled: !!userId,
     });
   };
 
-  const useCreateProfile = () => {
-    return useMutation<UserProfile, Error, CreateUserProfileDto>({
+  const useUpdateCandidateProfile = () => {
+    return useMutation<UserCandidateProfile, Error, CreateCandidateProfileDto>({
       mutationFn: async (data) => {
-        const res = await api.post('/Profile', data);
+        // FindUser uses userId in the URL or body depending on implementation
+        // Usually it's PUT /UserProfile/{id}
+        // For now using the existing endpoint from Swagger dump
+        const res = await api.post('/UserProfile', data);
         return res.data?.data ?? res.data;
       },
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: ['profiles'] });
-      },
-    });
-  };
-
-  const useUpdateProfile = () => {
-    return useMutation<UserProfile, Error, UpdateUserProfileDto>({
-      mutationFn: async (data) => {
-        const res = await api.put(`/Profile/${data.id}`, data);
-        return res.data?.data ?? res.data;
-      },
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: ['profiles', data.id] });
-        queryClient.invalidateQueries({ queryKey: ['profiles', 'user', data.userId] });
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: ['profiles', 'candidate', variables.userId] });
       },
     });
   };
 
   // --- EDUCATION ---
 
-  const useGetEducationsByProfile = (profileId: number) => {
+  const useGetEducationsByUser = (userId: number) => {
     return useQuery<Education[]>({
-      queryKey: ['profiles', profileId, 'education'],
+      queryKey: ['profiles', 'user', userId, 'education'],
       queryFn: async () => {
-        const res = await api.get(`/Education/by-profile/${profileId}`);
+        const res = await api.get(`/UserEducation/by-user/${userId}`);
         return res.data?.data ?? res.data ?? [];
       },
-      enabled: !!profileId,
+      enabled: !!userId,
     });
   };
 
   const useAddEducation = () => {
-    return useMutation<Education, Error, CreateUserEducationDto>({
+    return useMutation<Education, Error, CreateEducationDto>({
       mutationFn: async (data) => {
-        const res = await api.post('/Education', data);
+        const res = await api.post('/UserEducation', data);
         return res.data?.data ?? res.data;
       },
       onSuccess: (_, variables) => {
-        queryClient.invalidateQueries({ queryKey: ['profiles'] });
+        queryClient.invalidateQueries({ queryKey: ['profiles', 'user', variables.userId, 'education'] });
       },
     });
   };
 
   const useDeleteEducation = () => {
-    return useMutation<void, Error, number>({
-      mutationFn: async (id) => {
-        await api.delete(`/Education/${id}`);
+    return useMutation<void, Error, { id: number; userId: number }>({
+      mutationFn: async ({ id }) => {
+        await api.delete(`/UserEducation/${id}`);
       },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['profiles'] });
+      onSuccess: (_, { userId }) => {
+        queryClient.invalidateQueries({ queryKey: ['profiles', 'user', userId, 'education'] });
       },
     });
   };
@@ -123,24 +149,24 @@ export const useProfileQueries = () => {
   };
 
   const useAddExperience = () => {
-    return useMutation<Experience, Error, CreateUserExperienceDto>({
+    return useMutation<Experience, Error, CreateExperienceDto>({
       mutationFn: async (data) => {
         const res = await api.post('/UserExperience', data);
         return res.data?.data ?? res.data;
       },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['profiles'] });
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: ['profiles', 'user', variables.userId, 'experience'] });
       },
     });
   };
 
   const useDeleteExperience = () => {
-    return useMutation<void, Error, number>({
-      mutationFn: async (id) => {
+    return useMutation<void, Error, { id: number; userId: number }>({
+      mutationFn: async ({ id }) => {
         await api.delete(`/UserExperience/${id}`);
       },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['profiles'] });
+      onSuccess: (_, { userId }) => {
+        queryClient.invalidateQueries({ queryKey: ['profiles', 'user', userId, 'experience'] });
       },
     });
   };
@@ -158,6 +184,17 @@ export const useProfileQueries = () => {
     });
   };
 
+  const useSearchSkills = (name: string) => {
+    return useQuery<Skill[]>({
+      queryKey: ['skills', 'search', name],
+      queryFn: async () => {
+        const res = await api.get('/Skill/search', { params: { name } });
+        return res.data?.data ?? res.data ?? [];
+      },
+      enabled: name.length > 1,
+    });
+  };
+
   const useAddProfileSkill = () => {
     return useMutation<ProfileSkill, Error, CreateProfileSkillDto>({
       mutationFn: async (data) => {
@@ -171,35 +208,12 @@ export const useProfileQueries = () => {
   };
 
   const useDeleteProfileSkill = () => {
-    return useMutation<void, Error, number>({
-      mutationFn: async (id) => {
+    return useMutation<void, Error, { id: number; profileId: number }>({
+      mutationFn: async ({ id }) => {
         await api.delete(`/ProfileSkill/${id}`);
       },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['profiles'] });
-      },
-    });
-  };
-
-  const useAddEndorsement = () => {
-    return useMutation<Endorsement, Error, CreateEndorsementDto>({
-      mutationFn: async (data) => {
-        const res = await api.post('/Endorsement', data);
-        return res.data?.data ?? res.data;
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['profiles'] });
-      },
-    });
-  };
-
-  const useDeleteEndorsement = () => {
-    return useMutation<void, Error, number>({
-      mutationFn: async (id) => {
-        await api.delete(`/Endorsement/${id}`);
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['profiles'] });
+      onSuccess: (_, { profileId }) => {
+        queryClient.invalidateQueries({ queryKey: ['profiles', profileId, 'skills'] });
       },
     });
   };
@@ -230,12 +244,12 @@ export const useProfileQueries = () => {
   };
 
   const useDeleteProfileLanguage = () => {
-    return useMutation<void, Error, number>({
-      mutationFn: async (id) => {
+    return useMutation<void, Error, { id: number; profileId: number }>({
+      mutationFn: async ({ id }) => {
         await api.delete(`/ProfileLanguage/${id}`);
       },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['profiles'] });
+      onSuccess: (_, { profileId }) => {
+        queryClient.invalidateQueries({ queryKey: ['profiles', profileId, 'languages'] });
       },
     });
   };
@@ -265,26 +279,56 @@ export const useProfileQueries = () => {
     });
   };
 
+  // --- UPLOAD ---
+
+  const useUploadPhoto = () => {
+    return useMutation<string, Error, File>({
+      mutationFn: async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await api.post('/Upload/photo', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        return res.data?.data ?? res.data;
+      }
+    });
+  };
+
+  const useUploadCV = () => {
+    return useMutation<string, Error, File>({
+      mutationFn: async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await api.post('/Upload/cv', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        return res.data?.data ?? res.data;
+      }
+    });
+  };
+
   return {
     useGetProfile,
     useGetProfileByUserId,
-    useCreateProfile,
     useUpdateProfile,
-    useGetEducationsByProfile,
+    useGetCandidateProfile,
+    useUpdateCandidateProfile,
+    useGetEducationsByUser,
     useAddEducation,
+    useDeleteEducation,
     useGetExperiencesByUser,
     useAddExperience,
+    useDeleteExperience,
     useGetProfileSkills,
+    useSearchSkills,
     useAddProfileSkill,
-    useAddEndorsement,
+    useDeleteProfileSkill,
     useGetProfileLanguages,
     useAddProfileLanguage,
     useDeleteProfileLanguage,
     useGetRecommendations,
     useAddRecommendation,
-    useDeleteEducation,
-    useDeleteExperience,
-    useDeleteProfileSkill,
-    useDeleteEndorsement,
+    useUploadPhoto,
+    useUploadCV
   };
 };

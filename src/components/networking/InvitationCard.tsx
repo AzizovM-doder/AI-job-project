@@ -1,61 +1,81 @@
 'use client';
 
-import { Connection } from '@/src/types/connection';
+import { Connection, ConnectionStatus } from '@/src/types/connection';
+import { UserPublicProfileDto } from '@/src/types/profile';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Check, X, User } from 'lucide-react';
 import { useConnectionQueries } from '@/src/hooks/queries/useConnectionQueries';
 import { toast } from 'sonner';
+import { useTranslations, useLocale } from 'next-intl';
+import Link from 'next/link';
 
-export default function InvitationCard({ invitation }: { invitation: Connection }) {
+export default function InvitationCard({
+  invitation,
+  profile
+}: {
+  invitation: Connection;
+  profile?: UserPublicProfileDto;
+}) {
+  const t = useTranslations('Networking');
   const { useRespondRequest } = useConnectionQueries();
-  const respondMutation = useRespondRequest(invitation.id);
+  const respondMutation = useRespondRequest();
 
-  const handleRespond = (isAccepted: boolean) => {
-    respondMutation.mutate({ isAccepted }, {
+  const handleRespond = (status: ConnectionStatus) => {
+    respondMutation.mutate({ connectionId: invitation.id, status }, {
       onSuccess: () => {
-        toast.success(isAccepted ? 'Connection accepted' : 'Invitation ignored');
+        const name = profile?.fullName || invitation.requesterName || t('network_member');
+        toast.success(
+          status === ConnectionStatus.Accepted
+            ? t('connected_with', { name })
+            : t('invitation_ignored')
+        );
       }
     });
   };
 
+  const displayName = profile?.fullName || invitation.requesterName || t('network_member');
+  const displayAvatar = profile?.avatarUrl || null;
+  const locale = useLocale();
+
   return (
     <div className="flex items-center justify-between p-4 border-b border-border/40 hover:bg-muted/30 transition-colors group">
-      <div className="flex gap-3 items-center">
+      <Link href={`/${locale}/profile/${invitation.requesterId}`} className="flex gap-3 items-center flex-1 min-w-0">
         <div className="size-14 rounded-full bg-primary/10 overflow-hidden border shrink-0">
-           {invitation.requesterName ? (
-             <div className="size-full flex items-center justify-center font-bold text-primary bg-primary/5 uppercase">
-               {invitation.requesterName[0]}
-             </div>
-           ) : (
-             <User className="size-full p-3 text-muted-foreground/40" />
-           )}
+          {displayAvatar ? (
+            <img src={displayAvatar} alt={displayName} className="size-full object-cover" />
+          ) : displayName ? (
+            <div className="size-full flex items-center justify-center font-bold text-primary bg-primary/5 uppercase">
+              {displayName[0]}
+            </div>
+          ) : (
+            <User className="size-full p-3 text-muted-foreground/40" />
+          )}
         </div>
-        <div className="overflow-hidden">
-          <p className="text-[14px] font-bold truncate leading-tight">{invitation.requesterName || 'Professional User'}</p>
-          <p className="text-[12px] text-muted-foreground line-clamp-1">Software Engineer at TechLink</p>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Shared connection with Michael Chen</p>
+        <div className="overflow-hidden flex-1">
+          <p className="text-[14px] font-bold truncate leading-tight group-hover:text-primary transition-colors">{displayName}</p>
+          <p className="text-[12px] text-muted-foreground line-clamp-1">{profile?.title || ''}</p>
         </div>
-      </div>
-      
+      </Link>
+
       <div className="flex items-center gap-1 sm:gap-2 ml-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           className="text-muted-foreground font-bold hover:bg-black/5 h-9 px-3"
-          onClick={() => handleRespond(false)}
+          onClick={() => handleRespond(ConnectionStatus.Declined)}
           disabled={respondMutation.isPending}
         >
-          Ignore
+          {t('ignore_btn')}
         </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant="outline"
+          size="sm"
           className="rounded-full font-bold h-9 px-5 border-primary text-primary hover:bg-primary/5"
-          onClick={() => handleRespond(true)}
+          onClick={() => handleRespond(ConnectionStatus.Accepted)}
           disabled={respondMutation.isPending}
         >
-          Accept
+          {t('accept_btn')}
         </Button>
       </div>
     </div>

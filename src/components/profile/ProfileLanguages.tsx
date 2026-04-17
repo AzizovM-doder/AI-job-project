@@ -1,6 +1,6 @@
 'use client';
 
-import { ProfileLanguage } from '@/src/types/skill';
+import { ProfileLanguage } from '@/src/types/profile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Globe, Trash2 } from 'lucide-react';
@@ -27,20 +27,20 @@ export default function ProfileLanguages({ languages, isOwnProfile, onAdd, onDel
         {languages && languages.length > 0 ? (
           languages.map((lang) => (
             <div key={lang.id} className="flex items-center justify-between group border-b border-border/40 pb-4 last:border-0 last:pb-0">
-               <div>
-                 <h3 className="text-[14px] font-bold">{lang.languageName}</h3>
-                 <p className="text-[12px] text-muted-foreground">{lang.proficiencyLevel}</p>
-               </div>
-               {isOwnProfile && (
-                 <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="size-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity text-destructive"
-                    onClick={() => onDelete(lang.id)}
-                 >
-                   <Trash2 className="size-4" />
-                 </Button>
-               )}
+              <div>
+                <h3 className="text-[14px] font-bold">{lang.languageName}</h3>
+                <p className="text-[12px] text-muted-foreground">{lang.level}</p>
+              </div>
+              {isOwnProfile && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity text-destructive"
+                  onClick={() => onDelete(lang.id)}
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              )}
             </div>
           ))
         ) : (

@@ -2,35 +2,116 @@
 
 import { useMessageQueries } from '@/src/hooks/queries/useMessageQueries';
 import { useAiQueries } from '@/src/hooks/queries/useAiQueries';
+import { useUserQueries } from '@/src/hooks/queries/useUserQueries';
+import { useProfileQueries } from '@/src/hooks/queries/useProfileQueries';
 import { useAuthStore } from '@/src/store/authStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { Send, Sparkles, MoreHorizontal, User, Paperclip, Smile, Image as ImageIcon } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { 
+  Send, Sparkles, MoreHorizontal, User, Paperclip, 
+  Trash2, MessageSquare, AlertCircle, Zap, Trash
+} from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { Modal } from '@/components/ui/modal';
 import { format } from 'date-fns';
+import EmojiPicker from './EmojiPicker';
+import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 interface ChatWindowProps {
   conversationId: number | null;
+  onDelete?: () => void;
 }
 
-export default function ChatWindow({ conversationId }: ChatWindowProps) {
+/**
+ * SenderProfile component to fetch and display profile data for a specific user.
+ * Leverages TanStack Query's caching to avoid multiple network requests for the same user.
+ */
+const SenderProfile = ({ userId, showName = true, className }: { userId: number; showName?: boolean; className?: string }) => {
+  const { useGetProfileByUserId } = useProfileQueries();
+  const { data: profile } = useGetProfileByUserId(userId);
+  const { locale } = useParams();
+
+  return (
+    <div className={cn("flex items-center gap-2", className)}>
+      <Link href={`/${locale}/profile/${userId}`} className="hover:opacity-80 transition-opacity">
+        <div className="size-10 rounded-full bg-muted flex items-center justify-center border border-border/40 overflow-hidden shrink-0 shadow-sm">
+          {profile?.photoUrl ? (
+            <img src={profile.photoUrl} alt="User" className="size-full object-cover" />
+          ) : (
+            <User className="size-5 text-muted-foreground" />
+          )}
+        </div>
+      </Link>
+      {showName && (
+        <Link href={`/${locale}/profile/${userId}`} className="hover:text-primary transition-colors truncate max-w-[120px]">
+          <span className="text-xs font-bold text-foreground">
+            {profile ? (profile.fullName || (profile.firstName ? `${profile.firstName} ${profile.lastName || ''}` : `User ${userId}`)) : `User ${userId}`}
+          </span>
+        </Link>
+      )}
+    </div>
+  );
+};
+
+export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps) {
+  const t = useTranslations('Messages');
   const { user } = useAuthStore();
-  const { useGetMessages, useSendMessage, useGetConversation } = useMessageQueries();
+  const { locale } = useParams();
+  const { 
+    useGetMessages, 
+    useSendMessage, 
+    useGetConversation,
+    useDeleteConversation,
+    useHardDeleteConversation,
+    useDeleteMessage
+  } = useMessageQueries();
   const { useDraftMessage } = useAiQueries();
-  
+  const { useGetPublicProfiles } = useUserQueries();
+
   const [input, setInput] = useState('');
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isHardDelete, setIsHardDelete] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: conversation } = useGetConversation(conversationId!);
-  const { data: messages, isLoading } = useGetMessages(conversationId!);
+  const { data: messages, isLoading: isMessagesLoading } = useGetMessages(conversationId!);
+  
+  const deleteMutation = useDeleteConversation();
+  const hardDeleteMutation = useHardDeleteConversation();
+  const deleteMsgMutation = useDeleteMessage();
+
+  const otherUserId = useMemo(() => {
+    if (!conversation || !user) return null;
+    const currentUserId = parseInt(user.userId);
+    return conversation.user1Id === currentUserId ? conversation.user2Id : conversation.user1Id;
+  }, [conversation, user]);
+
+  const { data: profiles } = useGetPublicProfiles(otherUserId ? [otherUserId] : []);
+  const otherUser = profiles?.[0];
+
   const sendMutation = useSendMessage();
   const aiDraftMutation = useDraftMessage();
+
+  const isLoading = isMessagesLoading;
 
   // Scroll to bottom on new messages
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      // 4. Use a useRef to auto-scroll to the bottom of the chat
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [messages]);
 
@@ -46,7 +127,7 @@ export default function ChatWindow({ conversationId }: ChatWindowProps) {
   const handleAiDraft = () => {
     if (!user) return;
     aiDraftMutation.mutate({
-      userId: user.id,
+      userId: parseInt(user.userId),
       purpose: "Professional follow-up",
       tone: "Professional but friendly",
       extraContext: "Discussing job opportunity"
@@ -57,92 +138,193 @@ export default function ChatWindow({ conversationId }: ChatWindowProps) {
     });
   };
 
-  if (!conversationId) {
+  const confirmDelete = (hard: boolean) => {
+    setIsHardDelete(hard);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!conversationId) return;
+    
+    const mutation = isHardDelete ? hardDeleteMutation : deleteMutation;
+    
+    try {
+      await mutation.mutateAsync(conversationId);
+      toast.success(isHardDelete ? t('chat_deleted') : t('chat_archived'));
+      setDeleteConfirmOpen(false);
+      if (onDelete) onDelete();
+    } catch (error) {
+      toast.error('Failed to delete');
+    }
+  };
+
+  const handleDeleteMessage = async (messageId: number) => {
+    if (!conversationId) return;
+    try {
+      await deleteMsgMutation.mutateAsync({ id: messageId, conversationId });
+      toast.success(t('message_deleted'));
+    } catch (error) {
+      toast.error('Failed to delete message');
+    }
+  };
+
+  if (conversationId === null || conversationId === undefined) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-background">
-        <div className="size-20 rounded-full bg-muted flex items-center justify-center mb-4">
+      <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-background">
+        <div className="size-20 rounded-2xl bg-muted flex items-center justify-center mb-6">
           <MessageSquare className="size-10 text-muted-foreground/40" />
         </div>
-        <h3 className="text-xl font-bold">Select a message</h3>
-        <p className="text-muted-foreground mt-1 max-w-xs text-sm">
-          Choose from your existing conversations or start a new one to reach out to your network.
+        <h3 className="text-xl font-bold text-foreground">{t('select_chat')}</h3>
+        <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+          Select a conversation from the list to start messaging with your network.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-background overflow-hidden">
-      {/* Header */}
-      <div className="h-14 px-4 border-b border-border/60 flex items-center justify-between bg-card z-10 shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="size-8 rounded-full bg-primary/20 flex items-center justify-center border font-bold text-xs uppercase overflow-hidden">
-            {conversation?.otherUser?.avatarUrl ? (
-              <img src={conversation.otherUser.avatarUrl} alt="User" className="size-full object-cover" />
-            ) : (
-              <User className="size-4 text-primary" />
-            )}
-          </div>
-          <div>
-            <h3 className="text-sm font-bold leading-tight">
-              {conversation?.otherUser?.fullName || 'User'}
-            </h3>
-            <p className="text-[11px] text-muted-foreground">Active now</p>
+    <div className="flex-1 flex flex-col h-full bg-background overflow-hidden relative border-l border-border/40">
+      {/* Modal for Confirmation */}
+      <Modal 
+        isOpen={deleteConfirmOpen} 
+        onClose={() => setDeleteConfirmOpen(false)}
+        title={isHardDelete ? t('confirm_delete_title') : t('confirm_archive_title')}
+      >
+        <div className="space-y-6">
+          <p className="text-sm text-muted-foreground">
+            {isHardDelete ? t('confirm_delete_desc') : t('confirm_archive_desc')}
+          </p>
+          <div className="flex justify-end gap-3">
+            <Button variant="ghost" onClick={() => setDeleteConfirmOpen(false)}>
+              {t('cancel')}
+            </Button>
+            <Button 
+              variant={isHardDelete ? "destructive" : "default"}
+              onClick={handleDelete}
+            >
+              {isHardDelete ? t('delete') : t('archive')}
+            </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Clean Header */}
+      <div className="h-18 px-6 border-b border-border/40 flex items-center justify-between bg-background/95 backdrop-blur-md z-20 shrink-0">
+        <div className="flex items-center gap-3">
+          <SenderProfile userId={otherUserId!} showName={false} />
+          <div>
+            <Link href={`/${locale}/profile/${otherUserId}`} className="hover:text-primary transition-colors">
+              <h3 className="text-[0.9375rem] font-bold text-foreground leading-tight">
+                {otherUser?.fullName || (otherUser?.firstName ? `${otherUser.firstName} ${otherUser.lastName || ''}` : (otherUser?.userName || `User ${conversationId}`))}
+              </h3>
+            </Link>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="size-1.5 rounded-full bg-green-500" />
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{t('online')}</p>
+            </div>
+          </div>
+        </div>
+
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="size-8 text-muted-foreground"><MoreHorizontal className="size-5" /></Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="size-9 rounded-full">
+                <MoreHorizontal className="size-4 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => confirmDelete(false)} className="gap-2">
+                <AlertCircle className="size-4" /> {t('archive')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => confirmDelete(true)} className="gap-2 text-destructive focus:text-destructive">
+                <Trash2 className="size-4" /> {t('delete')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      {/* Message Stream */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-6">
+      {/* Message Stream with 70vh Constraint */}
+      <div 
+        ref={scrollRef} 
+        className="flex-1 overflow-y-auto p-6 space-y-6 bg-muted/5 dark:bg-transparent max-h-[70vh]"
+      >
         {isLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-10 w-48 rounded-2xl" />
-            <Skeleton className="h-10 w-64 rounded-2xl ml-auto" />
-            <Skeleton className="h-10 w-32 rounded-2xl" />
+          <div className="space-y-6">
+            <div className="flex gap-3">
+              <Skeleton className="size-8 rounded-full bg-muted" />
+              <Skeleton className="h-10 w-48 rounded-2xl rounded-tl-none bg-muted" />
+            </div>
+            <div className="flex gap-3 flex-row-reverse">
+              <Skeleton className="size-8 rounded-full bg-muted" />
+              <Skeleton className="h-10 w-32 rounded-2xl rounded-tr-none bg-muted" />
+            </div>
           </div>
         ) : messages && messages.length > 0 ? (
           messages.map((msg, idx) => {
-            const isMe = msg.senderId === user?.userId;
+            const isMe = msg.senderId === parseInt(user?.userId || '0');
             const prevMsg = messages[idx - 1];
             const isNewGroup = !prevMsg || prevMsg.senderId !== msg.senderId;
 
             return (
-              <div key={idx} className={cn("flex group", isMe ? "justify-end" : "justify-start")}>
-                <div className={cn("max-w-[80%] space-y-1", isMe ? "items-end" : "items-start")}>
+              <div key={idx} className={cn("flex items-end gap-2 group/msg", isMe ? "flex-row-reverse" : "flex-row")}>
+                {/* Profile avatar next to message */}
+                {!isMe && isNewGroup && (
+                   <SenderProfile userId={msg.senderId} showName={false} className="mb-1" />
+                )}
+                {/* Placeholder for alignment if not new group */}
+                {!isMe && !isNewGroup && (
+                   <div className="size-8 shrink-0" />
+                )}
+                
+                <div className={cn("max-w-[80%] flex flex-col", isMe ? "items-end" : "items-start")}>
                   {isNewGroup && (
-                    <span className={cn("text-[11px] font-bold px-1 text-muted-foreground", isMe ? "text-right block" : "")}>
-                       {isMe ? 'You' : conversation?.otherUser?.fullName || 'Other'} • {format(new Date(msg.createdAt), 'HH:mm')}
-                    </span>
+                    <div className={cn("flex items-center gap-2 px-1 mb-1", isMe ? "flex-row-reverse" : "flex-row")}>
+                       <span className="text-[10px] font-bold text-muted-foreground/60">
+                         {format(new Date(msg.createdAt), 'HH:mm')}
+                       </span>
+                    </div>
                   )}
-                  <div className={cn(
-                    "px-4 py-2.5 rounded-2xl text-[14px] leading-relaxed",
-                    isMe 
-                      ? "bg-primary text-primary-foreground rounded-tr-none" 
-                      : "bg-[#f4f2ee] dark:bg-muted text-foreground rounded-tl-none"
-                  )}>
-                    {msg.content}
+                  <div className="flex items-center gap-2 group/actions">
+                    {isMe && (
+                      <button
+                        onClick={() => handleDeleteMessage(msg.id)}
+                        className="opacity-0 group-hover/msg:opacity-100 p-1.5 rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all duration-200"
+                        title={t('delete_message')}
+                      >
+                        <Trash className="size-3.5" />
+                      </button>
+                    )}
+                    
+                    <div className={cn(
+                      "px-4 py-2.5 text-sm leading-relaxed shadow-sm break-words relative transition-all duration-200",
+                      isMe
+                        ? "bg-primary text-primary-foreground rounded-2xl rounded-br-none"
+                        : "bg-card border border-border/40 text-foreground rounded-2xl rounded-bl-none hover:border-primary/30"
+                    )}>
+                      {msg.content}
+                    </div>
                   </div>
                 </div>
               </div>
             );
           })
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-center opacity-50 p-10">
-             <div className="size-16 rounded-full border-2 border-dashed flex items-center justify-center mb-4">
-               <User className="size-8" />
-             </div>
-             <p className="text-sm font-bold uppercase tracking-widest">Initialization Complete</p>
-             <p className="text-xs">Secure channel established. Ready for transmission.</p>
+          <div className="h-full flex flex-col items-center justify-center text-center opacity-40 p-12">
+            <div className="size-16 rounded-full border-2 border-dashed border-muted-foreground/20 flex items-center justify-center mb-4">
+              <Zap className="size-8 text-muted-foreground/20" />
+            </div>
+            <p className="text-xs font-medium uppercase tracking-widest">{t('start_conversation')}</p>
           </div>
         )}
       </div>
 
       {/* Input Area */}
-      <div className="p-3 border-t bg-card shrink-0">
-        <form onSubmit={handleSend} className="bg-background border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary/20 transition-all border-border/80">
+      <div className="p-4 bg-background border-t border-border/40 shrink-0 sticky bottom-0">
+        <form 
+          onSubmit={handleSend} 
+          className="flex flex-col bg-muted/30 border border-border/60 rounded-xl overflow-hidden focus-within:ring-1 focus-within:ring-primary/20 transition-all"
+        >
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -152,39 +334,42 @@ export default function ChatWindow({ conversationId }: ChatWindowProps) {
                 handleSend();
               }
             }}
-            placeholder="Write a message..."
-            className="w-full bg-transparent p-3 text-sm focus:outline-none resize-none min-h-[60px] max-h-[150px]"
+            placeholder={t('type_message')}
+            className="w-full bg-transparent p-4 text-sm focus:outline-none resize-none min-h-[50px] max-h-[120px] scrollbar-hide"
           />
-          <div className="px-2 py-1.5 flex items-center justify-between border-t border-border/40 bg-muted/20">
-            <div className="flex items-center gap-1">
-              <Button type="button" variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-primary">
-                <ImageIcon className="size-5" />
-              </Button>
-              <Button type="button" variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-primary">
-                <Paperclip className="size-5" />
-              </Button>
-              <Button type="button" variant="ghost" size="icon" className="size-8 text-muted-foreground hover:text-primary">
-                <Smile className="size-5" />
-              </Button>
-              <div className="w-[1px] h-4 bg-border mx-1" />
-              <Button 
-                type="button" 
-                variant="ghost" 
-                size="sm" 
+          
+          <div className="px-4 py-2 flex items-center justify-between border-t border-border/10">
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
                 onClick={handleAiDraft}
                 disabled={aiDraftMutation.isPending}
-                className="text-xs font-bold gap-1.5 text-primary bg-primary/5 hover:bg-primary/10 h-7"
+                className="h-8 px-3 rounded-lg text-[11px] font-bold gap-1.5 text-primary hover:bg-primary/5 transition-all"
               >
                 <Sparkles className={cn("size-3.5", aiDraftMutation.isPending && "animate-spin")} />
-                {aiDraftMutation.isPending ? 'Generating...' : 'AI Draft'}
+                {aiDraftMutation.isPending ? '...' : t('ai_draft')}
+              </Button>
+              
+              <div className="w-px h-3 bg-border/40 mx-1" />
+              
+              <EmojiPicker 
+                onEmojiSelect={(emoji) => setInput(prev => prev + emoji)}
+              />
+              
+              <Button type="button" variant="ghost" size="icon" className="size-8 text-muted-foreground/60 hover:text-foreground">
+                <Paperclip className="size-4" />
               </Button>
             </div>
-            <Button 
-              type="submit" 
+
+            <Button
+              type="submit"
               disabled={!input.trim() || sendMutation.isPending}
-              className={cn("h-7 rounded-sm px-4 font-bold text-xs transition-transform active:scale-95")}
+              size="sm"
+              className="h-8 rounded-lg font-bold text-xs px-4"
             >
-              Send
+              {t('send')}
             </Button>
           </div>
         </form>
@@ -192,5 +377,3 @@ export default function ChatWindow({ conversationId }: ChatWindowProps) {
     </div>
   );
 }
-
-import { MessageSquare } from 'lucide-react';

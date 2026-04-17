@@ -1,5 +1,10 @@
-import axios from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '../store/authStore';
+
+// Extended interface to include custom retry flag
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 const api = axios.create({
   baseURL: '/api',
@@ -8,6 +13,28 @@ const api = axios.create({
   },
 });
 
+interface QueueItem {
+  resolve: (token: string | null) => void;
+  reject: (error: unknown) => void;
+}
+
+// Flag to track the refresh state
+let isRefreshing = false;
+// Queue to hold requests that fail while refreshing
+let failedQueue: QueueItem[] = [];
+
+const processQueue = (error: unknown, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// Request interceptor for adding the bearer token
 api.interceptors.request.use(
   (config) => {
     const { token } = useAuthStore.getState();
@@ -19,44 +46,77 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Response interceptor for handling token expiration
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+  async (error: AxiosError) => {
+    const originalRequest = error.config as CustomAxiosRequestConfig;
 
+    // Handle 401 errors
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // If already refreshing, wait for the token and retry
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
-        const { refreshToken, setTokens, logout } = useAuthStore.getState();
+        const { refreshToken, setTokens } = useAuthStore.getState();
         
-        if (!refreshToken) throw new Error('No refresh token available');
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
 
-        // Use standard axios to avoid recursion
-        const response = await axios.post(`${api.defaults.baseURL}/Auth/refresh-token`, { refreshToken });
+        // Call the refresh token endpoint using a fresh axios instance to avoid recursion
+        const response = await axios.post('/api/Auth/refresh-token', 
+          { refreshToken },
+          { headers: { 'Content-Type': 'application/json' } }
+        );
         
-        const { token: newToken, refreshToken: newRefreshToken } = response.data.data;
+        const data = response.data?.data ?? response.data;
+        const newToken = data.token || data.accessToken;
+        const newRefreshToken = data.refreshToken;
         
-        setTokens(newToken, newRefreshToken);
+        if (!newToken) {
+          throw new Error('Invalid refresh token response');
+        }
+        
+        // Update the store and local storage via zustand persist
+        setTokens(newToken, newRefreshToken || refreshToken);
 
+        // Update default header for future requests
+        api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+        
+        // Process the queue with the new token
+        processQueue(null, newToken);
+        
+        // Retry the original request
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        return axios(originalRequest);
-      } catch (refreshError) {
-        useAuthStore.getState().logout();
+        return api(originalRequest);
+      } catch (refreshError: unknown) {
+        processQueue(refreshError, null);
+        await useAuthStore.getState().logout();
         
-        // Use window.location as absolute fallback, but try to preserve locale if possible
+        // Redirect to login if on the client side
         if (typeof window !== 'undefined') {
           const path = window.location.pathname;
-          const isAuthPage = path.includes('/login') || path.includes('/register');
-          
-          // ONLY redirect if we are not already on an auth page to prevent loop
-          if (!isAuthPage) {
-            const pathParts = path.split('/');
-            const locale = ['en', 'ru', 'tj'].includes(pathParts[1]) ? pathParts[1] : 'tj';
-            window.location.href = `/${locale}/login`;
+          if (!path.includes('/login') && !path.includes('/register')) {
+            const loc = ['en', 'ru', 'tj'].includes(path.split('/')[1]) ? path.split('/')[1] : 'tj';
+            window.location.href = `/${loc}/login`;
           }
         }
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
@@ -69,6 +129,5 @@ export default api;
 export const customInstance = async <T>(config: import('axios').AxiosRequestConfig): Promise<T> => {
   const promise = api({ ...config });
   const response = await promise;
-  // Fallback unpacking from nest response architectures
   return response.data?.data ?? response.data;
 };

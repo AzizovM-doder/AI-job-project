@@ -1,93 +1,140 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { useMessageQueries } from '@/src/hooks/queries/useMessageQueries';
+import { useAuthStore } from '@/src/store/authStore';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Search, User } from 'lucide-react';
-import { formatDistanceToNowStrict } from 'date-fns';
+import { Search, MessageSquare, Plus } from 'lucide-react';
+import UserSearchModal from './UserSearchModal';
+import { UserPublicProfileDto } from '@/src/types/user';
+import { useTranslations } from 'next-intl';
+import ConversationListItem from './ConversationListItem';
 
 interface ConversationListProps {
   activeId: number | null;
   onSelect: (id: number) => void;
+  onStartNewConversation?: (userId: number) => void;
+  isCreating?: boolean;
 }
 
-export default function ConversationList({ activeId, onSelect }: ConversationListProps) {
+export default function ConversationList({
+  activeId,
+  onSelect,
+  onStartNewConversation,
+  isCreating
+}: ConversationListProps) {
+  const t = useTranslations('Messages');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { user: currentUser } = useAuthStore();
   const { useGetConversations } = useMessageQueries();
+
+  // 1. Fetch Conversations
   const { data: conversations, isLoading } = useGetConversations();
 
+  const filteredConversations = useMemo(() => {
+    if (!conversations) return [];
+
+    return conversations.filter(conv => {
+      if (!searchTerm) return true;
+      const name = (conv.otherUser?.fullName || '').toLowerCase();
+      return name.includes(searchTerm.toLowerCase());
+    });
+  }, [conversations, searchTerm]);
+
+  // 3. Compute set of user IDs we already have a chat with
+  const existingUserIds = useMemo(() => {
+    if (!conversations || !currentUser) return new Set<number>();
+
+    const currentIdNum = parseInt(currentUser.userId);
+    const ids = conversations.map(c =>
+      c.user1Id === currentIdNum ? c.user2Id : c.user1Id
+    );
+
+    return new Set(ids);
+  }, [conversations, currentUser]);
+
+  const handleSelectUser = async (user: UserPublicProfileDto) => {
+    if (user.userId !== undefined && onStartNewConversation) {
+      console.log('[ConversationList] Selecting user for new chat:', user.userId);
+      try {
+        await onStartNewConversation(user.userId);
+        console.log('[ConversationList] Conversation creation flow completed');
+        setIsModalOpen(false);
+      } catch (err) {
+        console.error('[ConversationList] Error in selection flow:', err);
+        // Error toast is already handled in the parent MessagesPage
+      }
+    }
+  };
+
   return (
-    <div className="flex flex-col h-full border-r border-border/60 bg-background">
-      {/* Header & Search */}
-      <div className="p-4 border-b border-border/60">
-        <h2 className="text-base font-bold mb-3">Messaging</h2>
+    <div className="flex flex-col h-full bg-background border-r border-border/40">
+      {/* Clean Header */}
+      <div className="p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold tracking-tight text-foreground">{t('title')}</h2>
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            size="icon"
+            variant="ghost"
+            className="rounded-full hover:bg-muted"
+            title={t('new_message')}
+          >
+            <Plus className="size-5" />
+          </Button>
+        </div>
+
+        {/* Search */}
         <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search messages"
-            className="w-full bg-[#edf3f8] dark:bg-muted h-[34px] pl-10 pr-4 rounded-md text-sm border-none focus:ring-2 focus:ring-primary/20 transition-all"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder={t('search_placeholder')}
+            className="w-full h-10 pl-9 pr-4 text-sm bg-muted/50 border-transparent rounded-lg focus:ring-1 focus:ring-primary/20 focus:border-primary/20 transition-all placeholder:text-muted-foreground/60"
           />
         </div>
       </div>
 
+      <UserSearchModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelectUser={handleSelectUser}
+        isCreating={isCreating}
+        existingUserIds={existingUserIds}
+      />
+
       {/* List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
         {isLoading ? (
           [1, 2, 3, 4].map(i => (
-            <div key={i} className="p-4 flex gap-3 border-b border-border/40">
+            <div key={i} className="p-4 flex gap-3 border-b border-border/10">
               <Skeleton className="size-12 rounded-full shrink-0" />
-              <div className="space-y-2 flex-1">
+              <div className="space-y-2 flex-1 py-1">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-3 w-full" />
               </div>
             </div>
           ))
-        ) : conversations && conversations.length > 0 ? (
-          conversations.map((conv) => (
-            <div
-              key={conv.id}
-              onClick={() => onSelect(conv.id)}
-              className={cn(
-                "p-4 flex gap-3 cursor-pointer transition-colors relative border-b border-border/40",
-                activeId === conv.id 
-                  ? "bg-primary/5 border-l-4 border-l-primary" 
-                  : "hover:bg-muted/50 border-l-4 border-l-transparent"
-              )}
-            >
-              <div className="size-12 rounded-full bg-primary/10 shrink-0 overflow-hidden border">
-                {conv.otherUser?.avatarUrl ? (
-                  <img src={conv.otherUser.avatarUrl} alt="User" className="size-full object-cover" />
-                ) : (
-                  <div className="size-full flex items-center justify-center bg-muted text-muted-foreground">
-                    <User className="size-6" />
-                  </div>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-baseline mb-0.5">
-                  <span className={cn("text-sm truncate", conv.unreadCount > 0 ? "font-bold text-foreground" : "font-medium text-foreground")}>
-                    {conv.otherUser?.fullName || `User ${conv.user1Id === conv.user2Id ? conv.user2Id : (conv.user1Id)}`}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground shrink-0 ml-2">
-                    {conv.lastMessageAt ? formatDistanceToNowStrict(new Date(conv.lastMessageAt)) : ''}
-                  </span>
-                </div>
-                <p className={cn(
-                  "text-[12px] truncate pr-4",
-                  conv.unreadCount > 0 ? "font-bold text-foreground" : "text-muted-foreground"
-                )}>
-                  {conv.lastMessagePreview || 'Start a conversation'}
-                </p>
-              </div>
-              {conv.unreadCount > 0 && (
-                <div className="absolute right-4 bottom-5 size-2 bg-primary rounded-full shadow-[0_0_8px_rgba(var(--primary),0.5)]" />
-              )}
-            </div>
-          ))
+        ) : filteredConversations.length > 0 ? (
+          <div className="divide-y divide-border/10">
+            {filteredConversations.map((conv) => (
+              <ConversationListItem
+                key={conv.id}
+                conversation={conv}
+                isActive={activeId === conv.id}
+                onSelect={onSelect}
+              />
+            ))}
+          </div>
         ) : (
-          <div className="p-10 text-center text-muted-foreground">
-            <p className="text-sm font-medium">No messages yet</p>
-            <p className="text-xs mt-1">Direct messages appear here.</p>
+          <div className="p-10 text-center space-y-3 opacity-60">
+            <MessageSquare className="size-8 mx-auto text-muted-foreground/40" />
+            <p className="text-sm font-medium">{t('void_detected')}</p>
           </div>
         )}
       </div>

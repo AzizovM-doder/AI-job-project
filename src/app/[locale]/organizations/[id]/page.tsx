@@ -58,7 +58,7 @@ export default function OrganizationPublicProfile() {
               {org.name.toUpperCase()}
             </h1>
             {isOwner && (
-              <Button 
+              <Button
                 onClick={() => router.push(`/${locale}/organization/profile`)}
                 className="h-10 px-6 font-bold tracking-widest uppercase transition-all hover:scale-105"
               >
@@ -72,10 +72,10 @@ export default function OrganizationPublicProfile() {
               {org.location || 'GLOBAL_HQ'}
             </div>
             {org.website && (
-              <a 
-                href={org.website} 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href={org.website}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:text-primary transition-colors"
               >
                 <Globe className="size-4" />
@@ -118,8 +118,8 @@ export default function OrganizationPublicProfile() {
                 ))
               ) : jobs?.length ? (
                 jobs.map((job) => (
-                  <Card 
-                    key={job.id} 
+                  <Card
+                    key={job.id}
                     className="hover:border-primary transition-all cursor-pointer group hover:bg-primary/5"
                     onClick={() => router.push(`/${locale}/jobs/${job.id}`)}
                   >

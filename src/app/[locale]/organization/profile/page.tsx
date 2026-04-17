@@ -16,8 +16,8 @@ export default function OrganizationProfilePage() {
   const t = useTranslations('Organization');
   const router = useRouter();
   const { locale } = useParams();
-  const { useMyOrganizations, useCreateOrganization, useUpdateOrganization } = useOrganizationQueries();
-  const { data: orgs, isLoading } = useMyOrganizations();
+  const { useGetMyOrganizations, useCreateOrganization, useUpdateOrganization } = useOrganizationQueries();
+  const { data: orgs, isLoading } = useGetMyOrganizations();
   const createOrg = useCreateOrganization();
   const updateOrg = useUpdateOrganization();
   const [isEditing, setIsEditing] = useState(false);
@@ -32,11 +32,11 @@ export default function OrganizationProfilePage() {
     if (org) {
       updateOrg.mutate({ id: org.id, data }, { onSuccess: () => setIsEditing(false) });
     } else {
-      createOrg.mutate(data as any, { 
+      createOrg.mutate(data as any, {
         onSuccess: () => {
           setIsEditing(false);
           router.push(`/${locale}/organization/dashboard`);
-        } 
+        }
       });
     }
   };

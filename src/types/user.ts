@@ -20,11 +20,14 @@ export interface User {
 
 export interface UserPublicProfileDto {
   userId: number;
+  id?: number; // Alias for userId returned by some endpoints
   fullName: string | null;
   firstName: string | null;
   lastName: string | null;
   title?: string | null;
+  headline?: string | null; // From Profile endpoint
   avatarUrl?: string | null;
+  photoUrl?: string | null; // From Profile endpoint
 }
 
 export interface UserSettingsDto {

@@ -3,7 +3,6 @@
 import ProtectedRoute from '@/src/components/ProtectedRoute';
 import { PageTransition } from '@/src/components/PageTransition';
 import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
-import { useJobStore } from '@/src/store/jobStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import JobSearchHeader from '@/src/components/jobs/JobSearchHeader';
@@ -11,8 +10,9 @@ import JobCard from '@/src/components/jobs/JobCard';
 import { Bookmark, List, Bell, PlayCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+import { Container } from '@/src/components/ui/Container';
+
 export default function JobsPage() {
-  const { filters } = useJobStore();
   const { useJobs } = useJobQueries();
   const { data: jobsResponse, isLoading, isError } = useJobs();
 
@@ -22,7 +22,7 @@ export default function JobsPage() {
         {/* Search Header */}
         <JobSearchHeader onSearch={() => {}} />
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 items-start pb-12">
+        <Container className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start pb-12">
           
           {/* Main Content */}
           <div className="md:col-span-8 space-y-6">
@@ -35,7 +35,21 @@ export default function JobsPage() {
                <CardContent className="p-4 pt-4 space-y-4">
                   {isLoading ? (
                     [1, 2, 3].map(i => (
-                      <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                      <Card key={i} className="p-4 flex gap-4 border-border/40">
+                        <Skeleton className="size-14 rounded-sm shrink-0" />
+                        <div className="flex-1 space-y-3">
+                          <div className="flex justify-between items-start">
+                            <Skeleton className="h-5 w-48" />
+                            <Skeleton className="size-6 rounded-full" />
+                          </div>
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-4 w-24" />
+                          <div className="flex gap-2 pt-2">
+                            <Skeleton className="h-6 w-16" />
+                            <Skeleton className="h-6 w-20" />
+                          </div>
+                        </div>
+                      </Card>
                     ))
                   ) : isError ? (
                     <div className="p-10 text-center border-dashed border-destructive/40 bg-destructive/5 text-destructive font-bold text-xs uppercase tracking-widest">
@@ -107,7 +121,7 @@ export default function JobsPage() {
             </Card>
           </aside>
 
-        </div>
+        </Container>
       </PageTransition>
     </ProtectedRoute>
   );

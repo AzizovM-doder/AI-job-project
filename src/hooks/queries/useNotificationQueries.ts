@@ -18,13 +18,14 @@ export const useNotificationQueries = () => {
     });
   };
 
-  const useGetNotificationsPaged = (params?: { SearchTerm?: string; PageNumber?: number; PageSize?: number }) => {
+  const useGetNotificationsPaged = (params?: { userId?: number; PageNumber?: number; PageSize?: number }) => {
     return useQuery<NotificationPagedResult>({
       queryKey: ['notifications', 'paged', params],
       queryFn: async () => {
         const res = await api.get('/Notification/paged', { params });
-        return res.data.data ?? res.data ?? null;
+        return res.data; // Paged result is usually in data or directly returned
       },
+      enabled: true,
     });
   };
 
@@ -33,7 +34,8 @@ export const useNotificationQueries = () => {
       queryKey: ['notifications', 'user', userId],
       queryFn: async () => {
         const res = await api.get(`/Notification/by-user/${userId}`);
-        return res.data.data ?? res.data ?? null;
+        const data = res.data?.data ?? res.data;
+        return Array.isArray(data) ? data : [];
       },
       enabled: !!userId,
     });
@@ -43,7 +45,7 @@ export const useNotificationQueries = () => {
     return useMutation<Notification, Error, any>({
       mutationFn: async (data) => {
         const res = await api.post('/Notification', data);
-        return res.data.data ?? res.data;
+        return res.data?.data ?? res.data;
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['notifications'] });
@@ -54,8 +56,7 @@ export const useNotificationQueries = () => {
   const useMarkAsRead = () => {
     return useMutation<void, Error, number>({
       mutationFn: async (id: number) => {
-        const res = await api.patch(`/Notification/${id}/read`);
-        return res.data;
+        await api.patch(`/Notification/${id}/read`);
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['notifications'] });

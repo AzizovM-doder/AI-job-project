@@ -9,22 +9,26 @@ import { useProfileQueries } from '@/src/hooks/queries/useProfileQueries';
 import { toast } from 'sonner';
 
 interface ProfileAboutProps {
-  bio: string | null;
+  aboutMe: string | null;
   isOwnProfile: boolean;
+  profileId: number;
   userId: number;
 }
 
-export default function ProfileAbout({ bio, isOwnProfile, userId }: ProfileAboutProps) {
+export default function ProfileAbout({ aboutMe, isOwnProfile, profileId, userId }: ProfileAboutProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedBio, setEditedBio] = useState(bio || '');
+  const [editedAbout, setEditedAbout] = useState(aboutMe || '');
   const { useUpdateProfile } = useProfileQueries();
   const { useAiAsk } = useAiQueries();
-  
+
   const updateMutation = useUpdateProfile();
   const aiMutation = useAiAsk();
 
   const handleSave = () => {
-    updateMutation.mutate({ bio: editedBio }, {
+    updateMutation.mutate({
+      id: profileId,
+      about: editedAbout
+    } as any, {
       onSuccess: () => {
         setIsEditing(false);
         toast.success('About section updated');
@@ -33,11 +37,11 @@ export default function ProfileAbout({ bio, isOwnProfile, userId }: ProfileAbout
   };
 
   const handleAiImprove = () => {
-    aiMutation.mutate({ 
-      prompt: `Rewrite this professional "About" section to be more engaging and professional for a LinkedIn profile: "${editedBio || bio || ''}"` 
+    aiMutation.mutate({
+      prompt: `Rewrite this professional "About" section to be more engaging and professional for a LinkedIn profile: "${editedAbout || aboutMe || ''}"`
     }, {
-      onSuccess: (data) => {
-        setEditedBio(data);
+      onSuccess: (data: string) => {
+        setEditedAbout(data);
         setIsEditing(true);
         toast.success('AI refinement applied');
       }
@@ -50,19 +54,19 @@ export default function ProfileAbout({ bio, isOwnProfile, userId }: ProfileAbout
         <CardTitle className="text-xl font-bold">About</CardTitle>
         {isOwnProfile && (
           <div className="flex items-center gap-2">
-             <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-primary font-bold gap-1.5 h-8 bg-primary/5 hover:bg-primary/10"
-                onClick={handleAiImprove}
-                disabled={aiMutation.isPending}
-             >
-               {aiMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Sparkles className="size-3.5" />}
-               Improve with AI
-             </Button>
-             <Button variant="ghost" size="icon" className="rounded-full size-9" onClick={() => setIsEditing(!isEditing)}>
-               <Pencil className="size-5" />
-             </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-primary font-bold gap-1.5 h-8 bg-primary/5 hover:bg-primary/10"
+              onClick={handleAiImprove}
+              disabled={aiMutation.isPending}
+            >
+              {aiMutation.isPending ? <Loader2 className="size-3.5 animate-spin" /> : <Sparkles className="size-3.5" />}
+              Improve with AI
+            </Button>
+            <Button variant="ghost" size="icon" className="rounded-full size-9" onClick={() => setIsEditing(!isEditing)}>
+              <Pencil className="size-5" />
+            </Button>
           </div>
         )}
       </CardHeader>
@@ -71,8 +75,8 @@ export default function ProfileAbout({ bio, isOwnProfile, userId }: ProfileAbout
           <div className="space-y-4">
             <textarea
               className="w-full bg-background border rounded-lg p-4 text-[14px] leading-relaxed min-h-[160px] focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-              value={editedBio}
-              onChange={(e) => setEditedBio(e.target.value)}
+              value={editedAbout}
+              onChange={(e) => setEditedAbout(e.target.value)}
               placeholder="What are you passionate about? What are your key achievements?"
             />
             <div className="flex justify-end gap-2">
@@ -85,7 +89,7 @@ export default function ProfileAbout({ bio, isOwnProfile, userId }: ProfileAbout
           </div>
         ) : (
           <p className="text-[14px] leading-relaxed whitespace-pre-wrap text-foreground/90">
-            {bio || "Add a summary to tell people about your professional experience and key skills."}
+            {aboutMe || "Add a summary to tell people about your professional experience and key skills."}
           </p>
         )}
       </CardContent>

@@ -63,14 +63,14 @@ export default function AIToolsPage() {
             <CardContent>
               <div className="border border-dashed border-primary/40 p-8 text-center space-y-4">
                 <p className="text-[10px] text-muted-foreground">UPLOAD PDF/DOCX FOR SCANNING</p>
-                <input 
-                  type="file" 
-                  id="cv-upload" 
-                  className="hidden" 
+                <input
+                  type="file"
+                  id="cv-upload"
+                  className="hidden"
                   onChange={handleFileUpload}
                   accept=".pdf,.docx"
                 />
-                <Button 
+                <Button
                   onClick={() => document.getElementById('cv-upload')?.click()}
                   variant="outline"
                   className="w-full"
@@ -94,8 +94,8 @@ export default function AIToolsPage() {
               <p className="text-[10px] text-muted-foreground uppercase">
                 {role === 'Organization' ? 'REFINE_EXISTING_DESCRIPTION' : 'GENERATE_APPLICATION_LETTER'}
               </p>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
                 onClick={handleDraft}
                 disabled={draftMutation.isPending || improveMutation.isPending}

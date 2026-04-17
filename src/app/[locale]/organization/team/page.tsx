@@ -11,24 +11,24 @@ import { Organization, OrganizationMemberRole } from '@/src/types/organization';
 
 export default function TeamPage() {
   const {
-    useMyOrganizations,
-    useOrganizationMembers,
+    useGetMyOrganizations,
+    useGetMembersByOrganization,
     useInviteMember,
     useRemoveMember,
-    useUpdateMember,
+    useUpdateMemberRole,
   } = useOrganizationQueries();
 
-  const { data: orgs } = useMyOrganizations();
+  const { data: orgs } = useGetMyOrganizations();
   const [activeOrg, setActiveOrg] = useState<Organization | null>(null);
 
   useEffect(() => {
     if (orgs?.length && !activeOrg) setActiveOrg(orgs[0]);
   }, [orgs, activeOrg]);
 
-  const { data: members, isLoading } = useOrganizationMembers(activeOrg?.id ?? null);
+  const { data: members, isLoading } = useGetMembersByOrganization(activeOrg?.id ?? 0);
   const inviteMember = useInviteMember();
   const removeMember = useRemoveMember();
-  const updateMember = useUpdateMember();
+  const updateMember = useUpdateMemberRole();
 
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<OrganizationMemberRole>(OrganizationMemberRole.Member);

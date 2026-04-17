@@ -42,10 +42,9 @@ export default function FeedPostCard({ post }: { post: PostFeedItemDto }) {
                 <span className="text-[14px] font-bold hover:text-primary hover:underline cursor-pointer">
                   {post.authorName || 'Collaborator'}
                 </span>
-                <span className="text-[14px] text-muted-foreground">• 1st</span>
               </div>
               <p className="text-[12px] text-muted-foreground line-clamp-1 max-w-[200px] sm:max-w-none">
-                Software Engineer at AI-JOB Network
+                AI-JOB Network Member
               </p>
               <div className="flex items-center gap-1 text-[12px] text-muted-foreground mt-0.5">
                 <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
@@ -62,7 +61,7 @@ export default function FeedPostCard({ post }: { post: PostFeedItemDto }) {
 
       <CardContent className="px-4 py-2">
         <p className="text-[14px] leading-[1.4] whitespace-pre-wrap">{post.content}</p>
-        
+
         {post.imageUrl && (
           <div className="mt-3 rounded-lg overflow-hidden border border-border/50 bg-muted/20">
             <img src={post.imageUrl} alt="Post media" className="w-full h-auto max-h-[400px] object-cover" />
@@ -86,8 +85,8 @@ export default function FeedPostCard({ post }: { post: PostFeedItemDto }) {
       </div>
 
       <CardFooter className="px-1 py-1 mt-1 border-t flex items-center justify-between">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className={cn(
             "flex-1 h-12 text-muted-foreground font-semibold hover:bg-black/5 hover:text-foreground group",
             post.likedByMe && "text-primary"
@@ -97,9 +96,9 @@ export default function FeedPostCard({ post }: { post: PostFeedItemDto }) {
           <ThumbsUp className={cn("size-5 mr-2", post.likedByMe && "fill-current")} />
           <span className="hidden sm:inline">Like</span>
         </Button>
-        
-        <Button 
-          variant="ghost" 
+
+        <Button
+          variant="ghost"
           className="flex-1 h-12 text-muted-foreground font-semibold hover:bg-black/5 hover:text-foreground"
           onClick={() => setShowComments(!showComments)}
         >
@@ -107,8 +106,8 @@ export default function FeedPostCard({ post }: { post: PostFeedItemDto }) {
           <span className="hidden sm:inline">Comment</span>
         </Button>
 
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="flex-1 h-12 text-muted-foreground font-semibold hover:bg-black/5 hover:text-foreground"
           onClick={handleRepost}
         >

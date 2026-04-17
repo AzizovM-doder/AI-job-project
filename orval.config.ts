@@ -8,7 +8,6 @@ export default defineConfig({
       target: 'src/hooks/api/endpoints.ts',
       schemas: 'src/types/api',
       client: 'react-query',
-      prettier: true,
       override: {
         mutator: {
           path: './src/lib/api.ts',

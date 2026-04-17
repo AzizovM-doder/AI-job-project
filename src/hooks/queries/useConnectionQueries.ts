@@ -49,7 +49,7 @@ export const useConnectionQueries = () => {
     return useMutation<void, Error, number>({
       mutationFn: async (addresseeId) => {
         const res = await api.post(`/Connection/send/${addresseeId}`);
-        return res.data;
+        return res.data?.data ?? res.data;
       },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['connections'] });
@@ -59,9 +59,9 @@ export const useConnectionQueries = () => {
 
   // POST /api/Connection/send-by-email
   const useSendRequestByEmail = () => {
-    return useMutation<void, Error, SendConnectionByEmailDto>({
-      mutationFn: async (data) => {
-        const res = await api.post('/Connection/send-by-email', data);
+    return useMutation<void, Error, string>({
+      mutationFn: async (email) => {
+        const res = await api.post('/Connection/send-by-email', { email });
         return res.data;
       },
       onSuccess: () => {
@@ -71,10 +71,10 @@ export const useConnectionQueries = () => {
   };
 
   // PUT /api/Connection/{connectionId}/respond
-  const useRespondRequest = (connectionId: number) => {
-    return useMutation<void, Error, UpdateConnectionDto>({
-      mutationFn: async (data) => {
-        const res = await api.put(`/Connection/${connectionId}/respond`, data);
+  const useRespondRequest = () => {
+    return useMutation<void, Error, { connectionId: number; status: ConnectionStatus }>({
+      mutationFn: async ({ connectionId, status }) => {
+        const res = await api.put(`/Connection/${connectionId}/respond`, { status });
         return res.data;
       },
       onSuccess: () => {

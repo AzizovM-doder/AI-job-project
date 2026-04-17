@@ -44,7 +44,7 @@ export default async function LocaleLayout({children, params}: Props) {
           <Providers>
             <NextIntlClientProvider locale={locale}>
               <Navbar />
-              <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-5 py-6 sm:py-8">
+              <main className="flex-1 w-full">
                 {children}
               </main>
               <Footer />

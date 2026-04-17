@@ -3,10 +3,9 @@
 import { useParams, useRouter } from 'next/navigation';
 import ProtectedRoute from '@/src/components/ProtectedRoute';
 import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
-import { useApplicationQueries } from '@/src/hooks/queries/useApplicationQueries';
 import { useJobMatchingQueries } from '@/src/hooks/queries/useJobMatchingQueries';
 import { useMetadataQueries } from '@/src/hooks/queries/useMetadataQueries';
-import { useAI } from '@/src/hooks/useAI';
+import { useAiQueries } from '@/src/hooks/queries/useAiQueries';
 import { useAuthStore } from '@/src/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,6 +14,7 @@ import {
   Zap, FileText, Calendar
 } from 'lucide-react';
 import { ApplicationStatus } from '@/src/types/job';
+import { AiDraftResultDto } from '@/src/types/ai';
 import { useState } from 'react';
 
 export default function JobDetailPage() {
@@ -24,40 +24,27 @@ export default function JobDetailPage() {
   const jobId = Number(params.id);
 
   const { user } = useAuthStore();
-  const { useJobDetail, useJobSkills } = useJobQueries();
-  const { useApplyForJob } = useApplicationQueries();
+  const { useGetJob, useGetJobSkills, useApplyToJob } = useJobQueries();
   const { useMatchExplanation } = useJobMatchingQueries();
-  const { useDraftCoverLetter } = useAI();
+  const { useDraftCoverLetter } = useAiQueries();
   const { useMetadataQueries: _m } = { useMetadataQueries: useMetadataQueries };
 
-  const { data: job, isLoading } = useJobDetail(jobId);
-  const { data: skills } = useJobSkills(jobId);
-  const applyMutation = useApplyForJob();
+  const { data: job, isLoading } = useGetJob(jobId);
+  const { data: skills } = useGetJobSkills(jobId);
+  const applyMutation = useApplyToJob();
   const draftCoverLetter = useDraftCoverLetter();
 
   const userId = user?.userId ? Number(user.userId) : null;
   const { data: matchExplanation, isLoading: matchLoading } = useMatchExplanation(userId, jobId);
 
-  const [coverLetter, setCoverLetter] = useState('');
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [applied, setApplied] = useState(false);
 
-  const handleDraftCoverLetter = () => {
-    if (!userId) return;
-    draftCoverLetter.mutate(
-      { jobId, userId, tone: 'professional' },
-      {
-        onSuccess: (data) => {
-          const draft = data?.data?.draft ?? data?.data ?? data;
-          setCoverLetter(typeof draft === 'string' ? draft : JSON.stringify(draft));
-        },
-      }
-    );
-  };
 
   const handleApply = () => {
+    if (!userId) return;
     applyMutation.mutate(
-      { jobId, coverLetter },
+      { jobId, userId },
       {
         onSuccess: () => {
           setApplied(true);
@@ -98,27 +85,22 @@ export default function JobDetailPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[9px] border border-primary/40 px-2 py-0.5 text-primary font-bold tracking-widest">
-                  {job.jobType.toUpperCase()}
+                  {job.jobType?.toUpperCase() || 'N/A'}
                 </span>
                 <span className="text-[9px] border border-secondary/40 px-2 py-0.5 text-secondary font-bold tracking-widest">
-                  {job.experienceLevel.toUpperCase()}
+                  {job.experienceLevel?.toUpperCase() || 'N/A'}
                 </span>
-                {job.isRemote && (
-                  <span className="text-[9px] border border-green-500/40 px-2 py-0.5 text-green-400 font-bold tracking-widest">
-                    REMOTE_ELIGIBLE
-                  </span>
-                )}
               </div>
               <h1 className="text-3xl md:text-5xl font-black tracking-tighter terminal-glow">
-                {job.title.toUpperCase()}
+                {job.title?.toUpperCase() || 'UNTITLED_JOB'}
               </h1>
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Briefcase className="size-3" />
-                  {job.organizationName?.toUpperCase() || `ORG_${job.organizationId}`}
+                  {`ORG_${job.organizationId}`}
                 </span>
                 <span className="flex items-center gap-1">
-                  <MapPin className="size-3" /> {job.location.toUpperCase()}
+                  <MapPin className="size-3" /> {job.location?.toUpperCase() || 'REMOTE'}
                 </span>
                 {job.salaryMin > 0 && (
                   <span className="flex items-center gap-1 text-primary font-bold">
@@ -206,19 +188,19 @@ export default function JobDetailPage() {
                 <div className="space-y-2 text-[10px]">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">TYPE</span>
-                    <span className="font-bold">{job.jobType}</span>
+                    <span className="font-bold">{job.jobType || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">LEVEL</span>
-                    <span className="font-bold">{job.experienceLevel}</span>
+                    <span className="font-bold">{job.experienceLevel || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">EXP_REQUIRED</span>
                     <span className="font-bold">{job.experienceRequired}Y</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">REMOTE</span>
-                    <span className="font-bold">{job.isRemote ? 'YES' : 'NO'}</span>
+                    <span className="text-muted-foreground">EXP_REQUIRED</span>
+                    <span className="font-bold">{job.experienceRequired}Y</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">POSTED</span>
@@ -253,31 +235,9 @@ export default function JobDetailPage() {
                     ✕
                   </Button>
                 </div>
-                <p className="text-[10px] text-muted-foreground tracking-widest">
-                  APPLYING_FOR: {job.title.toUpperCase()}
+                <p className="text-[10px] text-muted-foreground tracking-widest leading-relaxed">
+                  By clicking submit, you agree to share your profile details with the employer.
                 </p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[10px] text-muted-foreground uppercase tracking-widest">
-                      COVER_LETTER (optional)
-                    </label>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-[9px] h-6 rounded-none hover:text-primary"
-                      onClick={handleDraftCoverLetter}
-                      disabled={draftCoverLetter.isPending}
-                    >
-                      {draftCoverLetter.isPending ? <Loader2 className="size-3 animate-spin" /> : '⚡ AI_DRAFT'}
-                    </Button>
-                  </div>
-                  <textarea
-                    value={coverLetter}
-                    onChange={(e) => setCoverLetter(e.target.value)}
-                    className="w-full bg-background border border-primary/20 p-3 text-xs font-mono focus:outline-none focus:border-primary min-h-[140px] resize-none"
-                    placeholder="WRITE_YOUR_COVER_LETTER_OR_USE_AI_DRAFT..."
-                  />
-                </div>
                 <div className="flex gap-3 justify-end">
                   <Button variant="outline" className="rounded-none" onClick={() => setShowApplyModal(false)}>
                     CANCEL

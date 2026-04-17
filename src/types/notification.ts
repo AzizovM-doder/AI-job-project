@@ -1,15 +1,25 @@
+export enum NotificationType {
+  JobMatched = 'JobMatched',
+  ApplicationStatusChanged = 'ApplicationStatusChanged',
+  NewMessage = 'NewMessage',
+  ConnectionRequest = 'ConnectionRequest',
+  RecommendationReceived = 'RecommendationReceived'
+}
+
 export interface Notification {
   id: number;
   userId: number;
+  type: NotificationType | string;
+  title: string;
   message: string;
-  type: string;
+  relatedId?: number;
   isRead: boolean;
   createdAt: string;
 }
 
 export interface NotificationPagedResult {
   items: Notification[];
-  pageNumber: number;
+  page: number;
   pageSize: number;
   totalCount: number;
   totalPages: number;
@@ -17,8 +27,8 @@ export interface NotificationPagedResult {
   hasNext: boolean;
 }
 
-export interface NotificationListResponse {
+export interface NotificationResponse<T> {
   statusCode: number;
   description: string[];
-  data: NotificationPagedResult;
+  data: T;
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { useApplicationQueries } from '@/src/hooks/queries/useApplicationQueries';
 import { useJobMatchingQueries } from '@/src/hooks/queries/useJobMatchingQueries';
 import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
 import { Button } from '@/components/ui/button';
@@ -23,21 +22,23 @@ export default function ApplicantsPage() {
   const locale = params.locale as string;
   const jobId = Number(params.id);
 
-  const { useJobDetail } = useJobQueries();
-  const { useApplicationsByJob, useUpdateApplicationStatus } = useApplicationQueries();
+  const { useGetJob, useGetApplicationsByJob, useUpdateApplication } = useJobQueries();
   const { useRecommendedApplicants } = useJobMatchingQueries();
 
-  const { data: job } = useJobDetail(jobId);
-  const { data: applications, isLoading } = useApplicationsByJob(jobId);
+  const { data: job } = useGetJob(jobId);
+  const { data: applications, isLoading } = useGetApplicationsByJob(jobId);
   const { data: recommended } = useRecommendedApplicants(jobId);
-  const updateStatus = useUpdateApplicationStatus();
+  const updateStatus = useUpdateApplication();
 
-  const handleStatus = (id: number, status: ApplicationStatus) => {
-    updateStatus.mutate({ id, status });
+  const handleStatus = (app: any, status: ApplicationStatus) => {
+    updateStatus.mutate({ 
+      ...app,
+      status 
+    });
   };
 
-  const getMatchPercent = (userId: number) => {
-    return recommended?.items?.find((r) => r.userId === userId)?.matchPercentage;
+  const getMatchScore = (userId: number) => {
+    return recommended?.items?.find((r) => r.application.userId === userId)?.matchScore;
   };
 
   return (
@@ -80,14 +81,14 @@ export default function ApplicantsPage() {
               </thead>
               <tbody className="divide-y divide-primary/10">
                 {applications.map((app) => {
-                  const match = getMatchPercent(app.userId);
+                  const match = getMatchScore(app.userId);
                   return (
                     <tr key={app.id} className="hover:bg-primary/5 transition-colors">
                       <td className="p-4 font-bold">
-                        {(app.applicantName || `USER_${app.userId}`).toUpperCase()}
+                        {`CANDIDATE_${app.userId}`}
                       </td>
                       <td className="p-4 text-muted-foreground hidden md:table-cell">
-                        {app.applicantEmail?.toLowerCase() || '—'}
+                        {`UID_${app.userId}`}
                       </td>
                       <td className="p-4 text-center hidden md:table-cell">
                         {match !== undefined ? (
@@ -110,7 +111,7 @@ export default function ApplicantsPage() {
                               <Button
                                 size="sm"
                                 className="h-7 px-2 rounded-none text-[9px] bg-green-600 hover:bg-green-700"
-                                onClick={() => handleStatus(app.id, ApplicationStatus.Accepted)}
+                                onClick={() => handleStatus(app, ApplicationStatus.Accepted)}
                                 disabled={updateStatus.isPending}
                               >
                                 <Check className="size-3 mr-1" /> ACCEPT
@@ -119,7 +120,7 @@ export default function ApplicantsPage() {
                                 size="sm"
                                 variant="destructive"
                                 className="h-7 px-2 rounded-none text-[9px]"
-                                onClick={() => handleStatus(app.id, ApplicationStatus.Rejected)}
+                                onClick={() => handleStatus(app, ApplicationStatus.Rejected)}
                                 disabled={updateStatus.isPending}
                               >
                                 <X className="size-3 mr-1" /> REJECT

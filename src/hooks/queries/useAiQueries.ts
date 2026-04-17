@@ -72,7 +72,7 @@ export const useAiQueries = () => {
   const useDraftMessage = () => {
     return useMutation<AiDraftResultDto, Error, AiDraftMessageRequestDto>({
       mutationFn: async (data) => {
-        const res = await api.post('/api/Ai/draft-message', data);
+        const res = await api.post('/Ai/draft-message', data);
         return res.data?.data ?? res.data;
       },
     });

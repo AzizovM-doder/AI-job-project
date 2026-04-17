@@ -27,3 +27,21 @@ export interface JwtPayload {
 }
 
 export type UserRole = 'Candidate' | 'Organization';
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  token: string;
+  newPassword: string;
+}
+
+export interface LogoutRequest {
+  refreshToken: string;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
