@@ -1,10 +1,10 @@
 'use client';
 
-import { useNotificationQueries } from '@/src/hooks/queries/useNotificationQueries';
-import { useAuthStore } from '@/src/store/authStore';
-import { PageTransition } from '@/src/components/PageTransition';
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import NotificationItem from '@/src/components/notifications/NotificationItem';
+import { useNotificationQueries } from '@/hooks/queries/useNotificationQueries';
+import { useAuthStore } from '@/store/authStore';
+import { PageTransition } from '@/components/PageTransition';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import NotificationItem from '@/components/notifications/NotificationItem';
 import { Button } from '@/components/ui/button';
 import { Bell, CheckCheck, Trash2, Filter } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Mail, ArrowLeft } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 import Link from 'next/link';
 
 interface ForgotPasswordForm {

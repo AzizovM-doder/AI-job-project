@@ -1,10 +1,10 @@
 'use client';
 
-import { useMessageQueries } from '@/src/hooks/queries/useMessageQueries';
-import { useAiQueries } from '@/src/hooks/queries/useAiQueries';
-import { useUserQueries } from '@/src/hooks/queries/useUserQueries';
-import { useProfileQueries } from '@/src/hooks/queries/useProfileQueries';
-import { useAuthStore } from '@/src/store/authStore';
+import { useMessageQueries } from '@/hooks/queries/useMessageQueries';
+import { useAiQueries } from '@/hooks/queries/useAiQueries';
+import { useUserQueries } from '@/hooks/queries/useUserQueries';
+import { useProfileQueries } from '@/hooks/queries/useProfileQueries';
+import { useAuthStore } from '@/store/authStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { 

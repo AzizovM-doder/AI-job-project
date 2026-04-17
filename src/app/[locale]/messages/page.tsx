@@ -1,20 +1,20 @@
 'use client';
 
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { PageTransition } from '@/src/components/PageTransition';
-import ConversationList from '@/src/components/messages/ConversationList';
-import ChatWindow from '@/src/components/messages/ChatWindow';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { PageTransition } from '@/components/PageTransition';
+import ConversationList from '@/components/messages/ConversationList';
+import ChatWindow from '@/components/messages/ChatWindow';
 import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { useMessageQueries } from '@/src/hooks/queries/useMessageQueries';
-import { useConnectionQueries } from '@/src/hooks/queries/useConnectionQueries';
+import { useMessageQueries } from '@/hooks/queries/useMessageQueries';
+import { useConnectionQueries } from '@/hooks/queries/useConnectionQueries';
 import { toast } from 'sonner';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import axios from 'axios';
 
-import { Container } from '@/src/components/ui/Container';
+import { Container } from '@/components/ui/Container';
 
 export default function MessagesPage() {
   const { locale } = useParams();

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 import { 
   PostFeedItemDto, 
   CreatePostDto, 
@@ -10,7 +10,7 @@ import {
   CreatePostCommentDto,
   PostLikeStateDto,
   PostFeedItemDtoPagedResult
-} from '@/src/types/post';
+} from '@/types/post';
 
 export const useFeedQueries = () => {
   const queryClient = useQueryClient();

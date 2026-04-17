@@ -1,12 +1,12 @@
 'use client';
 
-import { useAuthStore } from '@/src/store/authStore';
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { PageTransition } from '@/src/components/PageTransition';
-import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
-import { useJobMatchingQueries } from '@/src/hooks/queries/useJobMatchingQueries';
-import { useConnectionQueries } from '@/src/hooks/queries/useConnectionQueries';
-import { useNotificationQueries } from '@/src/hooks/queries/useNotificationQueries';
+import { useAuthStore } from '@/store/authStore';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { PageTransition } from '@/components/PageTransition';
+import { useJobQueries } from '@/hooks/queries/useJobQueries';
+import { useJobMatchingQueries } from '@/hooks/queries/useJobMatchingQueries';
+import { useConnectionQueries } from '@/hooks/queries/useConnectionQueries';
+import { useNotificationQueries } from '@/hooks/queries/useNotificationQueries';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Briefcase, Users, Bell, ArrowRight, Star, MapPin, Eye, GraduationCap, ChevronRight, User } from 'lucide-react';

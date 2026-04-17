@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/src/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -27,8 +27,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { useNotificationQueries } from '@/src/hooks/queries/useNotificationQueries';
-import { useMessageQueries } from '@/src/hooks/queries/useMessageQueries';
+import { useNotificationQueries } from '@/hooks/queries/useNotificationQueries';
+import { useMessageQueries } from '@/hooks/queries/useMessageQueries';
 import { useState } from 'react';
 import NotificationDropdown from './notifications/NotificationDropdown';
 import MobileDrawer from './MobileDrawer';

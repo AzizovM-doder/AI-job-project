@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Lock } from 'lucide-react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 import Link from 'next/link';
 
 interface ResetPasswordForm {

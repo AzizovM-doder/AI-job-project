@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import ProtectedRoute from '@/src/components/ProtectedRoute';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useOrganizationQueries } from '@/src/hooks/queries/useOrganizationQueries';
+import { useOrganizationQueries } from '@/hooks/queries/useOrganizationQueries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { Building2, Globe, MapPin, Users, Save, Loader2, Edit2, X } from 'lucide-react';
-import { Organization, UpdateOrganizationDto } from '@/src/types/organization';
+import { Organization, UpdateOrganizationDto } from '@/types/organization';
 import { useTranslations } from 'next-intl';
 import { useRouter, useParams } from 'next/navigation';
 

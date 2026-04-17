@@ -3,11 +3,11 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
-import { routing } from "@/src/i18n/routing";
-import Providers from "@/src/components/Providers";
-import { ThemeProvider } from "@/src/components/ThemeProvider";
-import Navbar from "@/src/components/Navbar";
-import Footer from "@/src/components/Footer";
+import { routing } from "@/i18n/routing";
+import Providers from "@/components/Providers";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { Metadata } from "next";
 

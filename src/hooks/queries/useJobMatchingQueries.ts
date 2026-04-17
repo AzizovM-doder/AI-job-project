@@ -1,11 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 import {
   JobWithMatchDtoPagedResult,
   ApplicantWithMatchDtoPagedResult,
-} from '@/src/types/job';
+} from '@/types/job';
 
 export const useJobMatchingQueries = () => {
   // GET /api/JobMatching/recommended-jobs/:userId

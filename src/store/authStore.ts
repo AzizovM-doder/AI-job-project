@@ -2,8 +2,8 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { AuthResponse, JwtPayload, UserRole, LoginCredentials, RegisterCredentials } from '@/src/types/auth';
-import api from '@/src/lib/api';
+import { AuthResponse, JwtPayload, UserRole, LoginCredentials, RegisterCredentials } from '@/types/auth';
+import api from '@/lib/api';
 
 export interface AuthUser {
   userId: string;

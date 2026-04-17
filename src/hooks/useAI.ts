@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 
 export const useAI = () => {
   // POST /api/Ai/analyze-cv

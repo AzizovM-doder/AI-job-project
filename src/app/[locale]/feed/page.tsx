@@ -1,17 +1,17 @@
 'use client';
 
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { PageTransition } from '@/src/components/PageTransition';
-import ThreeColumnLayout from '@/src/components/layouts/ThreeColumnLayout';
-import FeedIdentityCard from '@/src/components/feed/FeedIdentityCard';
-import FeedSuggestionsCard from '@/src/components/feed/FeedSuggestionsCard';
-import StartPostBox from '@/src/components/feed/StartPostBox';
-import FeedPostCard from '@/src/components/feed/FeedPostCard';
-import { useFeedQueries } from '@/src/hooks/queries/useFeedQueries';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { PageTransition } from '@/components/PageTransition';
+import ThreeColumnLayout from '@/components/layouts/ThreeColumnLayout';
+import FeedIdentityCard from '@/components/feed/FeedIdentityCard';
+import FeedSuggestionsCard from '@/components/feed/FeedSuggestionsCard';
+import StartPostBox from '@/components/feed/StartPostBox';
+import FeedPostCard from '@/components/feed/FeedPostCard';
+import { useFeedQueries } from '@/hooks/queries/useFeedQueries';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
 
-import { Container } from '@/src/components/ui/Container';
+import { Container } from '@/components/ui/Container';
 
 export default function FeedPage() {
   const { useGetFeed } = useFeedQueries();

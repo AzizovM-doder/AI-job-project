@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 import { cn } from '@/lib/utils';
-import { useUserQueries } from '@/src/hooks/queries/useUserQueries';
-import { UserPublicProfileDto } from '@/src/types/user';
+import { useUserQueries } from '@/hooks/queries/useUserQueries';
+import { UserPublicProfileDto } from '@/types/user';
 import { useTranslations } from 'next-intl';
 
 interface UserSearchModalProps {

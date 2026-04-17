@@ -1,6 +1,6 @@
 'use client';
 
-import { Education } from '@/src/types/profile';
+import { Education } from '@/types/profile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, GraduationCap } from 'lucide-react';

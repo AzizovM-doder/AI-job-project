@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useMessageQueries } from '@/src/hooks/queries/useMessageQueries';
-import { useAuthStore } from '@/src/store/authStore';
+import { useMessageQueries } from '@/hooks/queries/useMessageQueries';
+import { useAuthStore } from '@/store/authStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Search, MessageSquare, Plus } from 'lucide-react';
 import UserSearchModal from './UserSearchModal';
-import { UserPublicProfileDto } from '@/src/types/user';
+import { UserPublicProfileDto } from '@/types/user';
 import { useTranslations } from 'next-intl';
 import ConversationListItem from './ConversationListItem';
 

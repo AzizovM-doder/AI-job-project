@@ -3,8 +3,8 @@
 import { useForm } from 'react-hook-form';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/src/hooks/useAuth';
-import { RegisterCredentials } from '@/src/types/auth';
+import { useAuth } from '@/hooks/useAuth';
+import { RegisterCredentials } from '@/types/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';

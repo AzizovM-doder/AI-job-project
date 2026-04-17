@@ -1,12 +1,12 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 import { 
   Connection, 
   SendConnectionByEmailDto, 
   UpdateConnectionDto 
-} from '@/src/types/connection';
+} from '@/types/connection';
 
 export const useConnectionQueries = () => {
   const queryClient = useQueryClient();

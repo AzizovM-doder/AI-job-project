@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 import { 
   UserProfile, 
   MemberProfileDto,
@@ -19,7 +19,7 @@ import {
   CreateProfileLanguageDto,
   CreateEndorsementDto,
   CreateRecommendationDto
-} from '@/src/types/profile';
+} from '@/types/profile';
 
 export const useProfileQueries = () => {
   const queryClient = useQueryClient();

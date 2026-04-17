@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { CreateProfileSkillDto } from '@/src/types/profile';
-import { useProfileQueries } from '@/src/hooks/queries/useProfileQueries';
+import { CreateProfileSkillDto } from '@/types/profile';
+import { useProfileQueries } from '@/hooks/queries/useProfileQueries';
 import { Check, Search, Skill } from 'lucide-react';
 
 interface SkillModalProps {

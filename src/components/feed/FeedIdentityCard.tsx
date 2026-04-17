@@ -1,11 +1,11 @@
 'use client';
 
-import { useAuthStore } from '@/src/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent } from '@/components/ui/card';
 import { User, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
-import { useProfileQueries } from '@/src/hooks/queries/useProfileQueries';
+import { useProfileQueries } from '@/hooks/queries/useProfileQueries';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function FeedIdentityCard() {

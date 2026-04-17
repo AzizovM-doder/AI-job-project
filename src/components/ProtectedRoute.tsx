@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuthStore } from '@/src/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { useLocale } from 'next-intl';

@@ -1,11 +1,11 @@
 'use client';
 
-import { PostFeedItemDto } from '@/src/types/post';
+import { PostFeedItemDto } from '@/types/post';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { ThumbsUp, MessageSquare, Share2, Send, MoreHorizontal, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
-import { useFeedQueries } from '@/src/hooks/queries/useFeedQueries';
+import { useFeedQueries } from '@/hooks/queries/useFeedQueries';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 

@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Pencil, Sparkles, Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { useAiQueries } from '@/src/hooks/queries/useAiQueries';
-import { useProfileQueries } from '@/src/hooks/queries/useProfileQueries';
+import { useAiQueries } from '@/hooks/queries/useAiQueries';
+import { useProfileQueries } from '@/hooks/queries/useProfileQueries';
 import { toast } from 'sonner';
 
 interface ProfileAboutProps {

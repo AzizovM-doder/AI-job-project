@@ -1,9 +1,9 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useOrganizationQueries } from '@/src/hooks/queries/useOrganizationQueries';
-import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
-import { useAuthStore } from '@/src/store/authStore';
+import { useOrganizationQueries } from '@/hooks/queries/useOrganizationQueries';
+import { useJobQueries } from '@/hooks/queries/useJobQueries';
+import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Building2, Globe, MapPin, Briefcase, Mail, ArrowLeft, ExternalLink, Calendar } from 'lucide-react';

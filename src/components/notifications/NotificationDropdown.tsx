@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Bell, MoreHorizontal, Check, Settings } from 'lucide-react';
-import { useNotificationQueries } from '@/src/hooks/queries/useNotificationQueries';
+import { useNotificationQueries } from '@/hooks/queries/useNotificationQueries';
 import NotificationItem from './NotificationItem';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';

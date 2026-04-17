@@ -1,19 +1,19 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { PageTransition } from '@/src/components/PageTransition';
-import { useConnectionQueries } from '@/src/hooks/queries/useConnectionQueries';
-import { useUserQueries } from '@/src/hooks/queries/useUserQueries';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { PageTransition } from '@/components/PageTransition';
+import { useConnectionQueries } from '@/hooks/queries/useConnectionQueries';
+import { useUserQueries } from '@/hooks/queries/useUserQueries';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import ManageNetworkSidebar from '@/src/components/networking/ManageNetworkSidebar';
-import InvitationCard from '@/src/components/networking/InvitationCard';
+import ManageNetworkSidebar from '@/components/networking/ManageNetworkSidebar';
+import InvitationCard from '@/components/networking/InvitationCard';
 import { UserPlus, User, Building2, MoreHorizontal, X, Users, Globe, Mail, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useTranslations, useLocale } from 'next-intl';
-import { useAuthStore } from '@/src/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import {

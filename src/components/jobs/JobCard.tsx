@@ -1,6 +1,6 @@
 'use client';
 
-import { Job } from '@/src/types/job';
+import { Job } from '@/types/job';
 import { Card, CardContent } from '@/components/ui/card';
 import { Briefcase, MapPin, Sparkles, Building2, Bookmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';

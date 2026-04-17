@@ -1,8 +1,8 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/src/lib/api';
-import { Conversation, Message } from '@/src/types/message';
+import api from '@/lib/api';
+import { Conversation, Message } from '@/types/message';
 
 export const useMessages = () => {
   const queryClient = useQueryClient();

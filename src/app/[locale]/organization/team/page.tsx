@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { useOrganizationQueries } from '@/src/hooks/queries/useOrganizationQueries';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useOrganizationQueries } from '@/hooks/queries/useOrganizationQueries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, UserPlus, Trash2, Loader2 } from 'lucide-react';
-import { Organization, OrganizationMemberRole } from '@/src/types/organization';
+import { Organization, OrganizationMemberRole } from '@/types/organization';
 
 export default function TeamPage() {
   const {

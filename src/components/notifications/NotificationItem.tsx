@@ -1,6 +1,6 @@
 'use client';
 
-import { Notification, NotificationType } from '@/src/types/notification';
+import { Notification, NotificationType } from '@/types/notification';
 import { formatDistanceToNow } from 'date-fns';
 import { Bell, Briefcase, MessageSquare, CheckCircle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';

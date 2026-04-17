@@ -1,12 +1,12 @@
 'use client';
 
-import { useProfileQueries } from '@/src/hooks/queries/useProfileQueries';
-import { useAuthStore } from '@/src/store/authStore';
+import { useProfileQueries } from '@/hooks/queries/useProfileQueries';
+import { useAuthStore } from '@/store/authStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { User } from 'lucide-react';
 import { formatDistanceToNowStrict } from 'date-fns';
-import { ConversationListItemDto } from '@/src/types/message';
+import { ConversationListItemDto } from '@/types/message';
 
 interface ConversationListItemProps {
   conversation: ConversationListItemDto;

@@ -1,11 +1,11 @@
 'use client';
 
-import { useAuthStore } from '@/src/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent } from '@/components/ui/card';
 import { Image as ImageIcon, Video, Calendar, Layout } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
-import { useFeedQueries } from '@/src/hooks/queries/useFeedQueries';
+import { useFeedQueries } from '@/hooks/queries/useFeedQueries';
 import { toast } from 'sonner';
 
 export default function StartPostBox() {

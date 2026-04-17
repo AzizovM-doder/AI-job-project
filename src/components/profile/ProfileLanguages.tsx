@@ -1,6 +1,6 @@
 'use client';
 
-import { ProfileLanguage } from '@/src/types/profile';
+import { ProfileLanguage } from '@/types/profile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Globe, Trash2 } from 'lucide-react';

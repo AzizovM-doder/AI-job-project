@@ -1,8 +1,8 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/src/lib/api';
-import { NotificationPagedResult } from '@/src/types/notification';
+import api from '@/lib/api';
+import { NotificationPagedResult } from '@/types/notification';
 import { useAuthStore } from '../store/authStore';
 
 export const useNotifications = () => {

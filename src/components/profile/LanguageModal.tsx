@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { CreateProfileLanguageDto, LanguageLevel } from '@/src/types/profile';
-import { useMetadataQueries } from '@/src/hooks/queries/useMetadataQueries';
+import { CreateProfileLanguageDto, LanguageLevel } from '@/types/profile';
+import { useMetadataQueries } from '@/hooks/queries/useMetadataQueries';
 
 interface LanguageModalProps {
   isOpen: boolean;

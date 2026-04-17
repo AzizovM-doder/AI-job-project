@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
-import { useMetadataQueries } from '@/src/hooks/queries/useMetadataQueries';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useJobQueries } from '@/hooks/queries/useJobQueries';
+import { useMetadataQueries } from '@/hooks/queries/useMetadataQueries';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { ArrowLeft, Loader2, Trash2 } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
-import { UpdateJobDto, JobType, ExperienceLevel } from '@/src/types/job';
+import { UpdateJobDto, JobType, ExperienceLevel } from '@/types/job';
 
 export default function EditJobPage() {
   const router = useRouter();

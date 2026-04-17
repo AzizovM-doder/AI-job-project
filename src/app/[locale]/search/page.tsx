@@ -1,14 +1,14 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useUserQueries } from '@/src/hooks/queries/useUserQueries';
-import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
+import { useUserQueries } from '@/hooks/queries/useUserQueries';
+import { useJobQueries } from '@/hooks/queries/useJobQueries';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { User, Briefcase, MapPin, Search as SearchIcon, Users, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { PageTransition } from '@/src/components/PageTransition';
+import { PageTransition } from '@/components/PageTransition';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 

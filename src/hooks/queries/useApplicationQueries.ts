@@ -1,8 +1,8 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/src/lib/api';
-import { JobApplication, JobApplicationPagedResult, ApplicationStatus } from '@/src/types/job';
+import api from '@/lib/api';
+import { JobApplication, JobApplicationPagedResult, ApplicationStatus } from '@/types/job';
 
 export const useApplicationQueries = () => {
   const queryClient = useQueryClient();

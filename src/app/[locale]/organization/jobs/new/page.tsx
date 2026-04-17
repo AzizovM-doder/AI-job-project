@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
-import { useMetadataQueries } from '@/src/hooks/queries/useMetadataQueries';
-import { useOrganizationQueries } from '@/src/hooks/queries/useOrganizationQueries';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useJobQueries } from '@/hooks/queries/useJobQueries';
+import { useMetadataQueries } from '@/hooks/queries/useMetadataQueries';
+import { useOrganizationQueries } from '@/hooks/queries/useOrganizationQueries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { ArrowLeft, Loader2, Sparkles, AlertTriangle } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
-import { CreateJobDto, JobType, ExperienceLevel } from '@/src/types/job';
-import { useAI } from '@/src/hooks/useAI';
+import { CreateJobDto, JobType, ExperienceLevel } from '@/types/job';
+import { useAI } from '@/hooks/useAI';
 
 export default function NewJobPage() {
   const router = useRouter();

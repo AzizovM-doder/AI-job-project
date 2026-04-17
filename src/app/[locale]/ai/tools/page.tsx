@@ -1,9 +1,9 @@
 'use client';
 
-import { useAuthStore } from '@/src/store/authStore';
-import ProtectedRoute from '@/src/components/ProtectedRoute';
+import { useAuthStore } from '@/store/authStore';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useAI } from '@/src/hooks/useAI';
+import { useAI } from '@/hooks/useAI';
 import { Button } from '@/components/ui/button';
 import { Brain, FileSearch, Target, FileText, Sparkles, Loader2 } from 'lucide-react';
 import { useState } from 'react';

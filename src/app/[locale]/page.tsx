@@ -1,4 +1,4 @@
-import { Container } from '@/src/components/ui/Container';
+import { Container } from '@/components/ui/Container';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Terminal, Globe, Shield } from 'lucide-react';

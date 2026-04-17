@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { useAuth } from '@/src/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LoginCredentials } from '@/src/types/auth';
+import { LoginCredentials } from '@/types/auth';
 import axios from 'axios';
 import { useState } from 'react';
 

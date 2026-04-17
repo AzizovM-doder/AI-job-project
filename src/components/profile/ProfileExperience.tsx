@@ -1,6 +1,6 @@
 'use client';
 
-import { Experience } from '@/src/types/profile';
+import { Experience } from '@/types/profile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Briefcase } from 'lucide-react';

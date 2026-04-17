@@ -1,8 +1,8 @@
 'use client';
 
-import { useProfileQueries } from '@/src/hooks/queries/useProfileQueries';
-import { useMessageQueries } from '@/src/hooks/queries/useMessageQueries';
-import { useConnectionQueries } from '@/src/hooks/queries/useConnectionQueries';
+import { useProfileQueries } from '@/hooks/queries/useProfileQueries';
+import { useMessageQueries } from '@/hooks/queries/useMessageQueries';
+import { useConnectionQueries } from '@/hooks/queries/useConnectionQueries';
 import { useParams, useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import {
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
-import { PageTransition } from '@/src/components/PageTransition';
+import { PageTransition } from '@/components/PageTransition';
 
 export default function UserProfilePage() {
   const { id, locale } = useParams();

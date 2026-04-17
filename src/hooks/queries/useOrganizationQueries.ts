@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 import { 
   Organization, 
   OrganizationPagedResult, 
@@ -12,7 +12,7 @@ import {
   CreateOrganizationMemberDto,
   UpdateOrganizationMemberDto,
   OrganizationMemberInviteRespondDto
-} from '@/src/types/organization';
+} from '@/types/organization';
 
 export const useOrganizationQueries = () => {
   const queryClient = useQueryClient();

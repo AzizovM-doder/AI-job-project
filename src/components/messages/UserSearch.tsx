@@ -5,8 +5,8 @@ import { Search, User, X, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { useUserQueries } from '@/src/hooks/queries/useUserQueries';
-import { UserPublicProfileDto } from '@/src/types/user';
+import { useUserQueries } from '@/hooks/queries/useUserQueries';
+import { UserPublicProfileDto } from '@/types/user';
 
 interface UserSearchProps {
   onSelectUser: (user: UserPublicProfileDto) => void;

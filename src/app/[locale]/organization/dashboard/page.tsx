@@ -1,18 +1,18 @@
 'use client';
 
-import { useAuthStore } from '@/src/store/authStore';
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { PageTransition } from '@/src/components/PageTransition';
-import { useOrganizationQueries } from '@/src/hooks/queries/useOrganizationQueries';
-import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
+import { useAuthStore } from '@/store/authStore';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { PageTransition } from '@/components/PageTransition';
+import { useOrganizationQueries } from '@/hooks/queries/useOrganizationQueries';
+import { useJobQueries } from '@/hooks/queries/useJobQueries';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Users, BarChart3, Settings, Building2, Briefcase, ChevronRight, ClipboardList, Filter } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { Organization } from '@/src/types/organization';
-import { ApplicationStatus } from '@/src/types/job';
+import { Organization } from '@/types/organization';
+import { ApplicationStatus } from '@/types/job';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 

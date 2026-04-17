@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 import { 
   CreateAiPromptDto,
   AiCvAnalysisRequestDto,
@@ -12,7 +12,7 @@ import {
   AiDraftCoverLetterRequestDto,
   AiDraftMessageRequestDto,
   AiDraftResultDto
-} from '@/src/types/ai';
+} from '@/types/ai';
 
 export const useAiQueries = () => {
   

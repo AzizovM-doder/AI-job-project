@@ -1,27 +1,27 @@
 'use client';
 
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { PageTransition } from '@/src/components/PageTransition';
-import { useProfileQueries } from '@/src/hooks/queries/useProfileQueries';
-import { useAuthStore } from '@/src/store/authStore';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { PageTransition } from '@/components/PageTransition';
+import { useProfileQueries } from '@/hooks/queries/useProfileQueries';
+import { useAuthStore } from '@/store/authStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import ProfileHero from '@/src/components/profile/ProfileHero';
-import ProfileAbout from '@/src/components/profile/ProfileAbout';
-import ProfileExperience from '@/src/components/profile/ProfileExperience';
-import ProfileEducation from '@/src/components/profile/ProfileEducation';
-import ProfileSkills from '@/src/components/profile/ProfileSkills';
-import ProfileLanguages from '@/src/components/profile/ProfileLanguages';
-import ProfileEditModal from '@/src/components/profile/ProfileEditModal';
-import ImagePickerModal from '@/src/components/profile/ImagePickerModal';
-import ExperienceModal from '@/src/components/profile/ExperienceModal';
-import EducationModal from '@/src/components/profile/EducationModal';
-import SkillModal from '@/src/components/profile/SkillModal';
-import LanguageModal from '@/src/components/profile/LanguageModal';
+import ProfileHero from '@/components/profile/ProfileHero';
+import ProfileAbout from '@/components/profile/ProfileAbout';
+import ProfileExperience from '@/components/profile/ProfileExperience';
+import ProfileEducation from '@/components/profile/ProfileEducation';
+import ProfileSkills from '@/components/profile/ProfileSkills';
+import ProfileLanguages from '@/components/profile/ProfileLanguages';
+import ProfileEditModal from '@/components/profile/ProfileEditModal';
+import ImagePickerModal from '@/components/profile/ImagePickerModal';
+import ExperienceModal from '@/components/profile/ExperienceModal';
+import EducationModal from '@/components/profile/EducationModal';
+import SkillModal from '@/components/profile/SkillModal';
+import LanguageModal from '@/components/profile/LanguageModal';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Settings, ExternalLink } from 'lucide-react';
-import { Experience, Education, ProfileSkill, ProfileLanguage } from '@/src/types/profile';
+import { Experience, Education, ProfileSkill, ProfileLanguage } from '@/types/profile';
 
 export default function ProfilePage() {
   const { user: authUser } = useAuthStore();

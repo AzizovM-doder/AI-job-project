@@ -1,16 +1,16 @@
 'use client';
 
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { PageTransition } from '@/src/components/PageTransition';
-import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { PageTransition } from '@/components/PageTransition';
+import { useJobQueries } from '@/hooks/queries/useJobQueries';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import JobSearchHeader from '@/src/components/jobs/JobSearchHeader';
-import JobCard from '@/src/components/jobs/JobCard';
+import JobSearchHeader from '@/components/jobs/JobSearchHeader';
+import JobCard from '@/components/jobs/JobCard';
 import { Bookmark, List, Bell, PlayCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-import { Container } from '@/src/components/ui/Container';
+import { Container } from '@/components/ui/Container';
 
 export default function JobsPage() {
   const { useJobs } = useJobQueries();

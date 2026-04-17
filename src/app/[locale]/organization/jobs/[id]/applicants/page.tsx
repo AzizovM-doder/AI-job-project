@@ -1,12 +1,12 @@
 'use client';
 
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { useJobMatchingQueries } from '@/src/hooks/queries/useJobMatchingQueries';
-import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useJobMatchingQueries } from '@/hooks/queries/useJobMatchingQueries';
+import { useJobQueries } from '@/hooks/queries/useJobQueries';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Check, X, Star, Loader2 } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
-import { ApplicationStatus } from '@/src/types/job';
+import { ApplicationStatus } from '@/types/job';
 
 const statusColors: Record<string, string> = {
   [ApplicationStatus.Pending]: 'border-yellow-500/30 text-yellow-400 bg-yellow-500/10',

@@ -1,6 +1,6 @@
 'use client';
 
-import { ProfileSkill } from '@/src/types/profile';
+import { ProfileSkill } from '@/types/profile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Code, UserCheck, Trash2 } from 'lucide-react';

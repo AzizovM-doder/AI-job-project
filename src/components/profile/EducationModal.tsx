@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Education, CreateUserEducationDto } from '@/src/types/profile';
+import { Education, CreateUserEducationDto } from '@/types/profile';
 
 interface EducationModalProps {
   isOpen: boolean;

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Experience, CreateUserExperienceDto } from '@/src/types/profile';
+import { Experience, CreateUserExperienceDto } from '@/types/profile';
 
 interface ExperienceModalProps {
   isOpen: boolean;

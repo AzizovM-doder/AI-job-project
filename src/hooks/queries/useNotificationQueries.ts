@@ -1,8 +1,8 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/src/lib/api';
-import { Notification, NotificationPagedResult } from '@/src/types/notification';
+import api from '@/lib/api';
+import { Notification, NotificationPagedResult } from '@/types/notification';
 
 export const useNotificationQueries = () => {
   const queryClient = useQueryClient();

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 import { 
   Job, 
   JobPagedResult, 
@@ -18,7 +18,7 @@ import {
   CreateJobCategoryDto,
   JobSkill,
   CreateJobSkillDto
-} from '@/src/types/job';
+} from '@/types/job';
 
 export const useJobQueries = () => {
   const queryClient = useQueryClient();

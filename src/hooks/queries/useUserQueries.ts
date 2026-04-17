@@ -1,13 +1,13 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 import { 
   User, 
   UserSettingsDto, 
   UpdateUserSettingsDto, 
   UserPublicProfileDto 
-} from '@/src/types/user';
+} from '@/types/user';
 import axios from 'axios';
 
 export const useUserQueries = () => {

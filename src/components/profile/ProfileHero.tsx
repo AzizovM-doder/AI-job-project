@@ -1,6 +1,6 @@
 'use client';
 
-import { UserProfile } from '@/src/types/profile';
+import { UserProfile } from '@/types/profile';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Camera, MapPin, Link as LinkIcon, Pencil, UserPlus, Send, MessageSquare, Briefcase } from 'lucide-react';

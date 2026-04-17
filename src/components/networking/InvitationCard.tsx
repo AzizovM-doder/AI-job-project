@@ -1,11 +1,11 @@
 'use client';
 
-import { Connection, ConnectionStatus } from '@/src/types/connection';
-import { UserPublicProfileDto } from '@/src/types/profile';
+import { Connection, ConnectionStatus } from '@/types/connection';
+import { UserPublicProfileDto } from '@/types/profile';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Check, X, User } from 'lucide-react';
-import { useConnectionQueries } from '@/src/hooks/queries/useConnectionQueries';
+import { useConnectionQueries } from '@/hooks/queries/useConnectionQueries';
 import { toast } from 'sonner';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';

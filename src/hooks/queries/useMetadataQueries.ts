@@ -1,9 +1,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import api from '@/src/lib/api';
-import { JobCategory } from '@/src/types/job';
-import { Language } from '@/src/types/skill';
+import api from '@/lib/api';
+import { JobCategory } from '@/types/job';
+import { Language } from '@/types/skill';
 
 export const useMetadataQueries = () => {
   // GET /api/JobCategory — all categories

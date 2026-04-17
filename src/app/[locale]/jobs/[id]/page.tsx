@@ -1,20 +1,20 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import ProtectedRoute from '@/src/components/ProtectedRoute';
-import { useJobQueries } from '@/src/hooks/queries/useJobQueries';
-import { useJobMatchingQueries } from '@/src/hooks/queries/useJobMatchingQueries';
-import { useMetadataQueries } from '@/src/hooks/queries/useMetadataQueries';
-import { useAiQueries } from '@/src/hooks/queries/useAiQueries';
-import { useAuthStore } from '@/src/store/authStore';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { useJobQueries } from '@/hooks/queries/useJobQueries';
+import { useJobMatchingQueries } from '@/hooks/queries/useJobMatchingQueries';
+import { useMetadataQueries } from '@/hooks/queries/useMetadataQueries';
+import { useAiQueries } from '@/hooks/queries/useAiQueries';
+import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   ArrowLeft, MapPin, Briefcase, DollarSign, Star, Loader2,
   Zap, FileText, Calendar
 } from 'lucide-react';
-import { ApplicationStatus } from '@/src/types/job';
-import { AiDraftResultDto } from '@/src/types/ai';
+import { ApplicationStatus } from '@/types/job';
+import { AiDraftResultDto } from '@/types/ai';
 import { useState } from 'react';
 
 export default function JobDetailPage() {
