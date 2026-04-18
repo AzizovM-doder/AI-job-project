@@ -7,9 +7,10 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Briefcase, Home, MessageSquare,
-  Globe, Sun, Moon, User, LogOut, ChevronDown, Bell, Network, Search, Menu, Building2
+  Globe, Sun, Moon, User, LogOut, ChevronDown, Bell, Network, Search, Menu, Building2, Terminal
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useTerminalBoot } from '@/components/ThemeProvider';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -78,6 +79,7 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { setTheme, theme } = useTheme();
+  const { triggerTerminalBoot } = useTerminalBoot();
 
   // Handle search submission
   const handleSearch = (e: React.FormEvent) => {
@@ -181,6 +183,14 @@ export default function Navbar() {
                         <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
+                        <DropdownMenuSeparator className="opacity-50" />
+                        <DropdownMenuItem 
+                          onClick={triggerTerminalBoot}
+                          className="text-primary font-bold bg-primary/5 hover:bg-primary/10"
+                        >
+                          <Terminal className="mr-2 size-4" />
+                          Terminal Mode
+                        </DropdownMenuItem>
                       </DropdownMenuSubContent>
                     </DropdownMenuSub>
 

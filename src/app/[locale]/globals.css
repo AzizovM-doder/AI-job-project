@@ -3,6 +3,7 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant terminal (&:is(.terminal *));
 
 @theme inline {
   --color-background: var(--background);
@@ -41,6 +42,18 @@
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.5);
+
+  --animate-scanline: scanline 8s linear infinite;
+  --animate-terminal-blink: terminal-blink 1s step-end infinite;
+
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+  @keyframes terminal-blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
 }
 
 /* ── Light Theme ── */
@@ -102,6 +115,38 @@
   --ring: oklch(0.68 0.2 265);
 }
 
+/* ── Terminal Theme ── */
+.terminal {
+  --background: #000000;
+  --foreground: #00FF41;
+  --card: #000000;
+  --card-foreground: #00FF41;
+  --popover: #000000;
+  --popover-foreground: #00FF41;
+
+  --primary: #00FF41;
+  --primary-foreground: #000000;
+  
+  --secondary: #003311;
+  --secondary-foreground: #00FF41;
+  
+  --muted: #001100;
+  --muted-foreground: #00FF4180;
+  
+  --accent: #00FF41;
+  --accent-foreground: #000000;
+  
+  --destructive: #FF0000;
+  --destructive-foreground: #FFFFFF;
+  
+  --border: #00FF41;
+  --input: #00FF41;
+  --ring: #00FF41;
+  --radius: 0px;
+
+  --font-sans: var(--font-mono);
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -114,14 +159,48 @@
   }
 
   body {
-    @apply bg-[#f4f2ee] dark:bg-[#000000] text-foreground antialiased selection:bg-primary/20;
+    @apply bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground;
     font-feature-settings: "cv11", "ss01";
-    /* Premium Scrollbar */
     scrollbar-width: thin;
     scrollbar-color: var(--primary) transparent;
   }
 
-  /* Webkit Scrollbar Refinement */
+  /* Terminal Specific Overrides */
+  .terminal body {
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.4);
+    background-image: radial-gradient(circle at center, rgba(0, 51, 17, 0.2) 0%, #000 100%);
+  }
+
+  .terminal body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(0, 255, 65, 0.1);
+    opacity: 0.1;
+    z-index: 9998;
+    pointer-events: none;
+    animation: scanline 8s linear infinite;
+  }
+
+  .terminal body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 4px, 3px 100%;
+    z-index: 9997;
+    pointer-events: none;
+    opacity: 0.15;
+  }
+
+  /* Webkit Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -132,19 +211,35 @@
   ::-webkit-scrollbar-thumb {
     @apply bg-primary/20 hover:bg-primary/40 rounded-full transition-colors;
   }
-  ::-webkit-scrollbar-corner {
-    @apply bg-transparent;
+
+  .terminal ::-webkit-scrollbar-thumb {
+    @apply bg-primary hover:bg-primary shadow-[0_0_5px_rgba(0,255,65,0.5)] rounded-none;
   }
 }
 
 @layer utilities {
+  .terminal-glow {
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8), 0 0 20px rgba(0, 255, 65, 0.3);
+  }
   .sub-label {
     @apply text-[10px] font-bold uppercase tracking-widest text-muted-foreground;
   }
   .gradient-text {
     @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
   }
+  .terminal .gradient-text {
+    @apply bg-none text-primary;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8), 0 0 20px rgba(0, 255, 65, 0.3);
+  }
   .glass {
     @apply bg-background/80 backdrop-blur-md border border-border;
+  }
+  .terminal .glass {
+    @apply bg-black/90 backdrop-blur-none border-primary shadow-[0_0_10px_rgba(0,255,65,0.2)];
+  }
+
+  /* Terminal Image Filter */
+  .terminal img {
+    filter: sepia(100%) hue-rotate(80deg) saturate(3) brightness(0.8) contrast(1.2);
   }
 }
