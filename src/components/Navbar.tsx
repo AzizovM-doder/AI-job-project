@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Briefcase, Home, MessageSquare,
-  Globe, Sun, Moon, User, LogOut, ChevronDown, Bell, Network, Search, Menu
+  Globe, Sun, Moon, User, LogOut, ChevronDown, Bell, Network, Search, Menu, Building2
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import {
@@ -101,6 +101,7 @@ export default function Navbar() {
   const navLinks = [
     { href: `/${locale}/feed`, icon: Home, label: t('feed'), badge: 0 },
     { href: `/${locale}/networking`, icon: Network, label: 'Network', badge: 0 },
+    { href: `/${locale}/organizations`, icon: Building2, label: 'Organizations', badge: 0 },
     { href: `/${locale}/jobs`, icon: Briefcase, label: t('jobs'), badge: 0 },
     { href: `/${locale}/messages`, icon: MessageSquare, label: t('messages'), badge: unreadMessages },
   ];

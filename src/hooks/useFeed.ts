@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
-import { Post, PostComment } from '@/types/post';
+import { Post, PostCommentDto } from '@/types/post';
 
 export const useFeed = () => {
   const queryClient = useQueryClient();
@@ -43,7 +43,7 @@ export const useFeed = () => {
   };
 
   const useGetComments = (postId: number) => {
-    return useQuery<PostComment[]>({
+    return useQuery<PostCommentDto[]>({
       queryKey: ['comments', postId],
       queryFn: async () => {
         const response = await api.get(`/Post/${postId}/comments`);

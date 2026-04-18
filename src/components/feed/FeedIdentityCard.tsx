@@ -18,48 +18,48 @@ export default function FeedIdentityCard() {
   if (!user) return null;
 
   return (
-    <Card className="overflow-hidden shadow-sm border-border/60">
-      <div className="h-14 bg-gradient-to-r from-primary/20 to-accent/20 relative">
+    <Card className="overflow-hidden shadow-sm border-gray-200 bg-white rounded-xl">
+      <div className="h-14 bg-gray-200 relative">
         {profile?.backgroundPhotoUrl && (
-          <img src={profile.backgroundPhotoUrl} alt="Banner" className="size-full object-cover opacity-50" />
+          <img src={profile.backgroundPhotoUrl} alt="Banner" className="size-full object-cover" />
         )}
       </div>
       <CardContent className="px-3 pb-4">
         <div className="flex flex-col items-center -mt-8 mb-4">
-          <div className="size-16 rounded-full bg-background border-2 border-background overflow-hidden shadow-sm shadow-black/10">
+          <div className="size-16 rounded-full bg-white border-2 border-white overflow-hidden shadow-sm">
             {profile?.photoUrl || user.avatarUrl ? (
               <img src={profile?.photoUrl || user.avatarUrl!} alt={user.fullName || 'User'} className="size-full object-cover" />
             ) : (
-              <div className="size-full bg-muted flex items-center justify-center text-muted-foreground/60">
+              <div className="size-full bg-gray-100 flex items-center justify-center text-gray-400">
                 <User className="size-8" strokeWidth={1.5} />
               </div>
             )}
           </div>
           <Link
             href={`/${locale}/profile`}
-            className="mt-3 text-base font-bold hover:underline decoration-1 flex items-center gap-1"
+            className="mt-3 text-base font-bold text-gray-900 hover:underline decoration-2 flex items-center gap-1"
           >
             {user.fullName || user.userName}
-            {user.role === 'Organization' && <ShieldCheck className="size-3.5 text-primary" />}
+            {user.role === 'Organization' && <ShieldCheck className="size-3.5 text-blue-600" />}
           </Link>
 
           {isLoading ? (
-            <Skeleton className="h-3 w-32 mt-2" />
+            <Skeleton className="h-3 w-32 mt-2 bg-gray-100" />
           ) : (
-            <p className="text-xs text-muted-foreground mt-1 text-center line-clamp-2 px-2">
+            <p className="text-xs text-gray-500 mt-1 text-center line-clamp-2 px-2 font-medium">
               {profile?.headline || user.role}
             </p>
           )}
         </div>
 
-        <div className="border-t pt-3 space-y-2 mt-2">
-          <div className="flex justify-between text-xs group cursor-pointer">
-            <span className="text-muted-foreground font-medium group-hover:text-primary transition-colors">Connections</span>
-            <span className="text-primary font-bold">--</span>
+        <div className="border-t border-gray-100 pt-3 space-y-3 mt-2">
+          <div className="flex justify-between text-[11px] group cursor-pointer font-bold">
+            <span className="text-gray-500 group-hover:text-primary transition-colors">Connections</span>
+            <span className="text-blue-600">--</span>
           </div>
-          <div className="flex justify-between text-xs group cursor-pointer">
-            <span className="text-muted-foreground font-medium group-hover:text-primary transition-colors">Experience</span>
-            <span className="text-primary font-bold">{profile?.experienceYears || 0}y</span>
+          <div className="flex justify-between text-[11px] group cursor-pointer font-bold">
+            <span className="text-gray-500 group-hover:text-primary transition-colors">Profile views</span>
+            <span className="text-blue-600">--</span>
           </div>
         </div>
       </CardContent>

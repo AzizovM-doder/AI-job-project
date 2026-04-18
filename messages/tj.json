@@ -107,7 +107,9 @@
     "hybrid": "Гибридӣ",
     "junior": "Ҷавон",
     "middle": "Миёна",
-    "senior": "Калон"
+    "senior": "Калон",
+    "active_vacancies": "Ҷойҳои холии фаъол",
+    "no_records": "Ягон вакансияи фаъол ёфт нашуд"
   },
   "Profile": {
     "title_prefix": "Профили корбар",
@@ -147,7 +149,13 @@
     "website": "Вебсайт",
     "location": "Макон",
     "mission": "Вазифа ва арзишҳо",
-    "save": "Захира кардани тағирот"
+    "save": "Захира кардани тағирот",
+    "contact_channel": "Канали иртибот",
+    "system_log": "Логи система",
+    "established": "Таъсис ёфтааст",
+    "message_recruiter": "Тамос бо рекрутер",
+    "edit_organization": "Таҳрири ташкилот",
+    "view_details": "Муфассал"
   },
   "Messages": {
     "title": "Паёмҳо",

@@ -100,13 +100,16 @@ export default function MessagesPage() {
 
   // Handle URL param for starting conversation with specific user
   useEffect(() => {
-    const userId = searchParams.get('userId');
-    if (userId && conversations) {
-      handleStartNewConversation(parseInt(userId));
-      // Clear the URL param
-      router.replace(`/${locale}/messages`);
+    const userIdVal = searchParams.get('userId');
+    if (userIdVal) {
+      handleStartNewConversation(parseInt(userIdVal));
+      
+      // Clear the URL param immediately to prevent re-triggering
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('userId');
+      router.replace(`/${locale}/messages?${params.toString()}`);
     }
-  }, [searchParams, router, conversations, locale, handleStartNewConversation]);
+  }, [searchParams, router, locale, handleStartNewConversation]);
 
   const handleSelectConversation = (id: number) => {
     setActiveConversationId(id);

@@ -15,6 +15,9 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { PageTransition } from '@/components/PageTransition';
+import ProfileRecommendations from '@/components/profile/ProfileRecommendations';
+import RecommendationModal from '@/components/profile/RecommendationModal';
+import { useState } from 'react';
 
 export default function UserProfilePage() {
   const { id, locale } = useParams();
@@ -22,16 +25,21 @@ export default function UserProfilePage() {
   const t = useTranslations('Profile');
   const tm = useTranslations('Messages');
 
-  const { useGetProfileByUserId } = useProfileQueries();
+  const { useGetProfileByUserId, useGetRecommendations, useAddRecommendation, useDeleteRecommendation } = useProfileQueries();
   const { useCreateConversation } = useMessageQueries();
   const { useSendRequest, useGetMyConnections } = useConnectionQueries();
 
   const userId = Number(id);
   const { data: profile, isLoading, error } = useGetProfileByUserId(userId);
   const { data: myConnections } = useGetMyConnections();
-
+  const { data: recommendations } = useGetRecommendations(userId);
+ 
   const createConversation = useCreateConversation();
   const sendRequest = useSendRequest();
+  const addRecMutation = useAddRecommendation();
+  const deleteRecMutation = useDeleteRecommendation(userId);
+
+  const [isRecModalOpen, setIsRecModalOpen] = useState(false);
 
   // Check if already connected
   const isConnected = myConnections?.some(c =>
@@ -195,6 +203,27 @@ export default function UserProfilePage() {
           </div>
         </CardContent>
       </Card>
+
+      <div className="mt-8">
+        <ProfileRecommendations 
+          recommendations={recommendations || []}
+          isOwnProfile={false}
+          onAdd={() => setIsRecModalOpen(true)}
+          onDelete={(recId) => deleteRecMutation.mutate(recId)}
+        />
+      </div>
+
+      <RecommendationModal 
+        isOpen={isRecModalOpen}
+        onClose={() => setIsRecModalOpen(false)}
+        recipientName={profile.firstName + ' ' + (profile.lastName || '')}
+        isPending={addRecMutation.isPending}
+        onSave={(data) => {
+          addRecMutation.mutate({ ...data, recipientId: userId }, {
+            onSuccess: () => setIsRecModalOpen(false)
+          });
+        }}
+      />
     </PageTransition>
   );
 }

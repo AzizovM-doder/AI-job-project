@@ -107,7 +107,9 @@
     "hybrid": "Гибрид",
     "junior": "Младший",
     "middle": "Средний",
-    "senior": "Старший"
+    "senior": "Старший",
+    "active_vacancies": "Активные вакансии",
+    "no_records": "Активных вакансий не найдено"
   },
   "Profile": {
     "title_prefix": "Профиль пользователя",
@@ -147,7 +149,13 @@
     "website": "Веб-сайт",
     "location": "Локация",
     "mission": "Миссия и ценности",
-    "save": "Сохранить изменения"
+    "save": "Сохранить изменения",
+    "contact_channel": "Канал связи",
+    "system_log": "Системный лог",
+    "established": "Основано",
+    "message_recruiter": "Связаться с рекрутером",
+    "edit_organization": "Редактировать организацию",
+    "view_details": "Подробнее"
   },
   "Messages": {
     "title": "Сообщения",

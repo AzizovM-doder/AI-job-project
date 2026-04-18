@@ -124,6 +124,18 @@ export const useProfileQueries = () => {
     });
   };
 
+  const useUpdateEducation = () => {
+    return useMutation<Education, Error, Education>({
+      mutationFn: async (data) => {
+        const res = await api.put(`/UserEducation/${data.id}`, data);
+        return res.data?.data ?? res.data;
+      },
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: ['profiles', 'user', variables.userId, 'education'] });
+      },
+    });
+  };
+
   const useDeleteEducation = () => {
     return useMutation<void, Error, { id: number; userId: number }>({
       mutationFn: async ({ id }) => {
@@ -159,6 +171,19 @@ export const useProfileQueries = () => {
       },
     });
   };
+
+  const useUpdateExperience = () => {
+    return useMutation<Experience, Error, Experience>({
+      mutationFn: async (data) => {
+        const res = await api.put(`/UserExperience/${data.id}`, data);
+        return res.data?.data ?? res.data;
+      },
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({ queryKey: ['profiles', 'user', variables.userId, 'experience'] });
+      },
+    });
+  };
+
 
   const useDeleteExperience = () => {
     return useMutation<void, Error, { id: number; userId: number }>({
@@ -267,6 +292,17 @@ export const useProfileQueries = () => {
     });
   };
 
+  const useGetRecommendationById = (id: number) => {
+    return useQuery<Recommendation>({
+      queryKey: ['recommendations', id],
+      queryFn: async () => {
+        const res = await api.get(`/Recommendation/${id}`);
+        return res.data?.data ?? res.data;
+      },
+      enabled: !!id,
+    });
+  };
+
   const useAddRecommendation = () => {
     return useMutation<Recommendation, Error, CreateRecommendationDto>({
       mutationFn: async (data) => {
@@ -275,6 +311,17 @@ export const useProfileQueries = () => {
       },
       onSuccess: (_, variables) => {
         queryClient.invalidateQueries({ queryKey: ['profiles', 'user', variables.recipientId, 'recommendations'] });
+      },
+    });
+  };
+
+  const useDeleteRecommendation = (recipientId: number) => {
+    return useMutation<void, Error, number>({
+      mutationFn: async (id) => {
+        await api.delete(`/Recommendation/${id}`);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['profiles', 'user', recipientId, 'recommendations'] });
       },
     });
   };
@@ -315,9 +362,11 @@ export const useProfileQueries = () => {
     useUpdateCandidateProfile,
     useGetEducationsByUser,
     useAddEducation,
+    useUpdateEducation,
     useDeleteEducation,
     useGetExperiencesByUser,
     useAddExperience,
+    useUpdateExperience,
     useDeleteExperience,
     useGetProfileSkills,
     useSearchSkills,
@@ -327,7 +376,9 @@ export const useProfileQueries = () => {
     useAddProfileLanguage,
     useDeleteProfileLanguage,
     useGetRecommendations,
+    useGetRecommendationById,
     useAddRecommendation,
+    useDeleteRecommendation,
     useUploadPhoto,
     useUploadCV
   };

@@ -19,7 +19,14 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Modal } from '@/components/ui/modal';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import EmojiPicker from './EmojiPicker';
 import { toast } from 'sonner';
@@ -107,7 +114,6 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
   // Scroll to bottom on new messages
   useEffect(() => {
     if (scrollRef.current) {
-      // 4. Use a useRef to auto-scroll to the bottom of the chat
       scrollRef.current.scrollTo({
         top: scrollRef.current.scrollHeight,
         behavior: 'smooth'
@@ -185,28 +191,33 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
   return (
     <div className="flex-1 flex flex-col h-full bg-background overflow-hidden relative border-l border-border/40">
       {/* Modal for Confirmation */}
-      <Modal 
-        isOpen={deleteConfirmOpen} 
-        onClose={() => setDeleteConfirmOpen(false)}
-        title={isHardDelete ? t('confirm_delete_title') : t('confirm_archive_title')}
-      >
-        <div className="space-y-6">
-          <p className="text-sm text-muted-foreground">
-            {isHardDelete ? t('confirm_delete_desc') : t('confirm_archive_desc')}
-          </p>
-          <div className="flex justify-end gap-3">
-            <Button variant="ghost" onClick={() => setDeleteConfirmOpen(false)}>
+      <Dialog open={deleteConfirmOpen} onValueChange={(open) => !open && setDeleteConfirmOpen(false)}>
+        <DialogContent className="sm:max-w-md border-none shadow-2xl bg-background/95 backdrop-blur-xl rounded-3xl p-6">
+          <DialogHeader className="flex flex-col items-center text-center space-y-4 pt-4">
+            <div className={cn("p-4 rounded-full", isHardDelete ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary")}>
+              <AlertCircle className="size-8" />
+            </div>
+            <DialogTitle className="text-xl font-black tracking-tight">
+              {isHardDelete ? t('confirm_delete_title') : t('confirm_archive_title')}
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground leading-relaxed max-w-[280px]">
+              {isHardDelete ? t('confirm_delete_desc') : t('confirm_archive_desc')}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col sm:flex-row gap-3 w-full pt-4 sm:justify-center">
+            <Button variant="ghost" onClick={() => setDeleteConfirmOpen(false)} className="flex-1 rounded-xl font-bold h-11 min-w-[120px]">
               {t('cancel')}
             </Button>
             <Button 
               variant={isHardDelete ? "destructive" : "default"}
               onClick={handleDelete}
+              className="flex-1 rounded-xl font-bold h-11 min-w-[120px] shadow-lg transition-all active:scale-95"
             >
               {isHardDelete ? t('delete') : t('archive')}
             </Button>
-          </div>
-        </div>
-      </Modal>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Clean Header */}
       <div className="h-18 px-6 border-b border-border/40 flex items-center justify-between bg-background/95 backdrop-blur-md z-20 shrink-0">
@@ -244,10 +255,10 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
         </div>
       </div>
 
-      {/* Message Stream with 70vh Constraint */}
+      {/* Message Stream */}
       <div 
         ref={scrollRef} 
-        className="flex-1 overflow-y-auto p-6 space-y-6 bg-muted/5 dark:bg-transparent max-h-[70vh]"
+        className="flex-1 overflow-y-auto p-6 space-y-6 bg-muted/5 dark:bg-transparent max-h-[70vh] custom-scrollbar"
       >
         {isLoading ? (
           <div className="space-y-6">
@@ -268,11 +279,9 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
 
             return (
               <div key={idx} className={cn("flex items-end gap-2 group/msg", isMe ? "flex-row-reverse" : "flex-row")}>
-                {/* Profile avatar next to message */}
                 {!isMe && isNewGroup && (
                    <SenderProfile userId={msg.senderId} showName={false} className="mb-1" />
                 )}
-                {/* Placeholder for alignment if not new group */}
                 {!isMe && !isNewGroup && (
                    <div className="size-8 shrink-0" />
                 )}
@@ -297,7 +306,7 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
                     )}
                     
                     <div className={cn(
-                      "px-4 py-2.5 text-sm leading-relaxed shadow-sm break-words relative transition-all duration-200",
+                      "px-4 py-2.5 text-sm leading-relaxed shadow-sm break-words relative transition-all duration-200 font-medium",
                       isMe
                         ? "bg-primary text-primary-foreground rounded-2xl rounded-br-none"
                         : "bg-card border border-border/40 text-foreground rounded-2xl rounded-bl-none hover:border-primary/30"
@@ -323,7 +332,7 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
       <div className="p-4 bg-background border-t border-border/40 shrink-0 sticky bottom-0">
         <form 
           onSubmit={handleSend} 
-          className="flex flex-col bg-muted/30 border border-border/60 rounded-xl overflow-hidden focus-within:ring-1 focus-within:ring-primary/20 transition-all"
+          className="flex flex-col bg-muted/30 border border-border/60 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-primary/10 transition-all"
         >
           <textarea
             value={input}
@@ -335,7 +344,7 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
               }
             }}
             placeholder={t('type_message')}
-            className="w-full bg-transparent p-4 text-sm focus:outline-none resize-none min-h-[50px] max-h-[120px] scrollbar-hide"
+            className="w-full bg-transparent p-4 text-sm focus:outline-none resize-none min-h-[50px] max-h-[120px] custom-scrollbar font-medium"
           />
           
           <div className="px-4 py-2 flex items-center justify-between border-t border-border/10">
@@ -346,7 +355,7 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
                 size="sm"
                 onClick={handleAiDraft}
                 disabled={aiDraftMutation.isPending}
-                className="h-8 px-3 rounded-lg text-[11px] font-bold gap-1.5 text-primary hover:bg-primary/5 transition-all"
+                className="h-8 px-3 rounded-lg text-[11px] font-bold gap-1.5 text-primary hover:bg-white transition-all shadow-sm"
               >
                 <Sparkles className={cn("size-3.5", aiDraftMutation.isPending && "animate-spin")} />
                 {aiDraftMutation.isPending ? '...' : t('ai_draft')}
@@ -367,7 +376,7 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
               type="submit"
               disabled={!input.trim() || sendMutation.isPending}
               size="sm"
-              className="h-8 rounded-lg font-bold text-xs px-4"
+              className="h-8 rounded-lg font-bold text-xs px-5 shadow-lg shadow-primary/20 transition-all active:scale-95"
             >
               {t('send')}
             </Button>

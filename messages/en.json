@@ -107,7 +107,9 @@
     "hybrid": "Hybrid",
     "junior": "Junior",
     "middle": "Middle",
-    "senior": "Senior"
+    "senior": "Senior",
+    "active_vacancies": "Active Vacancies",
+    "no_records": "No active vacancies found"
   },
   "Profile": {
     "title_prefix": "User Profile",
@@ -147,7 +149,13 @@
     "website": "Website",
     "location": "Location",
     "mission": "Mission Statement",
-    "save": "Save Changes"
+    "save": "Save Changes",
+    "contact_channel": "Contact Channel",
+    "system_log": "System Log",
+    "established": "Established",
+    "message_recruiter": "Message Recruiter",
+    "edit_organization": "Edit Organization",
+    "view_details": "View Details"
   },
   "Messages": {
     "title": "Messages",

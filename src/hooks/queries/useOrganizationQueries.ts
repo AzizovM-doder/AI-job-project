@@ -163,6 +163,17 @@ export const useOrganizationQueries = () => {
     });
   };
 
+  const useSearchOrganizations = (name: string) => {
+    return useQuery<Organization[]>({
+      queryKey: ['organizations', 'search', name],
+      queryFn: async () => {
+        const res = await api.get('/Organization/search', { params: { name } });
+        return res.data?.data ?? res.data ?? [];
+      },
+      enabled: name.length >= 2,
+    });
+  };
+
   return {
     useGetOrganizationsPaged,
     useGetOrganization,
@@ -170,6 +181,7 @@ export const useOrganizationQueries = () => {
     useCreateOrganization,
     useUpdateOrganization,
     useDeleteOrganization,
+    useSearchOrganizations,
     useGetMembersByOrganization,
     useGetOrganizationDirectory,
     useInviteMember,

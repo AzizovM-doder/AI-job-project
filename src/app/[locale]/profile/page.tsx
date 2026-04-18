@@ -18,6 +18,8 @@ import ExperienceModal from '@/components/profile/ExperienceModal';
 import EducationModal from '@/components/profile/EducationModal';
 import SkillModal from '@/components/profile/SkillModal';
 import LanguageModal from '@/components/profile/LanguageModal';
+import ProfileRecommendations from '@/components/profile/ProfileRecommendations';
+import RecommendationModal from '@/components/profile/RecommendationModal';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Settings, ExternalLink } from 'lucide-react';
@@ -40,12 +42,15 @@ export default function ProfilePage() {
     useUpdateProfile,
     useUpdateCandidateProfile,
     useAddExperience,
+    useUpdateExperience,
     useDeleteExperience,
     useAddEducation,
+    useUpdateEducation,
     useDeleteEducation,
     useAddProfileSkill,
     useAddProfileLanguage,
-    useAddRecommendation
+    useAddRecommendation,
+    useDeleteRecommendation
   } = useProfileQueries();
 
   // Smart identity fetcher (multi-endpoint fallback logic resides in useGetPublicProfile, 
@@ -69,16 +74,21 @@ export default function ProfilePage() {
   const [selectedEdu, setSelectedEdu] = useState<Education | null>(null);
   const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+  const [isRecModalOpen, setIsRecModalOpen] = useState(false);
 
   const updateProfileMutation = useUpdateProfile();
   const deleteSkill = useDeleteProfileSkill();
   const deleteLang = useDeleteProfileLanguage();
   const deleteExp = useDeleteExperience();
   const deleteEdu = useDeleteEducation();
+  const deleteRec = useDeleteRecommendation(userId);
+  const addRecMutation = useAddRecommendation();
   
   // NEW: Initialize mutations at top level to avoid hook violation in callbacks
   const addExpMutation = useAddExperience();
+  const updateExpMutation = useUpdateExperience();
   const addEduMutation = useAddEducation();
+  const updateEduMutation = useUpdateEducation();
   const addSkillMutation = useAddProfileSkill();
   const addLangMutation = useAddProfileLanguage();
 
@@ -192,11 +202,17 @@ export default function ProfilePage() {
           experience={selectedExp}
           userId={userId}
           onSave={(data) => {
-            addExpMutation.mutate(data as any, {
-              onSuccess: () => { setIsExpModalOpen(false); setSelectedExp(null); }
-            });
+            if ('id' in data) {
+              updateExpMutation.mutate(data as Experience, {
+                onSuccess: () => { setIsExpModalOpen(false); setSelectedExp(null); }
+              });
+            } else {
+              addExpMutation.mutate(data, {
+                onSuccess: () => { setIsExpModalOpen(false); setSelectedExp(null); }
+              });
+            }
           }}
-          isPending={addExpMutation.isPending}
+          isPending={addExpMutation.isPending || updateExpMutation.isPending}
         />
 
         <EducationModal
@@ -205,11 +221,17 @@ export default function ProfilePage() {
           education={selectedEdu}
           userId={userId}
           onSave={(data) => {
-            addEduMutation.mutate(data as any, {
-               onSuccess: () => { setIsEduModalOpen(false); setSelectedEdu(null); }
-            });
+            if ('id' in data) {
+              updateEduMutation.mutate(data as Education, {
+                onSuccess: () => { setIsEduModalOpen(false); setSelectedEdu(null); }
+              });
+            } else {
+              addEduMutation.mutate(data, {
+                 onSuccess: () => { setIsEduModalOpen(false); setSelectedEdu(null); }
+              });
+            }
           }}
-          isPending={addEduMutation.isPending}
+          isPending={addEduMutation.isPending || updateEduMutation.isPending}
         />
 
         <SkillModal
@@ -234,6 +256,18 @@ export default function ProfilePage() {
             });
           }}
           isPending={addLangMutation.isPending}
+        />
+
+        <RecommendationModal 
+          isOpen={isRecModalOpen}
+          onClose={() => setIsRecModalOpen(false)}
+          recipientName={profile?.firstName + ' ' + profile?.lastName}
+          isPending={addRecMutation.isPending}
+          onSave={(data) => {
+            addRecMutation.mutate({ ...data, recipientId: userId }, {
+              onSuccess: () => setIsRecModalOpen(false)
+            });
+          }}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -266,6 +300,12 @@ export default function ProfilePage() {
               onDelete={(id) => deleteSkill.mutate({ id, profileId })}
               onEndorse={() => {}} // Endorsements are for others
             />
+            <ProfileRecommendations 
+              recommendations={recommendations || []}
+              isOwnProfile={true}
+              onAdd={() => setIsRecModalOpen(true)}
+              onDelete={(id) => deleteRec.mutate(id)}
+            />
           </div>
 
           {/* Sidebar */}
@@ -276,24 +316,6 @@ export default function ProfilePage() {
               onAdd={() => setIsLanguageModalOpen(true)}
               onDelete={(id) => deleteLang.mutate({ id, profileId })}
             />
-
-            {/* Recommendations Section */}
-            <Card className="shadow-sm border-border/60">
-              <CardHeader className="p-5 border-b border-border/60 flex flex-row items-center justify-between">
-                <CardTitle className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <ExternalLink className="size-4" /> Recommendations
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-5 space-y-4">
-                {recommendations?.length ? recommendations.map((rec) => (
-                  <div key={rec.id} className="text-sm italic text-muted-foreground border-l-2 border-primary/20 pl-4 py-1">
-                    "{rec.content}"
-                  </div>
-                )) : (
-                  <p className="text-xs text-muted-foreground italic">No recommendations yet.</p>
-                )}
-              </CardContent>
-            </Card>
           </aside>
         </div>
       </PageTransition>

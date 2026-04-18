@@ -5,23 +5,23 @@ export interface Post {
   imageUrl: string | null;
   createdAt: string;
   repostOfPostId: number | null;
-}
-
-export interface PostFeedItemDto {
-  id: number;
-  userId: number;
-  content: string | null;
-  imageUrl: string | null;
-  createdAt: string;
-  repostOfPostId: number | null;
   repostSourceUserId: number | null;
   likeCount: number;
   likedByMe: boolean;
   repostCount: number;
   authorName?: string;
   authorAvatar?: string | null;
+  authorHeadline?: string | null;
   commentsCount?: number;
+  user?: {
+    id: number;
+    name: string | null;
+    imageUrl: string | null;
+    headline: string | null;
+  };
 }
+
+export type PostFeedItemDto = Post;
 
 export interface PostCommentDto {
   id: number;
@@ -30,6 +30,14 @@ export interface PostCommentDto {
   content: string | null;
   createdAt: string;
   authorName?: string;
+  authorAvatar?: string | null;
+  authorHeadline?: string | null;
+  user?: {
+    id: number;
+    name: string | null;
+    imageUrl: string | null;
+    headline: string | null;
+  };
 }
 
 export interface PostLikeStateDto {

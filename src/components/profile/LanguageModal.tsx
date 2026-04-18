@@ -1,8 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Modal } from '@/components/ui/modal';
-import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { CreateProfileLanguageDto, LanguageLevel } from '@/types/profile';
 import { useMetadataQueries } from '@/hooks/queries/useMetadataQueries';
@@ -34,49 +39,83 @@ export default function LanguageModal({ isOpen, onClose, onSave, isPending, prof
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Add Language">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-bold">Select Language</label>
-          {isLoading ? (
-            <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
-          ) : (
-            <select
-              value={selectedLanguageId}
-              onChange={(e) => setSelectedLanguageId(e.target.value)}
-              className="w-full h-10 px-3 rounded-md border border-border bg-background focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
-              required
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[450px] border-none shadow-2xl bg-background/95 backdrop-blur-xl sm:rounded-lg p-0 overflow-hidden">
+        <DialogHeader className="p-8 pb-4">
+          <DialogTitle className="text-2xl font-black tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Add Language
+          </DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit}>
+          <div className="p-8 pt-0 space-y-6">
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em] px-1">Select Language</label>
+              {isLoading ? (
+                <div className="h-11 w-full bg-muted/30 animate-pulse rounded-xl" />
+              ) : (
+                <div className="relative group">
+                  <select
+                    value={selectedLanguageId}
+                    onChange={(e) => setSelectedLanguageId(e.target.value)}
+                    className="w-full h-11 px-4 rounded-xl border border-border/10 bg-muted/30 focus:ring-2 focus:ring-primary/10 outline-none transition-all text-[15px] font-bold appearance-none cursor-pointer"
+                    required
+                  >
+                    <option value="" disabled>Select a language...</option>
+                    {languages?.map((lang) => (
+                      <option key={lang.id} value={lang.id}>{lang.name}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                    <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em] px-1">Proficiency Level</label>
+              <div className="relative group">
+                <select
+                  value={level}
+                  onChange={(e) => setLevel(e.target.value as LanguageLevel)}
+                  className="w-full h-11 px-4 rounded-xl border border-border/10 bg-muted/30 focus:ring-2 focus:ring-primary/10 outline-none transition-all text-[15px] font-bold appearance-none cursor-pointer"
+                >
+                  {Object.values(LanguageLevel).map((lvl) => (
+                    <option key={lvl} value={lvl}>{lvl}</option>
+                  ))}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                  <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="p-8 pt-4 gap-3 bg-muted/10">
+            <Button 
+              type="button" 
+              variant="ghost" 
+              onClick={onClose} 
+              disabled={isPending}
+              className="rounded-xl font-bold h-11 px-6"
             >
-              <option value="" disabled>Select a language...</option>
-              {languages?.map((lang) => (
-                <option key={lang.id} value={lang.id}>{lang.name}</option>
-              ))}
-            </select>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-bold">Proficiency Level</label>
-          <select
-            value={level}
-            onChange={(e) => setLevel(e.target.value as LanguageLevel)}
-            className="w-full h-10 px-3 rounded-md border border-border bg-background focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
-          >
-            {Object.values(LanguageLevel).map((lvl) => (
-              <option key={lvl} value={lvl}>{lvl}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="pt-4 flex justify-end gap-3">
-          <Button type="button" variant="ghost" onClick={onClose} disabled={isPending}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isPending || !selectedLanguageId}>
-            {isPending ? 'Adding...' : 'Add Language'}
-          </Button>
-        </div>
-      </form>
-    </Modal>
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={isPending || !selectedLanguageId}
+              className="rounded-xl font-bold h-11 px-10 shadow-lg shadow-primary/20 transition-all active:scale-95"
+            >
+              {isPending ? 'Adding...' : 'Add Language'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
