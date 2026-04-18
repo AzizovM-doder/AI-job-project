@@ -21,12 +21,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
           cancelButton: "group-[.toast]:bg-gray-100 group-[.toast]:text-gray-600 font-bold rounded-lg",
           title: "font-bold text-sm tracking-tight",
         },
-        icons: {
-          success: <CheckCircle2 className="size-5 text-emerald-500" />,
-          error: <XCircle className="size-5 text-red-500" />,
-          info: <Info className="size-5 text-blue-500" />,
-          warning: <AlertCircle className="size-5 text-amber-500" />,
-        }
+      }}
+      icons={{
+        success: <CheckCircle2 className="size-5 text-emerald-500" />,
+        error: <XCircle className="size-5 text-red-500" />,
+        info: <Info className="size-5 text-blue-500" />,
+        warning: <AlertCircle className="size-5 text-amber-500" />,
       }}
       {...props}
     />

@@ -64,8 +64,8 @@ export default function StartPostBox() {
         <div className="space-y-4">
           <div className="flex gap-2">
             <div className="size-12 rounded-full bg-gray-100 shrink-0 overflow-hidden border border-gray-100">
-              {user?.avatarUrl ? (
-                <img src={user.avatarUrl} alt="Me" className="size-full object-cover" />
+              {(user as any)?.avatarUrl ? (
+                <img src={(user as any).avatarUrl} alt="Me" className="size-full object-cover" />
               ) : (
                 <div className="size-full flex items-center justify-center font-bold text-gray-400 bg-gray-50 uppercase text-sm">
                   {user?.fullName?.[0] || 'U'}

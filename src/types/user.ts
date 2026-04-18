@@ -24,6 +24,7 @@ export interface UserPublicProfileDto {
   fullName: string | null;
   firstName: string | null;
   lastName: string | null;
+  userName?: string | null;
   title?: string | null;
   headline?: string | null; // From Profile endpoint
   avatarUrl?: string | null;

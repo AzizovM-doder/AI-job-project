@@ -92,7 +92,7 @@ export default function UserSearchModal({
   };
 
   return (
-    <Dialog open={isOpen} onValueChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[450px] border-none shadow-2xl bg-background/95 backdrop-blur-xl rounded-3xl p-0 overflow-hidden">
         <DialogHeader className="p-8 pb-3">
           <DialogTitle className="text-2xl font-black tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">

@@ -28,7 +28,6 @@ export default function NewJobPage() {
 
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<CreateJobDto>({
     defaultValues: {
-      isRemote: false,
       experienceRequired: 1,
       salaryMin: 0,
       salaryMax: 0,
@@ -194,10 +193,7 @@ export default function NewJobPage() {
                 </select>
               </div>
               <div className="space-y-2 flex items-end">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" {...register('isRemote')} className="rounded-none" />
-                  <span className="text-[10px] tracking-widest uppercase">REMOTE_ELIGIBLE</span>
-                </label>
+                {/* Remote option is handled via JobType selection */}
               </div>
             </div>
           </section>

@@ -8,8 +8,10 @@ import api from '@/lib/api';
 export interface AuthUser {
   userId: string;
   email: string;
+  userName?: string | null;
   fullName: string;
   role: UserRole;
+  avatarUrl?: string | null;
 }
 
 interface AuthState {

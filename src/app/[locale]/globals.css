@@ -58,6 +58,8 @@
 
 /* ── Light Theme ── */
 :root {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
   --background: oklch(0.99 0 0);
   --foreground: oklch(0.13 0.02 265);
   --card: oklch(1 0 0);

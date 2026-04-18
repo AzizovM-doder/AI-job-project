@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { UserProfile, UpdateProfileDto } from '@/types/profile';
+import { UserProfile, UpdateUserProfileDto } from '@/types/profile';
 import { Textarea } from '@/components/ui/textarea';
 
 interface ProfileEditModalProps {
@@ -18,12 +18,12 @@ interface ProfileEditModalProps {
   onClose: () => void;
   profile: UserProfile | null;
   userId: number;
-  onSave: (data: UpdateProfileDto) => void;
+  onSave: (data: UpdateUserProfileDto) => void;
   isPending: boolean;
 }
 
 export default function ProfileEditModal({ isOpen, onClose, profile, userId, onSave, isPending }: ProfileEditModalProps) {
-  const [formData, setFormData] = useState<Partial<UpdateProfileDto>>({
+  const [formData, setFormData] = useState<UpdateUserProfileDto>({
     id: profile?.id || 0,
     firstName: profile?.firstName || '',
     lastName: profile?.lastName || '',
@@ -36,11 +36,11 @@ export default function ProfileEditModal({ isOpen, onClose, profile, userId, onS
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData as UpdateProfileDto);
+    onSave(formData);
   };
 
   return (
-    <Dialog open={isOpen} onValueChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[600px] border-none shadow-2xl bg-background/95 backdrop-blur-xl rounded-3xl p-0 overflow-hidden">
         <DialogHeader className="p-8 pb-4">
           <DialogTitle className="text-2xl font-black tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">

@@ -21,6 +21,8 @@ export interface ConversationListItemDto {
   };
 }
 
+export type Conversation = ConversationListItemDto;
+
 export interface CreateConversationDto {
   otherUserId: number;
 }

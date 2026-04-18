@@ -16,10 +16,10 @@ export default function EditJobPage() {
   const locale = params.locale as string;
   const jobId = Number(params.id);
 
-  const { useJobDetail, useUpdateJob, useDeleteJob } = useJobQueries();
+  const { useGetJob, useUpdateJob, useDeleteJob } = useJobQueries();
   const { useJobCategories } = useMetadataQueries();
 
-  const { data: job, isLoading } = useJobDetail(jobId);
+  const { data: job, isLoading } = useGetJob(jobId);
   const updateJob = useUpdateJob();
   const deleteJob = useDeleteJob();
   const { data: categories } = useJobCategories();

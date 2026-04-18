@@ -23,6 +23,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+import { Connection } from '@/types/connection';
+import { UserPublicProfileDto } from '@/types/user';
+
 type TabType = 'suggestions' | 'invitations' | 'connections';
 
 export default function NetworkingPage() {
@@ -301,7 +304,7 @@ function ConnectionBuddyCard({
   initialProfile
 }: {
   connection: Connection;
-  currentUserId: number;
+  currentUserId: number | null;
   initialProfile?: UserPublicProfileDto;
 }) {
   const t = useTranslations('Networking');

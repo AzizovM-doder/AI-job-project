@@ -188,7 +188,7 @@ export default function UserProfilePage() {
               )}
               <div className="flex items-center gap-1.5 bg-muted/50 px-3 py-1.5 rounded-full">
                 <Briefcase className="size-4 text-primary" />
-                {profile.experienceYears} {t('years_exp')}
+                {(profile as any).experienceYears} {t('years_exp')}
               </div>
             </div>
 
@@ -197,7 +197,7 @@ export default function UserProfilePage() {
                 {t('about')}
               </h3>
               <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap">
-                {profile.aboutMe || t('no_about')}
+                {(profile as any).aboutMe || profile.about || t('no_about')}
               </p>
             </div>
           </div>

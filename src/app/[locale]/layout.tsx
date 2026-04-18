@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
@@ -11,11 +11,7 @@ import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { Metadata } from "next";
 
-
-const inter = Inter({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
+// Font variable is defined in globals.css to avoid build-time network requests
 
 export const metadata: Metadata = {
   title: "AIJOB | TERMINAL ACCESS",
@@ -36,7 +32,7 @@ export default async function LocaleLayout({children, params}: Props) {
   return (
     <html
       lang={locale}
-      className={cn("h-full", "antialiased", inter.variable)}
+      className={cn("h-full", "antialiased")}
       suppressHydrationWarning
     >
       <body className="min-h-screen flex flex-col font-sans overflow-x-hidden text-[0.9375rem] leading-normal">

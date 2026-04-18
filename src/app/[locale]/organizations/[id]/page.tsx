@@ -34,7 +34,7 @@ export default function OrganizationPublicProfile() {
   const { data: org, isLoading: orgLoading } = useGetOrganization(orgId as number);
   const { data: jobs, isLoading: jobsLoading } = useGetJobsByOrganization(orgId as number);
 
-  const isOwner = user?.role === 'Organization' && user?.userId === org?.userId?.toString();
+  const isOwner = user?.role === 'Organization' && user?.userId === (org as any)?.userId?.toString();
 
   if (orgLoading) {
     return (
@@ -65,7 +65,7 @@ export default function OrganizationPublicProfile() {
             <div className="size-12 rounded-2xl bg-background border border-primary/10 flex items-center justify-center shadow-sm">
               <Building2 className="size-6" />
             </div>
-            <span className="text-xs font-black tracking-[0.3em] uppercase opacity-70">{org.industry || t('industry')}</span>
+            <span className="text-xs font-black tracking-[0.3em] uppercase opacity-70">{org.type || t('type')}</span>
           </div>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none">
@@ -85,21 +85,9 @@ export default function OrganizationPublicProfile() {
               <MapPin className="size-4 text-primary" />
               {org.location || t('location')}
             </div>
-            {org.website && (
-              <a
-                href={org.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-primary transition-colors"
-              >
-                <Globe className="size-4" />
-                {org.website.replace(/^https?:\/\//, '')}
-                <ExternalLink className="size-3" />
-              </a>
-            )}
             <div className="flex items-center gap-2">
               <Briefcase className="size-4" />
-              {org.size || t('team_size')}
+              {org.type}
             </div>
           </div>
         </div>
@@ -197,7 +185,7 @@ export default function OrganizationPublicProfile() {
             <CardContent className="p-6">
               <div className="flex items-center gap-3 text-xs font-bold text-muted-foreground uppercase tracking-widest">
                 <Calendar className="size-4 text-primary" />
-                {t('established')}: <span className="text-foreground">{org.createdAt ? new Date(org.createdAt).toLocaleDateString() : '—'}</span>
+                {t('established')}: <span className="text-foreground">{(org as any).createdAt ? new Date((org as any).createdAt).toLocaleDateString() : '—'}</span>
               </div>
             </CardContent>
           </Card>

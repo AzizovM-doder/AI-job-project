@@ -7,7 +7,19 @@ import { useOrganizationQueries } from '@/hooks/queries/useOrganizationQueries';
 import { useJobQueries } from '@/hooks/queries/useJobQueries';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Users, BarChart3, Settings, Building2, Briefcase, ChevronRight, ClipboardList, Filter } from 'lucide-react';
+import { 
+   Plus, 
+   Users, 
+   BarChart3, 
+   Settings, 
+   Building2, 
+   Briefcase, 
+   ChevronRight, 
+   ClipboardList, 
+   Filter, 
+   ShieldCheck, 
+   ArrowRight 
+} from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useEffect, useState } from 'react';

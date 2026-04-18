@@ -7,7 +7,7 @@ import { useOrganizationQueries } from '@/hooks/queries/useOrganizationQueries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
-import { Building2, Globe, MapPin, Users, Save, Loader2, Edit2, X } from 'lucide-react';
+import { Building2, Globe, MapPin, Users, Save, Loader2, Edit2, X, Settings } from 'lucide-react';
 import { Organization, UpdateOrganizationDto } from '@/types/organization';
 import { useTranslations } from 'next-intl';
 import { useRouter, useParams } from 'next/navigation';
@@ -96,22 +96,16 @@ export default function OrganizationProfilePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-1">{t('industry')}</label>
-                  <Input
-                    {...register('industry')}
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-1">ENTITY_TYPE</label>
+                  <select
+                    {...register('type')}
                     disabled={!isEditing}
-                    placeholder="Technology"
-                    className="h-14 rounded-2xl border-2 font-bold px-6 focus-visible:ring-primary/20"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-1">{t('team_size')}</label>
-                  <Input
-                    {...register('size')}
-                    disabled={!isEditing}
-                    placeholder="11-50, 51-200..."
-                    className="h-14 rounded-2xl border-2 font-bold px-6 focus-visible:ring-primary/20"
-                  />
+                    className="h-14 w-full rounded-2xl border-2 font-bold px-6 focus-visible:ring-primary/20 bg-background appearance-none"
+                  >
+                    <option value="Startup">Startup</option>
+                    <option value="Company">Company</option>
+                    <option value="Agency">Agency</option>
+                  </select>
                 </div>
               </CardContent>
             </Card>
@@ -124,11 +118,11 @@ export default function OrganizationProfilePage() {
               </CardHeader>
               <CardContent className="p-8 space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-1">{t('website')}</label>
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-1">LOGO_URL</label>
                   <Input
-                    {...register('website')}
+                    {...register('logoUrl')}
                     disabled={!isEditing}
-                    placeholder="https://company.com"
+                    placeholder="https://company.com/logo.png"
                     className="h-14 rounded-2xl border-2 font-bold px-6 focus-visible:ring-primary/20"
                   />
                 </div>

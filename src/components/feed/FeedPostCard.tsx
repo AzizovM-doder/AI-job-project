@@ -214,8 +214,8 @@ export default function FeedPostCard({ post }: { post: PostFeedItemDto }) {
           {/* Add Comment Input */}
           <div className="flex gap-2">
             <div className="size-10 rounded-full bg-gray-200 shrink-0 overflow-hidden border border-gray-100 shadow-sm">
-              {currentUser?.avatarUrl ? (
-                <img src={currentUser.avatarUrl} alt="Me" className="size-full object-cover" />
+              {(currentUser as any)?.avatarUrl ? (
+                <img src={(currentUser as any).avatarUrl} alt="Me" className="size-full object-cover" />
               ) : (
                 <div className="size-full flex items-center justify-center font-bold text-gray-400 text-xs">
                   {currentUser?.fullName?.[0] || 'U'}

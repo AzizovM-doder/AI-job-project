@@ -86,13 +86,13 @@ export const useJobQueries = () => {
     });
   };
 
-  const useUpdateJob = (id: number) => {
-    return useMutation<Job, Error, UpdateJobDto>({
-      mutationFn: async (data) => {
+  const useUpdateJob = () => {
+    return useMutation<Job, Error, { id: number; data: UpdateJobDto }>({
+      mutationFn: async ({ id, data }) => {
         const res = await api.put(`/Job/${id}`, data);
         return res.data?.data ?? res.data;
       },
-      onSuccess: () => {
+      onSuccess: (_, { id }) => {
         queryClient.invalidateQueries({ queryKey: ['jobs', id] });
         queryClient.invalidateQueries({ queryKey: ['jobs'] });
       },

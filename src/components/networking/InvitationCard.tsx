@@ -1,7 +1,7 @@
 'use client';
 
 import { Connection, ConnectionStatus } from '@/types/connection';
-import { UserPublicProfileDto } from '@/types/profile';
+import { UserPublicProfileDto } from '@/types/user';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Check, X, User } from 'lucide-react';

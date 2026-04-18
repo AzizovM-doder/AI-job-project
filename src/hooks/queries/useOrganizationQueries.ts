@@ -67,9 +67,9 @@ export const useOrganizationQueries = () => {
   };
 
   const useUpdateOrganization = () => {
-    return useMutation<Organization, Error, UpdateOrganizationDto>({
-      mutationFn: async (data) => {
-        const res = await api.put(`/Organization/${data.id}`, data);
+    return useMutation<Organization, Error, { id: number; data: any }>({
+      mutationFn: async ({ id, data }) => {
+        const res = await api.put(`/Organization/${id}`, data);
         return res.data?.data ?? res.data;
       },
       onSuccess: (data) => {
@@ -127,9 +127,9 @@ export const useOrganizationQueries = () => {
     });
   };
 
-  const useRespondInvitation = (invitationId: number) => {
-    return useMutation<void, Error, OrganizationMemberInviteRespondDto>({
-      mutationFn: async (data) => {
+  const useRespondInvitation = () => {
+    return useMutation<void, Error, { invitationId: number, data: OrganizationMemberInviteRespondDto }>({
+      mutationFn: async ({ invitationId, data }) => {
         const res = await api.put(`/OrganizationMember/invitation/${invitationId}/respond`, data);
         return res.data;
       },
@@ -151,13 +151,13 @@ export const useOrganizationQueries = () => {
     });
   };
 
-  const useRemoveMember = (id: number, organizationId: number) => {
-    return useMutation<void, Error, void>({
-      mutationFn: async () => {
+  const useRemoveMember = () => {
+    return useMutation<void, Error, { id: number, organizationId: number }>({
+      mutationFn: async ({ id }) => {
         const res = await api.delete(`/OrganizationMember/${id}`);
         return res.data;
       },
-      onSuccess: () => {
+      onSuccess: (_, { organizationId }) => {
         queryClient.invalidateQueries({ queryKey: ['organizations', organizationId, 'members'] });
       },
     });

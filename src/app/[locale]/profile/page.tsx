@@ -104,8 +104,8 @@ export default function ProfilePage() {
       const updateData = profile ? { ...profile } : { 
         id: 0, 
         userId, 
-        firstName: authUser?.name?.split(' ')[0] || 'New',
-        lastName: authUser?.name?.split(' ')[1] || 'Member',
+        firstName: authUser?.fullName?.split(' ')[0] || 'New',
+        lastName: authUser?.fullName?.split(' ')[1] || 'Member',
         headline: '',
         about: '',
         location: '',
@@ -124,8 +124,8 @@ export default function ProfilePage() {
           const updateData = profile ? { ...profile } : { 
             id: 0, 
             userId, 
-            firstName: authUser?.name?.split(' ')[0] || 'New',
-            lastName: authUser?.name?.split(' ')[1] || 'Member',
+            firstName: authUser?.fullName?.split(' ')[0] || 'New',
+            lastName: authUser?.fullName?.split(' ')[1] || 'Member',
             headline: '',
             about: '',
             location: '',
@@ -174,7 +174,7 @@ export default function ProfilePage() {
 
         {/* Header/Hero Section */}
         <ProfileHero 
-          profile={profile} 
+          profile={profile!} 
           candidate={candidate}
           isOwnProfile={true} 
           onEdit={() => setIsEditModalOpen(true)} 
@@ -186,10 +186,10 @@ export default function ProfilePage() {
           key={profile?.id || 'new'}
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
-          profile={profile}
+          profile={profile!}
           userId={userId}
           onSave={(data) => {
-            updateProfileMutation.mutate({ ...data, id: profile?.id, userId }, {
+            updateProfileMutation.mutate({ ...data, id: profile!.id }, {
               onSuccess: () => setIsEditModalOpen(false)
             });
           }}

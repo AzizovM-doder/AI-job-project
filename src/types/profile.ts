@@ -17,12 +17,14 @@ export interface UserProfile {
   userId: number;
   firstName: string | null;
   lastName: string | null;
+  fullName?: string | null;
   headline?: string | null;
   about?: string | null;
   location?: string | null;
   photoUrl?: string | null;
   backgroundPhotoUrl?: string | null;
   birthDate?: string | null;
+  experienceYears?: number;
   createdAt?: string;
 }
 
@@ -77,6 +79,22 @@ export interface ProfileLanguage {
   level: LanguageLevel;
 }
 
+export interface Endorsement {
+  id: number;
+  endorserId: number;
+  profileSkillId: number;
+  createdAt: string;
+}
+
+export interface MemberProfileDto {
+  userId: number;
+  firstName: string | null;
+  lastName: string | null;
+  fullName: string | null;
+  aboutMe: string | null;
+  experienceYears: number;
+}
+
 export interface Recommendation {
   id: number;
   authorId: number;
@@ -86,7 +104,7 @@ export interface Recommendation {
 }
 
 // DTOs for Mutations
-export interface CreateProfileDto {
+export interface CreateUserProfileDto {
   userId: number;
   firstName: string | null;
   lastName: string | null;
@@ -98,7 +116,7 @@ export interface CreateProfileDto {
   birthDate: string | null;
 }
 
-export interface UpdateProfileDto {
+export interface UpdateUserProfileDto {
   id: number;
   firstName: string | null;
   lastName: string | null;
@@ -119,7 +137,7 @@ export interface CreateCandidateProfileDto {
   cvFileUrl: string | null;
 }
 
-export interface CreateEducationDto {
+export interface CreateUserEducationDto {
   userId: number;
   institution: string | null;
   degree: string | null;
@@ -127,7 +145,7 @@ export interface CreateEducationDto {
   endYear: number;
 }
 
-export interface CreateExperienceDto {
+export interface CreateUserExperienceDto {
   userId: number;
   companyName: string | null;
   position: string | null;
@@ -139,6 +157,10 @@ export interface CreateProfileSkillDto {
   profileId: number;
   skillId: number;
   endorsementsCount?: number;
+}
+
+export interface CreateEndorsementDto {
+  profileSkillId: number;
 }
 
 export interface CreateProfileLanguageDto {

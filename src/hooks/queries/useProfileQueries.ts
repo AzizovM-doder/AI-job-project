@@ -18,7 +18,10 @@ import {
   CreateProfileSkillDto,
   CreateProfileLanguageDto,
   CreateEndorsementDto,
-  CreateRecommendationDto
+  CreateRecommendationDto,
+  UserCandidateProfile,
+  CreateCandidateProfileDto,
+  Skill
 } from '@/types/profile';
 
 export const useProfileQueries = () => {
@@ -54,7 +57,7 @@ export const useProfileQueries = () => {
   };
 
   const useUpdateProfile = () => {
-    return useMutation<UserProfile, Error, UpdateProfileDto>({
+    return useMutation<UserProfile, Error, UpdateUserProfileDto>({
       mutationFn: async (data) => {
         // Fallback to POST if ID is 0 or missing
         if (!data.id || data.id === 0) {
@@ -113,7 +116,7 @@ export const useProfileQueries = () => {
   };
 
   const useAddEducation = () => {
-    return useMutation<Education, Error, CreateEducationDto>({
+    return useMutation<Education, Error, CreateUserEducationDto>({
       mutationFn: async (data) => {
         const res = await api.post('/UserEducation', data);
         return res.data?.data ?? res.data;
@@ -161,7 +164,7 @@ export const useProfileQueries = () => {
   };
 
   const useAddExperience = () => {
-    return useMutation<Experience, Error, CreateExperienceDto>({
+    return useMutation<Experience, Error, CreateUserExperienceDto>({
       mutationFn: async (data) => {
         const res = await api.post('/UserExperience', data);
         return res.data?.data ?? res.data;

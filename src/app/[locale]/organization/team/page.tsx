@@ -51,6 +51,7 @@ export default function TeamPage() {
   const {
     useGetMyOrganizations,
     useGetMembersByOrganization,
+    useGetOrganizationDirectory,
     useInviteMember,
     useRemoveMember,
     useUpdateMemberRole,
@@ -65,7 +66,7 @@ export default function TeamPage() {
     if (orgs?.length && !activeOrg) setActiveOrg(orgs[0]);
   }, [orgs, activeOrg]);
 
-  const { data: members, isLoading: membersLoading } = useGetMembersByOrganization(activeOrg?.id ?? 0);
+  const { data: members, isLoading: membersLoading } = useGetOrganizationDirectory(activeOrg?.id ?? 0);
   const inviteMember = useInviteMember();
   const removeMember = useRemoveMember();
   const updateMember = useUpdateMemberRole();
@@ -95,7 +96,7 @@ export default function TeamPage() {
 
   const handleRemove = (memberId: number) => {
     if (!confirm('Are you sure you want to remove this member from your organization?')) return;
-    removeMember.mutate(memberId);
+    removeMember.mutate({ id: memberId, organizationId: activeOrg!.id });
   };
 
   const getRoleBadgeColor = (role: string | null) => {
@@ -176,7 +177,6 @@ export default function TeamPage() {
                             </div>
                             <div>
                                <p className="text-sm font-bold">{u.fullName}</p>
-                               <p className="text-[10px] text-muted-foreground">{u.email}</p>
                             </div>
                           </button>
                         ))
@@ -268,14 +268,14 @@ export default function TeamPage() {
                             <div className="flex items-center gap-3">
                               <div className="size-10 rounded-2xl bg-muted border-2 border-background shadow-sm flex items-center justify-center font-black text-primary overflow-hidden group-hover:scale-105 transition-transform">
                                 {member.fullName ? (
-                                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${member.userId}`} alt={member.fullName} className="size-full object-cover" />
+                                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed={(member as any).userId || member.id}`} alt={member.fullName} className="size-full object-cover" />
                                 ) : (
                                   <User className="size-5" />
                                 )}
                               </div>
                               <div className="space-y-0.5">
                                 <p className="font-bold tracking-tight text-foreground/90 leading-tight">
-                                  {member.fullName || `OPERATOR_${member.userId}`}
+                                  {member.fullName || `OPERATOR_${(member as any).userId || member.id}`}
                                 </p>
                                 <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
                                   {member.role === 'Owner' && <Crown className="size-3 inline-block mr-1 text-amber-500" />}
@@ -292,9 +292,9 @@ export default function TeamPage() {
                                <span className="text-[10px] font-black tracking-widest text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200">UNRESTRICTED</span>
                             ) : (
                               <Select 
-                                defaultValue={member.role} 
+                                defaultValue={member.role ?? undefined} 
                                 onValueChange={(v: OrganizationMemberRole) => 
-                                  updateMember.mutate({ id: member.id, organizationId: activeOrg!.id, userId: member.userId, role: v })
+                                  updateMember.mutate({ id: member.id, organizationId: activeOrg!.id, userId: (member as any).userId || 0, role: v })
                                 }
                               >
                                 <SelectTrigger className="h-8 rounded-lg border-none bg-muted/50 text-[10px] font-bold w-28 mx-auto">

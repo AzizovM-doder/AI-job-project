@@ -129,7 +129,7 @@ export const useMessageQueries = () => {
 
   // DELETE /api/Message/{id} - Delete a message
   const useDeleteMessage = () => {
-    return useMutation<void, Error, { id: number; conversationId: number }>({
+    return useMutation<void, Error, { id: number; conversationId: number }, { previousMessages: Message[] | undefined }>({
       mutationFn: async ({ id }) => {
         const res = await api.delete(`/Message/${id}`);
         return res.data;

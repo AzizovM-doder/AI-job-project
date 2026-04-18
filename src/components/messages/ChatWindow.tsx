@@ -191,7 +191,7 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
   return (
     <div className="flex-1 flex flex-col h-full bg-background overflow-hidden relative border-l border-border/40">
       {/* Modal for Confirmation */}
-      <Dialog open={deleteConfirmOpen} onValueChange={(open) => !open && setDeleteConfirmOpen(false)}>
+      <Dialog open={deleteConfirmOpen} onOpenChange={(open) => !open && setDeleteConfirmOpen(false)}>
         <DialogContent className="sm:max-w-md border-none shadow-2xl bg-background/95 backdrop-blur-xl rounded-3xl p-6">
           <DialogHeader className="flex flex-col items-center text-center space-y-4 pt-4">
             <div className={cn("p-4 rounded-full", isHardDelete ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary")}>

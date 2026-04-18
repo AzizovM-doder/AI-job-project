@@ -27,8 +27,8 @@ export default function FeedIdentityCard() {
       <CardContent className="px-3 pb-4">
         <div className="flex flex-col items-center -mt-8 mb-4">
           <div className="size-16 rounded-full bg-white border-2 border-white overflow-hidden shadow-sm">
-            {profile?.photoUrl || user.avatarUrl ? (
-              <img src={profile?.photoUrl || user.avatarUrl!} alt={user.fullName || 'User'} className="size-full object-cover" />
+            {profile?.photoUrl || (user as any).avatarUrl ? (
+              <img src={profile?.photoUrl || (user as any).avatarUrl!} alt={user.fullName || 'User'} className="size-full object-cover" />
             ) : (
               <div className="size-full bg-gray-100 flex items-center justify-center text-gray-400">
                 <User className="size-8" strokeWidth={1.5} />
@@ -39,7 +39,7 @@ export default function FeedIdentityCard() {
             href={`/${locale}/profile`}
             className="mt-3 text-base font-bold text-gray-900 hover:underline decoration-2 flex items-center gap-1"
           >
-            {user.fullName || user.userName}
+            {user.fullName || (user as any).userName}
             {user.role === 'Organization' && <ShieldCheck className="size-3.5 text-blue-600" />}
           </Link>
 
