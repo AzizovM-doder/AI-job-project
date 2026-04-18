@@ -54,9 +54,7 @@ function Button({
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     >
-      <span className="hidden terminal:inline mr-1 opacity-50 group-hover/btn:opacity-100">[</span>
       {children}
-      <span className="hidden terminal:inline ml-1 opacity-50 group-hover/btn:opacity-100">]</span>
     </Comp>
   )
 }

@@ -242,4 +242,20 @@
   .terminal img {
     filter: sepia(100%) hue-rotate(80deg) saturate(3) brightness(0.8) contrast(1.2);
   }
+  /* Terminal Button Brackets */
+  .terminal [data-slot="button"] {
+    @apply relative px-6 rounded-none;
+  }
+  .terminal [data-slot="button"]::before {
+    content: "[";
+    @apply absolute left-2 opacity-40 transition-opacity font-bold;
+  }
+  .terminal [data-slot="button"]::after {
+    content: "]";
+    @apply absolute right-2 opacity-40 transition-opacity font-bold;
+  }
+  .terminal [data-slot="button"]:hover::before,
+  .terminal [data-slot="button"]:hover::after {
+    @apply opacity-100;
+  }
 }
