@@ -103,7 +103,7 @@ export default function MessagesPage() {
     const userIdVal = searchParams.get('userId');
     if (userIdVal) {
       handleStartNewConversation(parseInt(userIdVal));
-      
+
       // Clear the URL param immediately to prevent re-triggering
       const params = new URLSearchParams(searchParams.toString());
       params.delete('userId');

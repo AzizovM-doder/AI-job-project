@@ -46,6 +46,7 @@
     "platform": "Platform",
     "jobs": "Browse Jobs",
     "feed": "Activity Feed",
+    "networking": "Crew Registry",
     "ai_tools": "AI Tools",
     "company": "Company",
     "about": "About",
@@ -67,7 +68,8 @@
     "candidate": "Candidate",
     "organization": "Organization",
     "forgotPassword": "Forgot Password?",
-    "terminalAccess": "Welcome Back"
+    "terminalAccess": "Welcome Back",
+    "externalClearanceRequired": "External clearance required for new personnel"
   },
   "Dashboard": {
     "welcome": "Welcome",

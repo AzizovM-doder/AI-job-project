@@ -176,10 +176,10 @@ export default function CandidateDashboard() {
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   Profiles with verified education history are prioritize by AI filters.
                 </p>
-                <Button 
+                <Button
                   onClick={() => router.push(`/${locale}/profile`)}
-                  variant="outline" 
-                  size="sm" 
+                  variant="outline"
+                  size="sm"
                   className="w-full rounded-full font-bold border-primary/40 text-primary hover:bg-primary/10"
                 >
                   <GraduationCap className="size-4 mr-2" /> Add education history

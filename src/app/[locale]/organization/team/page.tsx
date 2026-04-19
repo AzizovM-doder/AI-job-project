@@ -32,7 +32,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import {
-  DropdownMenu,
+  DropdownMenuPortal,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
@@ -138,8 +138,8 @@ export default function TeamPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Invitation Panel */}
           <div className="space-y-6">
-            <Card className="rounded-[2rem] border-2 border-primary/10 shadow-xl overflow-hidden">
-              <CardHeader className="bg-primary/5 pb-6">
+            <Card className="rounded-[2rem] border-2 border-primary/10 shadow-xl overflow-visible">
+              <CardHeader className="bg-primary/5 pb-6 rounded-t-[2rem]">
                 <CardTitle className="text-xl font-bold flex items-center gap-2">
                   <UserPlus className="size-5 text-primary" /> Recruit Member
                 </CardTitle>
@@ -206,7 +206,7 @@ export default function TeamPage() {
                        <SelectTrigger className="rounded-xl border-2">
                          <SelectValue placeholder="Select Role" />
                        </SelectTrigger>
-                       <SelectContent className="rounded-xl">
+                       <SelectContent className="rounded-xl z-[9999]">
                          {Object.values(OrganizationMemberRole).map((r) => (
                            <SelectItem key={r} value={r} className="font-medium">{r}</SelectItem>
                          ))}
@@ -235,8 +235,8 @@ export default function TeamPage() {
 
           {/* Members Table */}
           <div className="lg:col-span-2">
-            <Card className="rounded-[2rem] border-border/50 shadow-sm overflow-hidden">
-              <div className="bg-muted/30 p-6 border-b border-border/50 flex items-center justify-between">
+            <Card className="rounded-[2rem] border-border/50 shadow-sm overflow-visible">
+              <div className="bg-muted/30 p-6 border-b border-border/50 flex items-center justify-between rounded-t-[2rem]">
                 <div>
                    <h2 className="text-xl font-black tracking-tight flex items-center gap-2">
                      <Users className="size-5 text-primary" /> Active Personnel
@@ -300,7 +300,7 @@ export default function TeamPage() {
                                 <SelectTrigger className="h-8 rounded-lg border-none bg-muted/50 text-[10px] font-bold w-28 mx-auto">
                                   <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="rounded-xl shadow-xl">
+                                <SelectContent className="rounded-xl shadow-xl z-[9999]">
                                   {Object.values(OrganizationMemberRole).map((r) => (
                                     <SelectItem key={r} value={r} className="text-xs font-bold">{r.toUpperCase()}</SelectItem>
                                   ))}
@@ -315,7 +315,8 @@ export default function TeamPage() {
                                   <MoreVertical className="size-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="rounded-xl shadow-xl">
+                              <DropdownMenuPortal>
+                                <DropdownMenuContent align="end" className="rounded-xl shadow-xl z-[9999]">
                                 <DropdownMenuItem className="text-xs font-bold gap-2">
                                   <Mail className="size-3" /> Send Message
                                 </DropdownMenuItem>
@@ -328,7 +329,8 @@ export default function TeamPage() {
                                   </DropdownMenuItem>
                                 )}
                               </DropdownMenuContent>
-                            </DropdownMenu>
+                            </DropdownMenuPortal>
+                          </DropdownMenu>
                           </TableCell>
                         </TableRow>
                       ))

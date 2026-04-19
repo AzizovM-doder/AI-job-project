@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent } from '@/components/ui/card';
-import { Image as ImageIcon, Video, Calendar, Layout, X, Plus, Sparkles } from 'lucide-react';
+import { Image as ImageIcon, Video, Calendar, Layout, X, Plus, Sparkles, Send, Terminal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useFeedQueries } from '@/hooks/queries/useFeedQueries';
 import { useProfileQueries } from '@/hooks/queries/useProfileQueries';
 import { toast } from 'sonner';
 import ImagePickerModal from '@/components/profile/ImagePickerModal';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function StartPostBox() {
   const { user } = useAuthStore();
@@ -29,14 +30,14 @@ export default function StartPostBox() {
       setImageUrl(value);
     } else {
       setIsUploading(true);
-      const loadingToast = toast.loading('Uploading image...');
+      const loadingToast = toast.loading('Broadcasting image to relay nodes...');
       uploadPhotoMutation.mutate(value, {
         onSuccess: (url) => {
           setImageUrl(url);
-          toast.success('Image uploaded', { id: loadingToast });
+          toast.success('Image signal established', { id: loadingToast });
         },
         onError: () => {
-          toast.error('Failed to upload image', { id: loadingToast });
+          toast.error('Signal interference: Upload failed', { id: loadingToast });
         },
         onSettled: () => setIsUploading(false)
       });
@@ -50,24 +51,24 @@ export default function StartPostBox() {
       onSuccess: () => {
         setContent('');
         setImageUrl(null);
-        toast.success('Post created successfully!');
+        toast.success('Transmission Successful');
       },
       onError: () => {
-        toast.error('Failed to create post');
+        toast.error('Transmission Blocked');
       }
     });
   };
 
   return (
-    <Card className="shadow-sm border-gray-200 bg-white rounded-xl overflow-hidden">
-      <CardContent className="p-4">
-        <div className="space-y-4">
-          <div className="flex gap-2">
-            <div className="size-12 rounded-full bg-gray-100 shrink-0 overflow-hidden border border-gray-100">
+    <Card className="glass-card bg-white/[0.03] backdrop-blur-2xl border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-500 hover:border-primary/20">
+      <CardContent className="p-8">
+        <div className="space-y-6">
+          <div className="flex gap-4">
+            <div className="size-14 rounded-2xl bg-black border border-white/10 shrink-0 overflow-hidden shadow-2xl">
               {(user as any)?.avatarUrl ? (
                 <img src={(user as any).avatarUrl} alt="Me" className="size-full object-cover" />
               ) : (
-                <div className="size-full flex items-center justify-center font-bold text-gray-400 bg-gray-50 uppercase text-sm">
+                <div className="size-full flex items-center justify-center font-black text-white/20 bg-white/5 uppercase text-lg">
                   {user?.fullName?.[0] || 'U'}
                 </div>
               )}
@@ -75,68 +76,71 @@ export default function StartPostBox() {
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="flex-1 bg-white border border-gray-300 rounded-full px-5 py-3 text-[14px] font-medium focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-none h-[48px] min-h-[48px] overflow-hidden hover:bg-gray-50 transition-all placeholder:text-gray-500"
-              placeholder="Start a post..."
+              className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-[14px] font-medium text-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-white/20 resize-none h-14 min-h-[56px] overflow-hidden hover:bg-white/[0.07]"
+              placeholder="Initialize new professional signal..."
             />
           </div>
 
-          {imageUrl && (
-            <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-50 group">
-              <img src={imageUrl} alt="Post preview" className="w-full h-auto max-h-[300px] object-cover" />
-              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="rounded-full shadow-lg font-bold"
-                  onClick={() => setImageUrl(null)}
-                >
-                  <X className="size-4 mr-2" /> Remove
-                </Button>
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between pt-1">
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                onClick={() => setIsPhotoPickerOpen(true)}
-                className="text-gray-500 hover:bg-gray-100 hover:text-gray-900 h-12 px-3 flex items-center gap-2 rounded-lg transition-all"
+          <AnimatePresence>
+            {imageUrl && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="relative rounded-[2rem] overflow-hidden border border-white/10 bg-black/20 group"
               >
-                <ImageIcon className="size-5 text-blue-500 fill-current" />
-                <span className="text-[14px] font-bold">Media</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                className="text-gray-500 hover:bg-gray-100 hover:text-gray-900 h-12 px-3 flex items-center gap-2 rounded-lg transition-all hidden lg:flex"
-              >
-                <Calendar className="size-5 text-orange-400 fill-current" />
-                <span className="text-[14px] font-bold">Event</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                className="text-gray-500 hover:bg-gray-100 hover:text-gray-900 h-12 px-3 flex items-center gap-2 rounded-lg transition-all"
-              >
-                <Layout className="size-5 text-emerald-500 fill-current" />
-                <span className="text-[14px] font-bold">Article</span>
-              </Button>
-            </div>
-
-            {content.trim() && (
-              <Button
-                onClick={handlePost}
-                disabled={createPostMutation.isPending || (content.trim() === '' && !imageUrl) || isUploading}
-                className="rounded-full px-6 font-bold h-8 transition-all active:scale-95"
-              >
-                {createPostMutation.isPending ? 'Posting...' : 'Post'}
-              </Button>
+                <img src={imageUrl} alt="Post preview" className="w-full h-auto max-h-[400px] object-cover" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="rounded-xl shadow-2xl font-black uppercase text-[10px] tracking-widest px-6 h-10"
+                    onClick={() => setImageUrl(null)}
+                  >
+                    <X className="size-4 mr-2" /> De-authorize Media
+                  </Button>
+                </div>
+              </motion.div>
             )}
+          </AnimatePresence>
+
+          <div className="flex items-center justify-between pt-2 border-t border-white/5">
+            <div className="flex items-center gap-1">
+              {[
+                { icon: ImageIcon, label: 'Media', color: 'text-blue-500', onClick: () => setIsPhotoPickerOpen(true) },
+                { icon: Calendar, label: 'Event', color: 'text-orange-400', hideOnMobile: true },
+                { icon: Layout, label: 'Article', color: 'text-emerald-500' }
+              ].map((item, i) => (
+                <Button
+                  key={i}
+                  variant="ghost"
+                  size="sm"
+                  onClick={item.onClick}
+                  className={cn(
+                    "text-white/40 hover:bg-white/5 hover:text-white h-12 px-4 flex items-center gap-3 rounded-xl transition-all",
+                    item.hideOnMobile && "hidden lg:flex"
+                  )}
+                >
+                  <item.icon className={cn("size-5", item.color, "fill-current opacity-60")} />
+                  <span className="text-[11px] font-black uppercase tracking-widest">{item.label}</span>
+                </Button>
+              ))}
+            </div>
+
+            <AnimatePresence>
+              {content.trim() && (
+                <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }}>
+                  <Button
+                    onClick={handlePost}
+                    disabled={createPostMutation.isPending || isUploading}
+                    className="rounded-2xl px-8 font-heading font-black uppercase text-[10px] tracking-[0.2em] h-11 bg-primary text-primary-foreground shadow-2xl shadow-primary/20 transition-all active:scale-95 hover:scale-105"
+                  >
+                    {createPostMutation.isPending ? 'Broadcasting...' : 'Post Signal'}
+                    <Send className="size-4 ml-2" />
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </CardContent>
@@ -145,7 +149,7 @@ export default function StartPostBox() {
         isOpen={isPhotoPickerOpen}
         onClose={() => setIsPhotoPickerOpen(false)}
         onSelect={handleImageSelect}
-        title="Add Image to Post"
+        title="Source Local Media"
       />
     </Card>
   );

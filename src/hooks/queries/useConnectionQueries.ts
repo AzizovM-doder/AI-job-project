@@ -1,11 +1,8 @@
-'use client';
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/api';
-import { 
-  Connection,  
-  ConnectionStatus
-} from '@/types/connection';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/api";
+import { Connection, ConnectionStatus } from "@/types/connection";
 
 export const useConnectionQueries = () => {
   const queryClient = useQueryClient();
@@ -13,9 +10,9 @@ export const useConnectionQueries = () => {
   // GET /api/Connection/my
   const useGetMyConnections = () => {
     return useQuery<Connection[]>({
-      queryKey: ['connections', 'my'],
+      queryKey: ["connections", "my"],
       queryFn: async () => {
-        const res = await api.get('/Connection/my');
+        const res = await api.get("/Connection/my");
         return res.data?.data ?? res.data ?? [];
       },
     });
@@ -24,9 +21,9 @@ export const useConnectionQueries = () => {
   // GET /api/Connection/pending
   const useGetPendingConnections = () => {
     return useQuery<Connection[]>({
-      queryKey: ['connections', 'pending'],
+      queryKey: ["connections", "pending"],
       queryFn: async () => {
-        const res = await api.get('/Connection/pending');
+        const res = await api.get("/Connection/pending");
         return res.data?.data ?? res.data ?? [];
       },
     });
@@ -35,9 +32,9 @@ export const useConnectionQueries = () => {
   // GET /api/Connection/all
   const useGetAllConnections = () => {
     return useQuery<Connection[]>({
-      queryKey: ['connections', 'all'],
+      queryKey: ["connections", "all"],
       queryFn: async () => {
-        const res = await api.get('/Connection/all');
+        const res = await api.get("/Connection/all");
         return res.data?.data ?? res.data ?? [];
       },
     });
@@ -51,7 +48,7 @@ export const useConnectionQueries = () => {
         return res.data?.data ?? res.data;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['connections'] });
+        queryClient.invalidateQueries({ queryKey: ["connections"] });
       },
     });
   };
@@ -60,24 +57,30 @@ export const useConnectionQueries = () => {
   const useSendRequestByEmail = () => {
     return useMutation<void, Error, string>({
       mutationFn: async (email) => {
-        const res = await api.post('/Connection/send-by-email', { email });
+        const res = await api.post("/Connection/send-by-email", { email });
         return res.data;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['connections'] });
+        queryClient.invalidateQueries({ queryKey: ["connections"] });
       },
     });
   };
 
   // PUT /api/Connection/{connectionId}/respond
   const useRespondRequest = () => {
-    return useMutation<void, Error, { connectionId: number; status: ConnectionStatus }>({
+    return useMutation<
+      void,
+      Error,
+      { connectionId: number; status: ConnectionStatus }
+    >({
       mutationFn: async ({ connectionId, status }) => {
-        const res = await api.put(`/Connection/${connectionId}/respond`, { status });
+        const res = await api.put(`/Connection/${connectionId}/respond`, {
+          status,
+        });
         return res.data;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['connections'] });
+        queryClient.invalidateQueries({ queryKey: ["connections"] });
       },
     });
   };
@@ -90,7 +93,7 @@ export const useConnectionQueries = () => {
         return res.data;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['connections'] });
+        queryClient.invalidateQueries({ queryKey: ["connections"] });
       },
     });
   };

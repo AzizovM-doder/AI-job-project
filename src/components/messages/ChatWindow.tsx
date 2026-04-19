@@ -15,6 +15,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu, 
+  DropdownMenuPortal,
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger 
@@ -82,7 +83,7 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
     useHardDeleteConversation,
     useDeleteMessage
   } = useMessageQueries();
-  const { useDraftMessage } = useAiQueries();
+  const { useAiDraftMessage } = useAiQueries();
   const { useGetPublicProfiles } = useUserQueries();
 
   const [input, setInput] = useState('');
@@ -107,7 +108,7 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
   const otherUser = profiles?.[0];
 
   const sendMutation = useSendMessage();
-  const aiDraftMutation = useDraftMessage();
+  const aiDraftMutation = useAiDraftMessage();
 
   const isLoading = isMessagesLoading;
 
@@ -243,7 +244,8 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
                 <MoreHorizontal className="size-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuPortal>
+            <DropdownMenuContent align="end" className="w-48 z-[9999]">
               <DropdownMenuItem onClick={() => confirmDelete(false)} className="gap-2">
                 <AlertCircle className="size-4" /> {t('archive')}
               </DropdownMenuItem>
@@ -251,6 +253,7 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
                 <Trash2 className="size-4" /> {t('delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
+          </DropdownMenuPortal>
           </DropdownMenu>
         </div>
       </div>

@@ -1,89 +1,108 @@
-'use client';
+"use client";
 
-import { useMutation, useQuery } from '@tanstack/react-query';
-import api from '@/lib/api';
-import { 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/api";
+import {
   CreateAiPromptDto,
   AiCvAnalysisRequestDto,
-  AiCvAnalysisResultDto,
-  AiSkillGapResultDto,
+  AiCvAnalysisResultDtoResponse,
+  AiSkillGapResultDtoResponse,
   AiJobImproveRequestDto,
-  AiJobImproveResultDto,
+  AiJobImproveResultDtoResponse,
   AiDraftCoverLetterRequestDto,
   AiDraftMessageRequestDto,
-  AiDraftResultDto
-} from '@/types/ai';
+  AiDraftResultDtoResponse,
+} from "@/types/ai";
 
 export const useAiQueries = () => {
-  
-  // POST /api/Ai/ask
+  const queryClient = useQueryClient();
+
+  // 1. Ask AI (Generic Prompt)
   const useAiAsk = () => {
-    return useMutation<string, Error, CreateAiPromptDto>({
-      mutationFn: async (data) => {
-        const res = await api.post('/Ai/ask', data);
-        return res.data?.data ?? res.data;
+    return useMutation({
+      mutationFn: async (data: CreateAiPromptDto) => {
+        const res = await api.post("/Ai/ask", data);
+        return res.data;
       },
     });
   };
 
-  // POST /api/Ai/analyze-cv
-  const useAnalyzeCv = () => {
-    return useMutation<AiCvAnalysisResultDto, Error, AiCvAnalysisRequestDto>({
-      mutationFn: async (data) => {
-        const res = await api.post('/Ai/analyze-cv', data);
-        return res.data?.data ?? res.data;
+  // 2. CV Analyzer
+  const useAiAnalyzeCv = () => {
+    return useMutation({
+      mutationFn: async (data: AiCvAnalysisRequestDto) => {
+        const res = await api.post<AiCvAnalysisResultDtoResponse>(
+          "/Ai/analyze-cv",
+          data,
+        );
+        return res.data;
+      },
+      onSuccess: () => {
+        // Invalidate profile query to show updated skills if sync was true
+        queryClient.invalidateQueries({ queryKey: ["profile"] });
       },
     });
   };
 
-  // GET /api/Ai/skill-gap/{userId}/{jobId}
-  const useGetSkillGap = (userId: number, jobId: number) => {
-    return useQuery<AiSkillGapResultDto>({
-      queryKey: ['ai', 'skill-gap', userId, jobId],
+  // 3. Skill Gap Analysis
+  const useAiSkillGap = (userId: number, jobId: number) => {
+    return useQuery({
+      queryKey: ["ai", "skill-gap", userId, jobId],
       queryFn: async () => {
-        const res = await api.get(`/Ai/skill-gap/${userId}/${jobId}`);
-        return res.data?.data ?? res.data;
+        const res = await api.get<AiSkillGapResultDtoResponse>(
+          `/Ai/skill-gap/${userId}/${jobId}`,
+        );
+        return res.data;
       },
       enabled: !!userId && !!jobId,
     });
   };
 
-  // POST /api/Ai/improve-job
-  const useImproveJob = () => {
-    return useMutation<AiJobImproveResultDto, Error, AiJobImproveRequestDto>({
-      mutationFn: async (data) => {
-        const res = await api.post('/Ai/improve-job', data);
-        return res.data?.data ?? res.data;
+  // 4. Improve Job Post
+  const useAiImproveJob = () => {
+    return useMutation({
+      mutationFn: async (data: AiJobImproveRequestDto) => {
+        const res = await api.post<AiJobImproveResultDtoResponse>(
+          "/Ai/improve-job",
+          data,
+        );
+        return res.data;
       },
     });
   };
 
-  // POST /api/Ai/draft-cover-letter
-  const useDraftCoverLetter = () => {
-    return useMutation<AiDraftResultDto, Error, AiDraftCoverLetterRequestDto>({
-      mutationFn: async (data) => {
-        const res = await api.post('/Ai/draft-cover-letter', data);
-        return res.data?.data ?? res.data;
+  // 5. Draft Cover Letter
+  const useAiDraftCoverLetter = () => {
+    return useMutation({
+      mutationFn: async (data: AiDraftCoverLetterRequestDto) => {
+        const res = await api.post<AiDraftResultDtoResponse>(
+          "/Ai/draft-cover-letter",
+          data,
+        );
+        return res.data;
       },
     });
   };
 
-  // POST /api/Ai/draft-message
-  const useDraftMessage = () => {
-    return useMutation<AiDraftResultDto, Error, AiDraftMessageRequestDto>({
-      mutationFn: async (data) => {
-        const res = await api.post('/Ai/draft-message', data);
-        return res.data?.data ?? res.data;
+  // 6. Draft Message
+  const useAiDraftMessage = () => {
+    return useMutation({
+      mutationFn: async (data: AiDraftMessageRequestDto) => {
+        const res = await api.post<AiDraftResultDtoResponse>(
+          "/Ai/draft-message",
+          data,
+        );
+        return res.data;
       },
     });
   };
 
   return {
     useAiAsk,
-    useAnalyzeCv,
-    useGetSkillGap,
-    useImproveJob,
-    useDraftCoverLetter,
-    useDraftMessage,
+    useAiAnalyzeCv,
+    useAiSkillGap,
+    useAiImproveJob,
+    useAiDraftCoverLetter,
+    useAiDraftMessage,
   };
 };

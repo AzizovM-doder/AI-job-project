@@ -129,7 +129,12 @@ export const useMessageQueries = () => {
 
   // DELETE /api/Message/{id} - Delete a message
   const useDeleteMessage = () => {
-    return useMutation<void, Error, { id: number; conversationId: number }, { previousMessages: Message[] | undefined }>({
+    return useMutation<
+      void,
+      Error,
+      { id: number; conversationId: number },
+      { previousMessages: Message[] | undefined }
+    >({
       mutationFn: async ({ id }) => {
         const res = await api.delete(`/Message/${id}`);
         return res.data;
@@ -137,28 +142,35 @@ export const useMessageQueries = () => {
       // 3. Message Deletion - Optimistic Update
       onMutate: async ({ id, conversationId }) => {
         // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-        await queryClient.cancelQueries({ queryKey: ["messages", conversationId] });
+        await queryClient.cancelQueries({
+          queryKey: ["messages", conversationId],
+        });
 
         // Snapshot the previous value
-        const previousMessages = queryClient.getQueryData<Message[]>(["messages", conversationId]);
+        const previousMessages = queryClient.getQueryData<Message[]>([
+          "messages",
+          conversationId,
+        ]);
 
         // Optimistically update to the new value
         if (previousMessages) {
           queryClient.setQueryData<Message[]>(
             ["messages", conversationId],
-            previousMessages.filter((msg) => msg.id !== id)
+            previousMessages.filter((msg) => msg.id !== id),
           );
         }
 
         // Return a context object with the snapshotted value
-        return { previousMessages } as { previousMessages: Message[] | undefined };
+        return { previousMessages } as {
+          previousMessages: Message[] | undefined;
+        };
       },
       // If the mutation fails, use the context returned from onMutate to roll back
       onError: (_err, variables, context) => {
-        if (context && 'previousMessages' in context) {
+        if (context && "previousMessages" in context) {
           queryClient.setQueryData(
             ["messages", variables.conversationId],
-            context.previousMessages
+            context.previousMessages,
           );
         }
       },

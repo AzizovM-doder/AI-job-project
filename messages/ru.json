@@ -46,6 +46,7 @@
     "platform": "Платформа",
     "jobs": "Вакансии",
     "feed": "Лента активности",
+    "networking": "Реестр экипажа",
     "ai_tools": "ИИ Инструменты",
     "company": "Компания",
     "about": "О нас",
@@ -67,7 +68,8 @@
     "candidate": "Кандидат",
     "organization": "Организация",
     "forgotPassword": "Забыли пароль?",
-    "terminalAccess": "Добро пожаловать"
+    "terminalAccess": "Добро пожаловать",
+    "externalClearanceRequired": "Для новых сотрудников требуется внешнее разрешение"
   },
   "Dashboard": {
     "welcome": "Добро пожаловать",

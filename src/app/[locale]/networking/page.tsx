@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import {
   DropdownMenu,
+  DropdownMenuPortal,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
@@ -161,8 +162,8 @@ export default function NetworkingPage() {
               {/* SUGGESTIONS TAB */}
               {activeTab === 'suggestions' && (
                 <div className="space-y-6">
-                  <Card className="shadow-sm border-border/60 overflow-hidden bg-card/30">
-                    <CardHeader className="p-6 border-b border-border/40">
+                  <Card className="shadow-sm border-border/60 overflow-visible bg-card/30">
+                    <CardHeader className="p-6 border-b border-border/40 rounded-t-2xl">
                       <CardTitle className="text-xl font-black tracking-tight">{t('suggestions_title')}</CardTitle>
                       <p className="text-sm text-muted-foreground mt-1">{t('suggestions_desc')}</p>
                     </CardHeader>
@@ -180,8 +181,8 @@ export default function NetworkingPage() {
                       ) : suggestionUsers.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                           {suggestionUsers.map((person) => (
-                            <Card key={person.userId} className="overflow-hidden border-border/60 shadow-sm flex flex-col items-center text-center relative hover:shadow-xl hover:border-primary/20 transition-all group bg-background/60 backdrop-blur-sm">
-                              <div className="h-16 w-full bg-gradient-to-r from-primary/10 to-accent/10" />
+                            <Card key={person.userId} className="overflow-visible border-border/60 shadow-sm flex flex-col items-center text-center relative hover:shadow-xl hover:border-primary/20 transition-all group bg-background/60 backdrop-blur-sm">
+                              <div className="h-16 w-full bg-gradient-to-r from-primary/10 to-accent/10 rounded-t-xl" />
                               <CardContent className="p-4 pt-0 -mt-10 flex flex-col items-center flex-1 w-full">
                                 <div className="size-20 rounded-full border-2 border-background bg-muted overflow-hidden shrink-0 shadow-lg">
                                   {person.avatarUrl ? (
@@ -370,7 +371,8 @@ function ConnectionBuddyCard({
               <MoreHorizontal className="size-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="font-bold">
+          <DropdownMenuPortal>
+            <DropdownMenuContent align="end" className="font-bold z-[9999]">
             <DropdownMenuItem
               variant="destructive"
               onClick={(e) => {
@@ -384,7 +386,8 @@ function ConnectionBuddyCard({
               {t('remove_connection')}
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenuPortal>
+      </DropdownMenu>
       </div>
     </div>
   );

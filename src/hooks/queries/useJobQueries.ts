@@ -242,6 +242,5 @@ export const useJobQueries = () => {
     useGetMatchesForUser,
     useGetCategories,
     useGetJobSkills,
-    useSearchJobs,
   };
 };

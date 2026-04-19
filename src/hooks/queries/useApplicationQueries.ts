@@ -1,8 +1,12 @@
-'use client';
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/api';
-import { JobApplication, JobApplicationPagedResult, ApplicationStatus } from '@/types/job';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/api";
+import {
+  JobApplication,
+  JobApplicationPagedResult,
+  ApplicationStatus,
+} from "@/types/job";
 
 export const useApplicationQueries = () => {
   const queryClient = useQueryClient();
@@ -16,9 +20,9 @@ export const useApplicationQueries = () => {
     pageSize?: number;
   }) => {
     return useQuery<JobApplicationPagedResult>({
-      queryKey: ['applications', 'paged', params],
+      queryKey: ["applications", "paged", params],
       queryFn: async () => {
-        const response = await api.get('/JobApplication/paged', { params });
+        const response = await api.get("/JobApplication/paged", { params });
         return response.data.data ?? response.data ?? null;
       },
     });
@@ -27,7 +31,7 @@ export const useApplicationQueries = () => {
   // GET /api/JobApplication/by-job/:jobId — all applicants for a job
   const useApplicationsByJob = (jobId: number | null) => {
     return useQuery<JobApplication[]>({
-      queryKey: ['applications', 'by-job', jobId],
+      queryKey: ["applications", "by-job", jobId],
       queryFn: async () => {
         const response = await api.get(`/JobApplication/by-job/${jobId}`);
         return response.data.data ?? response.data ?? null;
@@ -39,7 +43,7 @@ export const useApplicationQueries = () => {
   // GET /api/JobApplication/by-user/:userId — all applications from a user
   const useApplicationsByUser = (userId: number | null) => {
     return useQuery<JobApplication[]>({
-      queryKey: ['applications', 'by-user', userId],
+      queryKey: ["applications", "by-user", userId],
       queryFn: async () => {
         const response = await api.get(`/JobApplication/by-user/${userId}`);
         return response.data.data ?? response.data ?? null;
@@ -51,7 +55,7 @@ export const useApplicationQueries = () => {
   // GET /api/JobApplication/:id — single application
   const useApplication = (id: number | null) => {
     return useQuery<JobApplication>({
-      queryKey: ['application', id],
+      queryKey: ["application", id],
       queryFn: async () => {
         const response = await api.get(`/JobApplication/${id}`);
         return response.data.data ?? response.data ?? null;
@@ -64,11 +68,11 @@ export const useApplicationQueries = () => {
   const useApplyForJob = () => {
     return useMutation({
       mutationFn: async (data: { jobId: number; coverLetter?: string }) => {
-        const response = await api.post('/JobApplication', data);
+        const response = await api.post("/JobApplication", data);
         return response.data;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['applications'] });
+        queryClient.invalidateQueries({ queryKey: ["applications"] });
       },
     });
   };
@@ -76,14 +80,24 @@ export const useApplicationQueries = () => {
   // PATCH /api/JobApplication/:id/status — org reviews an application
   const useUpdateApplicationStatus = () => {
     return useMutation({
-      mutationFn: async ({ id, status }: { id: number; status: ApplicationStatus }) => {
-        const response = await api.patch(`/JobApplication/${id}/status`, JSON.stringify(status), {
-          headers: { 'Content-Type': 'application/json' },
-        });
+      mutationFn: async ({
+        id,
+        status,
+      }: {
+        id: number;
+        status: ApplicationStatus;
+      }) => {
+        const response = await api.patch(
+          `/JobApplication/${id}/status`,
+          JSON.stringify(status),
+          {
+            headers: { "Content-Type": "application/json" },
+          },
+        );
         return response.data;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['applications'] });
+        queryClient.invalidateQueries({ queryKey: ["applications"] });
       },
     });
   };
@@ -96,7 +110,7 @@ export const useApplicationQueries = () => {
         return response.data;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['applications'] });
+        queryClient.invalidateQueries({ queryKey: ["applications"] });
       },
     });
   };

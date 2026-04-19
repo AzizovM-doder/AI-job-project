@@ -7,10 +7,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import JobSearchHeader from '@/components/jobs/JobSearchHeader';
 import JobCard from '@/components/jobs/JobCard';
-import { Bookmark, List, Bell, PlayCircle, Info } from 'lucide-react';
+import { Bookmark, List, Bell, PlayCircle, Info, Sparkles, Terminal, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
 import { Container } from '@/components/ui/Container';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { Space_Grotesk } from 'next/font/google';
+
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] });
 
 export default function JobsPage() {
   const { useJobs } = useJobQueries();
@@ -18,109 +22,125 @@ export default function JobsPage() {
 
   return (
     <ProtectedRoute>
-      <PageTransition className="space-y-6">
+      <PageTransition className={cn("space-y-8 pb-32", spaceGrotesk.className)}>
         {/* Search Header */}
         <JobSearchHeader onSearch={() => {}} />
 
-        <Container className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start pb-12">
+        <Container className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
           
           {/* Main Content */}
-          <div className="md:col-span-8 space-y-6">
-            
-            <Card className="shadow-sm border-border/60">
-               <CardHeader className="p-4 pb-0">
-                 <CardTitle className="text-lg font-bold">Recommended for you</CardTitle>
-                 <p className="text-sm text-muted-foreground font-normal">Based on your profile and search history</p>
-               </CardHeader>
-               <CardContent className="p-4 pt-4 space-y-4">
+          <div className="md:col-span-8 space-y-8">
+            <div className="flex items-center justify-between px-4">
+              <div className="space-y-1">
+                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Priority missions</h2>
+                <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Tailored access based on your credentials</p>
+              </div>
+              <Sparkles className="size-5 text-primary opacity-40" />
+            </div>
+
+            <Card className="glass-card bg-white/[0.03] backdrop-blur-3xl border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
+               <CardContent className="p-8 space-y-8">
                   {isLoading ? (
-                    [1, 2, 3].map(i => (
-                      <Card key={i} className="p-4 flex gap-4 border-border/40">
-                        <Skeleton className="size-14 rounded-sm shrink-0" />
-                        <div className="flex-1 space-y-3">
-                          <div className="flex justify-between items-start">
-                            <Skeleton className="h-5 w-48" />
-                            <Skeleton className="size-6 rounded-full" />
+                    <div className="space-y-6">
+                      {[1, 2, 3].map(i => (
+                        <Card key={i} className="p-8 flex gap-8 bg-white/5 border-white/5 rounded-[2rem]">
+                          <Skeleton className="size-20 rounded-[1.5rem] bg-white/5 shrink-0" />
+                          <div className="flex-1 space-y-4">
+                            <div className="flex justify-between items-start">
+                              <Skeleton className="h-6 w-64 bg-white/5" />
+                              <Skeleton className="size-10 rounded-xl bg-white/5" />
+                            </div>
+                            <Skeleton className="h-4 w-48 bg-white/5" />
+                            <Skeleton className="h-4 w-32 bg-white/5" />
                           </div>
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-4 w-24" />
-                          <div className="flex gap-2 pt-2">
-                            <Skeleton className="h-6 w-16" />
-                            <Skeleton className="h-6 w-20" />
-                          </div>
-                        </div>
-                      </Card>
-                    ))
+                        </Card>
+                      ))}
+                    </div>
                   ) : isError ? (
-                    <div className="p-10 text-center border-dashed border-destructive/40 bg-destructive/5 text-destructive font-bold text-xs uppercase tracking-widest">
-                      SYSTEM_ERROR: SECURE_DATA_FETCH_FAILED
+                    <div className="p-20 text-center glass-card bg-destructive/5 border-destructive/20 rounded-[2rem] border-dashed">
+                       <Terminal className="size-12 text-destructive mx-auto mb-6 opacity-40" />
+                       <p className="text-[11px] font-black uppercase tracking-[0.3em] text-destructive">SYSTEM_ERROR: REGISTRY_DENIED</p>
+                       <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest mt-2">The mission repository is currently offline for maintenance.</p>
                     </div>
                   ) : jobsResponse?.items && jobsResponse.items.length > 0 ? (
-                    jobsResponse.items.map((job) => (
-                      <JobCard key={job.id} job={job} />
-                    ))
+                    <div className="space-y-6">
+                      {jobsResponse.items.map((job) => (
+                        <JobCard key={job.id} job={job} />
+                      ))}
+                    </div>
                   ) : (
-                    <div className="p-12 text-center text-muted-foreground border border-dashed rounded-lg">
-                      <p className="font-bold">No jobs found</p>
-                      <p className="text-sm mt-1">Try adjusting your filters or search keywords.</p>
+                    <div className="p-24 text-center glass-card bg-white/5 rounded-[2.5rem] border-dashed border-white/10">
+                      <Terminal className="size-12 text-white/20 mx-auto mb-6" />
+                      <p className="text-xl font-heading font-black text-white uppercase tracking-tighter">Sector Void</p>
+                      <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest mt-2">No missions currently recorded in this quadrant.</p>
                     </div>
                   )}
                </CardContent>
             </Card>
 
             {jobsResponse?.items && jobsResponse.items.length > 3 && (
-               <button className="text-[14px] font-bold text-muted-foreground hover:text-primary transition-colors w-full text-center border border-border/60 bg-card p-3 rounded-lg shadow-sm">
-                 Show all {jobsResponse.totalCount} jobs →
+               <button className="w-full h-16 rounded-[1.8rem] bg-white/[0.03] backdrop-blur-3xl border border-white/10 font-heading font-black text-[10px] uppercase tracking-[0.3em] text-white/40 hover:text-primary hover:border-primary/40 hover:bg-white/5 transition-all shadow-xl">
+                 Decrypt All {jobsResponse.totalCount} Mission Profiles →
                </button>
             )}
           </div>
 
           {/* Sidebar */}
-          <aside className="md:col-span-4 space-y-4 sticky top-[72px]">
+          <aside className="md:col-span-4 space-y-8 sticky top-[100px]">
             {/* Shortcuts */}
-            <Card className="shadow-sm border-border/60">
+            <Card className="glass-card bg-white/[0.03] backdrop-blur-3xl border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
               <CardContent className="p-0">
-                 <div className="p-4 space-y-5">
-                   <div className="flex items-center gap-3 cursor-pointer group">
-                      <Bookmark className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                      <span className="text-[14px] font-bold text-muted-foreground group-hover:text-primary transition-colors">My jobs</span>
+                 <div className="p-8 space-y-8">
+                   <div className="flex items-center gap-4 cursor-pointer group/nav">
+                      <div className="size-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover/nav:bg-primary/20 group-hover/nav:border-primary/40 transition-all">
+                        <Bookmark className="size-4 text-white/40 group-hover/nav:text-primary transition-colors" />
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/40 group-hover/nav:text-white transition-colors">Stored Missions</span>
                    </div>
-                   <div className="flex items-center gap-3 cursor-pointer group">
-                      <Bell className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                      <span className="text-[14px] font-bold text-muted-foreground group-hover:text-primary transition-colors">Job alerts</span>
+                   <div className="flex items-center gap-4 cursor-pointer group/nav">
+                      <div className="size-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover/nav:bg-primary/20 group-hover/nav:border-primary/40 transition-all">
+                        <Bell className="size-4 text-white/40 group-hover/nav:text-primary transition-colors" />
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/40 group-hover/nav:text-white transition-colors">Sector Alerts</span>
                    </div>
-                   <div className="flex items-center gap-3 cursor-pointer group">
-                      <PlayCircle className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                      <span className="text-[14px] font-bold text-muted-foreground group-hover:text-primary transition-colors">Skill Assessments</span>
+                   <div className="flex items-center gap-4 cursor-pointer group/nav">
+                      <div className="size-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover/nav:bg-primary/20 group-hover/nav:border-primary/40 transition-all">
+                        <Activity className="size-4 text-white/40 group-hover/nav:text-primary transition-colors" />
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/40 group-hover/nav:text-white transition-colors">Skill Assessments</span>
                    </div>
                  </div>
-                 <hr className="border-border/60" />
-                 <Button variant="ghost" className="w-full rounded-none justify-start px-4 h-11 text-[14px] font-bold text-primary hover:bg-primary/5">
-                   <List className="size-4 mr-2" />
-                   Interview prep
+                 <div className="h-[1px] bg-white/5 mx-8" />
+                 <Button variant="ghost" className="w-full h-16 rounded-none justify-center px-8 font-heading font-black uppercase tracking-[0.2em] text-[10px] text-primary hover:bg-primary/5 transition-all">
+                   <Terminal className="size-4 mr-3" />
+                   Interview Prep Terminal
                  </Button>
               </CardContent>
             </Card>
 
             {/* Guidance Card */}
-            <Card className="shadow-sm border-border/60">
-              <CardHeader className="p-4 pb-0 flex flex-row items-center justify-between">
-                <CardTitle className="text-sm font-bold">Job seeker guidance</CardTitle>
-                <Info className="size-3.5 text-muted-foreground" />
-              </CardHeader>
-              <CardContent className="p-4">
-                 <p className="text-xs text-muted-foreground mb-3 leading-relaxed">Recommended based on your activity</p>
-                 <div className="flex items-center gap-2 group cursor-pointer">
-                    <div className="flex-1">
-                      <p className="text-[13px] font-bold group-hover:text-primary group-hover:underline transition-colors">I want to improve my resume</p>
-                      <p className="text-[11px] text-muted-foreground">Explore our AI resume evaluation tools.</p>
-                    </div>
-                    <div className="size-12 rounded bg-muted shrink-0" />
-                 </div>
-              </CardContent>
+            <Card className="glass-card bg-white/[0.03] backdrop-blur-3xl border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl p-8">
+              <div className="flex items-center justify-between mb-8">
+                <div className="space-y-1">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Ops_Guidance</h4>
+                  <p className="text-[9px] text-white/20 font-bold uppercase tracking-widest leading-tight">Optimized based on biometric activity</p>
+                </div>
+                <Info className="size-3.5 text-white/20" />
+              </div>
+              
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 group cursor-pointer p-4 rounded-2xl border border-white/5 hover:bg-white/5 transition-all">
+                  <div className="flex-1">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-white group-hover:text-primary transition-colors">Decrypt Resume Data</p>
+                    <p className="text-[9px] text-white/30 font-bold uppercase tracking-tight mt-1">Explore AI evaluation protocols.</p>
+                  </div>
+                  <div className="size-14 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center opacity-40">
+                    <Sparkles className="size-6 text-primary" />
+                  </div>
+                </div>
+              </div>
             </Card>
           </aside>
-
         </Container>
       </PageTransition>
     </ProtectedRoute>

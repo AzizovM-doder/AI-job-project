@@ -23,14 +23,14 @@ interface LanguageModalProps {
 export default function LanguageModal({ isOpen, onClose, onSave, isPending, profileId }: LanguageModalProps) {
   const { useLanguages } = useMetadataQueries();
   const { data: languages, isLoading } = useLanguages();
-  
+
   const [selectedLanguageId, setSelectedLanguageId] = useState<string>('');
   const [level, setLevel] = useState<LanguageLevel>(LanguageLevel.Beginner);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedLanguageId) return;
-    
+
     onSave({
       profileId,
       languageId: parseInt(selectedLanguageId),
@@ -97,17 +97,17 @@ export default function LanguageModal({ isOpen, onClose, onSave, isPending, prof
           </div>
 
           <DialogFooter className="p-8 pt-4 gap-3 bg-muted/10">
-            <Button 
-              type="button" 
-              variant="ghost" 
-              onClick={onClose} 
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onClose}
               disabled={isPending}
               className="rounded-xl font-bold h-11 px-6"
             >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={isPending || !selectedLanguageId}
               className="rounded-xl font-bold h-11 px-10 shadow-lg shadow-primary/20 transition-all active:scale-95"
             >

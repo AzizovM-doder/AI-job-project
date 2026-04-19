@@ -1,5 +1,7 @@
+Endorsement
+
 POST
-​/api​/UserExperience
+​/api​/Endorsement
 
 Parameters
 Try it out
@@ -11,11 +13,7 @@ application/json
 Example Value
 Schema
 {
-  "userId": 0,
-  "companyName": "string",
-  "position": "string",
-  "startDate": "2026-04-18T13:36:43.785Z",
-  "endDate": "2026-04-18T13:36:43.785Z"
+  "profileSkillId": 0
 }
 Responses
 Code	Description	Links
@@ -36,13 +34,16 @@ Schema
   "data": "string"
 }
 No links
-GET
-​/api​/UserExperience
+DELETE
+​/api​/Endorsement​/{id}
 
 Parameters
 Try it out
-No parameters
-
+Name	Description
+id *
+integer($int32)
+(path)
+id
 Responses
 Code	Description	Links
 200	
@@ -59,20 +60,11 @@ Schema
   "description": [
     "string"
   ],
-  "data": [
-    {
-      "id": 0,
-      "userId": 0,
-      "companyName": "string",
-      "position": "string",
-      "startDate": "2026-04-18T13:36:43.793Z",
-      "endDate": "2026-04-18T13:36:43.793Z"
-    }
-  ]
+  "data": "string"
 }
 No links
 GET
-​/api​/UserExperience​/{id}
+​/api​/Endorsement​/{id}
 
 Parameters
 Try it out
@@ -99,36 +91,22 @@ Schema
   ],
   "data": {
     "id": 0,
-    "userId": 0,
-    "companyName": "string",
-    "position": "string",
-    "startDate": "2026-04-18T13:36:43.802Z",
-    "endDate": "2026-04-18T13:36:43.802Z"
+    "endorserId": 0,
+    "profileSkillId": 0,
+    "createdAt": "2026-04-19T11:01:41.628Z"
   }
 }
 No links
-PUT
-​/api​/UserExperience​/{id}
+GET
+​/api​/Endorsement​/by-profile-skill​/{profileSkillId}
 
 Parameters
 Try it out
 Name	Description
-id *
+profileSkillId *
 integer($int32)
 (path)
-id
-Request body
-
-application/json
-Example Value
-Schema
-{
-  "id": 0,
-  "companyName": "string",
-  "position": "string",
-  "startDate": "2026-04-18T13:36:43.808Z",
-  "endDate": "2026-04-18T13:36:43.808Z"
-}
+profileSkillId
 Responses
 Code	Description	Links
 200	
@@ -145,40 +123,18 @@ Schema
   "description": [
     "string"
   ],
-  "data": "string"
-}
-No links
-DELETE
-​/api​/UserExperience​/{id}
-
-Parameters
-Try it out
-Name	Description
-id *
-integer($int32)
-(path)
-id
-Responses
-Code	Description	Links
-200	
-Success
-
-Media type
-
-text/plain
-Controls Accept header.
-Example Value
-Schema
-{
-  "statusCode": 0,
-  "description": [
-    "string"
-  ],
-  "data": "string"
+  "data": [
+    {
+      "id": 0,
+      "endorserId": 0,
+      "profileSkillId": 0,
+      "createdAt": "2026-04-19T11:01:41.633Z"
+    }
+  ]
 }
 No links
 GET
-​/api​/UserExperience​/by-user​/{userId}
+​/api​/Endorsement​/by-user​/{userId}
 
 Parameters
 Try it out
@@ -206,11 +162,628 @@ Schema
   "data": [
     {
       "id": 0,
-      "userId": 0,
-      "companyName": "string",
-      "position": "string",
-      "startDate": "2026-04-18T13:36:43.818Z",
-      "endDate": "2026-04-18T13:36:43.818Z"
+      "endorserId": 0,
+      "profileSkillId": 0,
+      "createdAt": "2026-04-19T11:01:41.640Z"
+    }
+  ]
+}
+
+
+
+
+Language
+POST
+​/api​/Language
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "name": "string",
+  "type": "Natural"
+}
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": "string"
+}
+No links
+GET
+​/api​/Language
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": [
+    {
+      "id": 0,
+      "name": "string",
+      "type": "Natural"
+    }
+  ]
+}
+No links
+GET
+​/api​/Language​/{id}
+
+Parameters
+Try it out
+Name	Description
+id *
+integer($int32)
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": {
+    "id": 0,
+    "name": "string",
+    "type": "Natural"
+  }
+}
+No links
+PUT
+​/api​/Language​/{id}
+
+Parameters
+Try it out
+Name	Description
+id *
+integer($int32)
+(path)
+id
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "id": 0,
+  "name": "string",
+  "type": "Natural"
+}
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": "string"
+}
+No links
+DELETE
+​/api​/Language​/{id}
+
+Parameters
+Try it out
+Name	Description
+id *
+integer($int32)
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": "string"
+}
+No links
+GET
+​/api​/Language​/search
+
+Parameters
+Try it out
+Name	Description
+name
+string
+(query)
+name
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": [
+    {
+      "id": 0,
+      "name": "string",
+      "type": "Natural"
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+ProfileSkill
+
+POST
+​/api​/ProfileSkill
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "profileId": 0,
+  "skillId": 0,
+  "endorsementsCount": 0
+}
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": {
+    "id": 0,
+    "profileId": 0,
+    "skillId": 0,
+    "endorsementsCount": 0
+  }
+}
+No links
+GET
+​/api​/ProfileSkill
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": [
+    {
+      "id": 0,
+      "profileId": 0,
+      "skillId": 0,
+      "endorsementsCount": 0
+    }
+  ]
+}
+No links
+GET
+​/api​/ProfileSkill​/{id}
+
+Parameters
+Try it out
+Name	Description
+id *
+integer($int32)
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": {
+    "id": 0,
+    "profileId": 0,
+    "skillId": 0,
+    "endorsementsCount": 0
+  }
+}
+No links
+PUT
+​/api​/ProfileSkill​/{id}
+
+Parameters
+Try it out
+Name	Description
+id *
+integer($int32)
+(path)
+id
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "id": 0,
+  "skillId": 0,
+  "endorsementsCount": 0
+}
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": {
+    "id": 0,
+    "profileId": 0,
+    "skillId": 0,
+    "endorsementsCount": 0
+  }
+}
+No links
+DELETE
+​/api​/ProfileSkill​/{id}
+
+Parameters
+Try it out
+Name	Description
+id *
+integer($int32)
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": "string"
+}
+No links
+GET
+​/api​/ProfileSkill​/by-profile​/{profileId}
+
+Parameters
+Try it out
+Name	Description
+profileId *
+integer($int32)
+(path)
+profileId
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": [
+    {
+      "id": 0,
+      "profileId": 0,
+      "skillId": 0,
+      "endorsementsCount": 0
+    }
+  ]
+}
+No links
+DELETE
+​/api​/ProfileSkill​/profile​/{profileId}​/skill​/{skillId}
+
+Parameters
+Try it out
+Name	Description
+profileId *
+integer($int32)
+(path)
+profileId
+skillId *
+integer($int32)
+(path)
+skillId
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": "string"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Recommendation
+
+POST
+​/api​/Recommendation
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "recipientId": 0,
+  "content": "string"
+}
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": "string"
+}
+No links
+DELETE
+​/api​/Recommendation​/{id}
+
+Parameters
+Try it out
+Name	Description
+id *
+integer($int32)
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": "string"
+}
+No links
+GET
+​/api​/Recommendation​/{id}
+
+Parameters
+Try it out
+Name	Description
+id *
+integer($int32)
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": {
+    "id": 0,
+    "authorId": 0,
+    "recipientId": 0,
+    "content": "string",
+    "createdAt": "2026-04-19T11:05:31.924Z"
+  }
+}
+No links
+GET
+​/api​/Recommendation​/by-recipient​/{recipientId}
+
+Parameters
+Try it out
+Name	Description
+recipientId *
+integer($int32)
+(path)
+recipientId
+Responses
+Code	Description	Links
+200	
+Success
+
+Media type
+
+text/plain
+Controls Accept header.
+Example Value
+Schema
+{
+  "statusCode": 0,
+  "description": [
+    "string"
+  ],
+  "data": [
+    {
+      "id": 0,
+      "authorId": 0,
+      "recipientId": 0,
+      "content": "string",
+      "createdAt": "2026-04-19T11:05:31.929Z"
     }
   ]
 }

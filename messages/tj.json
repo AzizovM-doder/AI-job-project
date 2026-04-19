@@ -46,6 +46,7 @@
     "platform": "Платформа",
     "jobs": "Вакансияҳо",
     "feed": "Лентаи фаъолият",
+    "networking": "Феҳристи кормандон",
     "ai_tools": "Асбобҳои ИЗ",
     "company": "Ширкат",
     "about": "Дар бораи мо",
@@ -67,7 +68,8 @@
     "candidate": "Номзад",
     "organization": "Ташкилот",
     "forgotPassword": "Рамзро фаромӯш кардед?",
-    "terminalAccess": "Хуш омадед"
+    "terminalAccess": "Хуш омадед",
+    "externalClearanceRequired": "Барои кормандони нав иҷозати беруна лозим аст"
   },
   "Dashboard": {
     "welcome": "Хуш омадед",

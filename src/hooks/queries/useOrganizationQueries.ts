@@ -1,33 +1,33 @@
-'use client';
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/api';
-import { 
-  Organization, 
-  OrganizationPagedResult, 
-  CreateOrganizationDto, 
-  UpdateOrganizationDto, 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/api";
+import {
+  Organization,
+  OrganizationPagedResult,
+  CreateOrganizationDto,
+  UpdateOrganizationDto,
   OrganizationMember,
   MemberDirectoryEntryDto,
   CreateOrganizationMemberDto,
   UpdateOrganizationMemberDto,
-  OrganizationMemberInviteRespondDto
-} from '@/types/organization';
+  OrganizationMemberInviteRespondDto,
+} from "@/types/organization";
 
 export const useOrganizationQueries = () => {
   const queryClient = useQueryClient();
 
   // --- ORGANIZATION MANAGEMENT ---
 
-  const useGetOrganizationsPaged = (params?: { 
-    Name?: string; 
-    PageNumber?: number; 
-    PageSize?: number; 
+  const useGetOrganizationsPaged = (params?: {
+    Name?: string;
+    PageNumber?: number;
+    PageSize?: number;
   }) => {
     return useQuery<OrganizationPagedResult>({
-      queryKey: ['organizations', 'paged', params],
+      queryKey: ["organizations", "paged", params],
       queryFn: async () => {
-        const res = await api.get('/Organization/paged', { params });
+        const res = await api.get("/Organization/paged", { params });
         return res.data?.data ?? res.data;
       },
     });
@@ -35,7 +35,7 @@ export const useOrganizationQueries = () => {
 
   const useGetOrganization = (id: number) => {
     return useQuery<Organization>({
-      queryKey: ['organizations', id],
+      queryKey: ["organizations", id],
       queryFn: async () => {
         const res = await api.get(`/Organization/${id}`);
         return res.data?.data ?? res.data;
@@ -46,9 +46,9 @@ export const useOrganizationQueries = () => {
 
   const useGetMyOrganizations = () => {
     return useQuery<Organization[]>({
-      queryKey: ['organizations', 'mine'],
+      queryKey: ["organizations", "mine"],
       queryFn: async () => {
-        const res = await api.get('/Organization/mine');
+        const res = await api.get("/Organization/mine");
         return res.data?.data ?? res.data ?? [];
       },
     });
@@ -57,11 +57,11 @@ export const useOrganizationQueries = () => {
   const useCreateOrganization = () => {
     return useMutation<Organization, Error, CreateOrganizationDto>({
       mutationFn: async (data) => {
-        const res = await api.post('/Organization', data);
+        const res = await api.post("/Organization", data);
         return res.data?.data ?? res.data;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['organizations'] });
+        queryClient.invalidateQueries({ queryKey: ["organizations"] });
       },
     });
   };
@@ -73,8 +73,8 @@ export const useOrganizationQueries = () => {
         return res.data?.data ?? res.data;
       },
       onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: ['organizations', data.id] });
-        queryClient.invalidateQueries({ queryKey: ['organizations'] });
+        queryClient.invalidateQueries({ queryKey: ["organizations", data.id] });
+        queryClient.invalidateQueries({ queryKey: ["organizations"] });
       },
     });
   };
@@ -86,7 +86,7 @@ export const useOrganizationQueries = () => {
         return res.data;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['organizations'] });
+        queryClient.invalidateQueries({ queryKey: ["organizations"] });
       },
     });
   };
@@ -95,9 +95,11 @@ export const useOrganizationQueries = () => {
 
   const useGetMembersByOrganization = (organizationId: number) => {
     return useQuery<OrganizationMember[]>({
-      queryKey: ['organizations', organizationId, 'members'],
+      queryKey: ["organizations", organizationId, "members"],
       queryFn: async () => {
-        const res = await api.get(`/OrganizationMember/by-organization/${organizationId}`);
+        const res = await api.get(
+          `/OrganizationMember/by-organization/${organizationId}`,
+        );
         return res.data?.data ?? res.data ?? [];
       },
       enabled: !!organizationId,
@@ -106,9 +108,11 @@ export const useOrganizationQueries = () => {
 
   const useGetOrganizationDirectory = (organizationId: number) => {
     return useQuery<MemberDirectoryEntryDto[]>({
-      queryKey: ['organizations', organizationId, 'directory'],
+      queryKey: ["organizations", organizationId, "directory"],
       queryFn: async () => {
-        const res = await api.get(`/OrganizationMember/directory/${organizationId}`);
+        const res = await api.get(
+          `/OrganizationMember/directory/${organizationId}`,
+        );
         return res.data?.data ?? res.data ?? [];
       },
       enabled: !!organizationId,
@@ -118,23 +122,32 @@ export const useOrganizationQueries = () => {
   const useInviteMember = () => {
     return useMutation<OrganizationMember, Error, CreateOrganizationMemberDto>({
       mutationFn: async (data) => {
-        const res = await api.post('/OrganizationMember/invite', data);
+        const res = await api.post("/OrganizationMember/invite", data);
         return res.data?.data ?? res.data;
       },
       onSuccess: (_, variables) => {
-        queryClient.invalidateQueries({ queryKey: ['organizations', variables.organizationId, 'members'] });
+        queryClient.invalidateQueries({
+          queryKey: ["organizations", variables.organizationId, "members"],
+        });
       },
     });
   };
 
   const useRespondInvitation = () => {
-    return useMutation<void, Error, { invitationId: number, data: OrganizationMemberInviteRespondDto }>({
+    return useMutation<
+      void,
+      Error,
+      { invitationId: number; data: OrganizationMemberInviteRespondDto }
+    >({
       mutationFn: async ({ invitationId, data }) => {
-        const res = await api.put(`/OrganizationMember/invitation/${invitationId}/respond`, data);
+        const res = await api.put(
+          `/OrganizationMember/invitation/${invitationId}/respond`,
+          data,
+        );
         return res.data;
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['organizations'] });
+        queryClient.invalidateQueries({ queryKey: ["organizations"] });
       },
     });
   };
@@ -146,28 +159,32 @@ export const useOrganizationQueries = () => {
         return res.data?.data ?? res.data;
       },
       onSuccess: (_, variables) => {
-        queryClient.invalidateQueries({ queryKey: ['organizations', variables.organizationId, 'members'] });
+        queryClient.invalidateQueries({
+          queryKey: ["organizations", variables.organizationId, "members"],
+        });
       },
     });
   };
 
   const useRemoveMember = () => {
-    return useMutation<void, Error, { id: number, organizationId: number }>({
+    return useMutation<void, Error, { id: number; organizationId: number }>({
       mutationFn: async ({ id }) => {
         const res = await api.delete(`/OrganizationMember/${id}`);
         return res.data;
       },
       onSuccess: (_, { organizationId }) => {
-        queryClient.invalidateQueries({ queryKey: ['organizations', organizationId, 'members'] });
+        queryClient.invalidateQueries({
+          queryKey: ["organizations", organizationId, "members"],
+        });
       },
     });
   };
 
   const useSearchOrganizations = (name: string) => {
     return useQuery<Organization[]>({
-      queryKey: ['organizations', 'search', name],
+      queryKey: ["organizations", "search", name],
       queryFn: async () => {
-        const res = await api.get('/Organization/search', { params: { name } });
+        const res = await api.get("/Organization/search", { params: { name } });
         return res.data?.data ?? res.data ?? [];
       },
       enabled: name.length >= 2,
