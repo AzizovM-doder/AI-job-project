@@ -153,15 +153,6 @@ const SunCoronaMaterial = shaderMaterial(
       float alpha = fresnel * (0.1 + wave * 0.5);
       
       // Dynamic Star Color (Mixing deep orange and burning white)
-      extend({ SunCoronaMaterial });
-
-      declare global {
-        namespace JSX {
-          interface IntrinsicElements {
-            sunCoronaMaterial: any;
-          }
-        }
-      }
       vec3 starColor = mix(uColor, vec3(1.0, 0.9, 0.2), wave);
       
       gl_FragColor = vec4(starColor, alpha);
@@ -255,11 +246,11 @@ function RealisticSun() {
       {/* Advanced Corona / Plasma Waves */}
       <mesh ref={coronaRef}>
         <sphereGeometry args={[1.3, 128, 128]} />
-        <sunCoronaMaterial
-          transparent
-          depthWrite={false}
-          side={THREE.DoubleSide}
-        />
+        {React.createElement('sunCoronaMaterial', {
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide
+        })}
       </mesh>
 
       {/* Primary Light Source */}
@@ -303,42 +294,57 @@ export default function MarsGlobe() {
         gl={{
           antialias: true,
           toneMapping: THREE.ReinhardToneMapping,
-          toneMappingExposure: 1.2
+          toneMappingExposure: 1.5
         }}
         dpr={[1, 2]}
       >
+        <PerspectiveCamera makeDefault position={[0, 0, 4]} fov={45} />
+        <ambientLight intensity={isTerminal ? 1 : 0.8} color={isTerminal ? "#00ff41" : "#ffffff"} />
+        
+        {/* Fill Light for visibility across all modes */}
+        {!isTerminal && <directionalLight position={[-2, 1, 2]} intensity={0.5} color="#ffffff" />}
+
+        {/* Independent Sun Suspense to prevent blocking Mars */}
         <Suspense fallback={null}>
-          <PerspectiveCamera makeDefault position={[0, 0, 4]} fov={45} />
-
-          <ambientLight intensity={isTerminal ? 1 : 0.05} color={isTerminal ? "#00ff41" : "#ffffff"} />
-
           {isLight && <RealisticSun />}
+        </Suspense>
 
+        {/* Dark Mode Specific Lighting */}
+        {!isLight && !isTerminal && (
+          <pointLight position={[2, 2, 2]} intensity={200} color="#ff8844" distance={50} />
+        )}
+
+        {/* Globe Suspense with Wireframe Fallback */}
+        <Suspense fallback={
+          <mesh>
+            <sphereGeometry args={[1, 32, 32]} />
+            <meshBasicMaterial wireframe color={isTerminal ? "#00ff41" : "#ff4400"} />
+          </mesh>
+        }>
           {isTerminal && (
             <gridHelper args={[10, 20, "#00ff41", "#022c0b"]} rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -2]} />
           )}
-
           <Globe theme={theme} />
-
-          {!isTerminal && (
-            <Stars
-              radius={200}
-              depth={100}
-              count={isLight ? 2000 : 5000}
-              factor={4}
-              saturation={0}
-              fade
-              speed={0.5}
-            />
-          )}
-
-          <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            autoRotate={false}
-            rotateSpeed={0.5}
-          />
         </Suspense>
+
+        {!isTerminal && (
+          <Stars
+            radius={200}
+            depth={100}
+            count={isLight ? 2000 : 5000}
+            factor={4}
+            saturation={0}
+            fade
+            speed={0.5}
+          />
+        )}
+
+        <OrbitControls
+          enableZoom={false}
+          enablePan={false}
+          autoRotate={false}
+          rotateSpeed={0.5}
+        />
       </Canvas>
 
       <div className={cn(

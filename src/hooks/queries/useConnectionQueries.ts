@@ -43,7 +43,7 @@ export const useConnectionQueries = () => {
 
   // POST /api/Connection/send/{addresseeId}
   const useSendRequest = () => {
-    return useMutation<void, Error, number>({
+    return useMutation<void, Error, number, { previousConnections: Connection[] | undefined }>({
       mutationFn: async (addresseeId) => {
         const res = await api.post(`/Connection/send/${addresseeId}`);
         return res.data?.data ?? res.data;
@@ -100,7 +100,8 @@ export const useConnectionQueries = () => {
     return useMutation<
       void,
       Error,
-      { connectionId: number; status: ConnectionStatus }
+      { connectionId: number; status: ConnectionStatus },
+      { previousConnections: Connection[] | undefined }
     >({
       mutationFn: async ({ connectionId, status }) => {
         const res = await api.put(`/Connection/${connectionId}/respond`, {
@@ -136,7 +137,7 @@ export const useConnectionQueries = () => {
 
   // DELETE /api/Connection/{connectionId}
   const useDeleteConnection = () => {
-    return useMutation<void, Error, number>({
+    return useMutation<void, Error, number, { previousConnections: Connection[] | undefined }>({
       mutationFn: async (connectionId) => {
         const res = await api.delete(`/Connection/${connectionId}`);
         return res.data;

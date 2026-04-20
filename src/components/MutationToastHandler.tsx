@@ -17,11 +17,11 @@ export default function MutationToastHandler() {
       
       if (!meta?.toast) return;
 
-      const mutationId = event.mutation.mutationId;
+      const mutationId = event.mutation?.mutationId;
       const action = meta.action || "sync"; // default to sync
 
       // Map mutation status to toast states
-      if (event.type === "updated" && event.action.type === "loading") {
+      if (event.type === "updated" && event.action.type === "pending") {
         toast.loading(t(`${action}_loading`), { id: mutationId });
       }
 

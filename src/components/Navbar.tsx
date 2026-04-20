@@ -152,7 +152,7 @@ export default function Navbar() {
   const organizationList = Array.isArray(orgData) ? orgData : orgData ? [orgData] : [];
   const organization = organizationList[0];
 
-  const springConfig = { type: "spring", stiffness: 100, damping: 20 };
+  const springConfig = { type: "spring", stiffness: 100, damping: 20 } as const;
 
   const handleLogout = async () => {
     try {

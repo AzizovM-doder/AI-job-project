@@ -28,7 +28,7 @@ export default function OrganizationSwitcher() {
 
   if (user?.role !== 'Organization') return null;
 
-  const springConfig = { type: "spring", stiffness: 100, damping: 20 };
+  const springConfig = { type: "spring", stiffness: 100, damping: 20 } as const;
 
   return (
     <div className="flex items-center gap-4">

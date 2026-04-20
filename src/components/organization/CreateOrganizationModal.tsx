@@ -39,7 +39,7 @@ export default function CreateOrganizationModal({ isOpen, onClose }: Props) {
     logoUrl: ''
   });
 
-  const springConfig = { type: "spring", stiffness: 100, damping: 20 };
+  const springConfig = { type: "spring", stiffness: 100, damping: 20 } as const;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -20,7 +20,8 @@ import {
   Settings,
   Zap,
   Layout,
-  Type
+  Type,
+  AlertTriangle
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useAiQueries } from '@/hooks/queries/useAiQueries';
@@ -376,7 +377,7 @@ export default function AiWorkspacePage() {
                            </div>
                            <div className="space-y-2">
                              <span className="text-[9px] font-black uppercase text-white/30 ml-2">Signal Tone</span>
-                             <Select value={tone} onValueChange={setTone}>
+                              <Select value={tone} onValueChange={setTone}>
                                <SelectTrigger className="bg-white/5 border-white/5 h-12 rounded-xl text-white font-bold">
                                  <SelectValue />
                                </SelectTrigger>
@@ -441,8 +442,17 @@ export default function AiWorkspacePage() {
                        ) : (
                          <motion.div key="result" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full h-full flex flex-col justify-start">
                              <div className="flex items-center gap-3 mb-8 border-b border-white/5 pb-6">
-                               <CheckCircle2 className="size-6 text-emerald-500" />
-                               <span className="text-[12px] font-black uppercase tracking-widest text-white">Data_Recovered_200_OK</span>
+                                {lastResult?.statusCode && lastResult.statusCode !== 200 ? (
+                                  <>
+                                    <AlertTriangle className="size-6 text-amber-500" />
+                                    <span className="text-[12px] font-black uppercase tracking-widest text-amber-500">System_Alert_{lastResult.statusCode}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle2 className="size-6 text-emerald-500" />
+                                    <span className="text-[12px] font-black uppercase tracking-widest text-white">Data_Recovered_200_OK</span>
+                                  </>
+                                )}
                              </div>
 
                              <div className="flex-1 overflow-y-auto custom-scrollbar space-y-8 pr-2">
@@ -451,7 +461,15 @@ export default function AiWorkspacePage() {
                                 {activeToolId === 'ask' && (
                                   <p className="text-lg leading-relaxed text-white font-medium">
                                     {typeof lastResult === 'object' 
-                                      ? (lastResult.content || lastResult.answer || lastResult.result || lastResult.response || JSON.stringify(lastResult)) 
+                                      ? (
+                                        lastResult.data?.content || 
+                                        lastResult.content || 
+                                        lastResult.answer || 
+                                        lastResult.result || 
+                                        lastResult.response || 
+                                        (Array.isArray(lastResult.description) ? lastResult.description.join('\n') : lastResult.description) ||
+                                        JSON.stringify(lastResult)
+                                      ) 
                                       : (lastResult || "TRANSMISSION_EMPTY")}
                                   </p>
                                 )}

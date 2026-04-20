@@ -279,7 +279,7 @@ export const useProfileQueries = () => {
   };
 
   const useAddEndorsement = () => {
-    return useMutation<Endorsement, Error, { profileSkillId: number; profileId: number }>({
+    return useMutation<Endorsement, Error, { profileSkillId: number; profileId: number }, { previousSkills: ProfileSkill[] | undefined }>({
       mutationFn: async ({ profileSkillId }) => {
         const res = await api.post("/Endorsement", { profileSkillId });
         return res.data?.data ?? res.data;
