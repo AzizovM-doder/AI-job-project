@@ -24,6 +24,7 @@ export const useAiQueries = () => {
         const res = await api.post("/Ai/ask", data);
         return res.data;
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -41,6 +42,7 @@ export const useAiQueries = () => {
         // Invalidate profile query to show updated skills if sync was true
         queryClient.invalidateQueries({ queryKey: ["profile"] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -68,6 +70,7 @@ export const useAiQueries = () => {
         );
         return res.data;
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -81,6 +84,7 @@ export const useAiQueries = () => {
         );
         return res.data;
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -94,15 +98,22 @@ export const useAiQueries = () => {
         );
         return res.data;
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
   return {
     useAiAsk,
+    useAsk: useAiAsk,
     useAiAnalyzeCv,
+    useAnalyzeCv: useAiAnalyzeCv,
     useAiSkillGap,
+    useSkillGap: useAiSkillGap,
     useAiImproveJob,
+    useImproveJob: useAiImproveJob,
     useAiDraftCoverLetter,
+    useDraftCoverLetter: useAiDraftCoverLetter,
     useAiDraftMessage,
+    useDraftMessage: useAiDraftMessage,
   };
 };

@@ -9,17 +9,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   MapPin, Briefcase, Info, MessageSquare,
-  ChevronLeft, Globe, UserPlus, Check, Sparkles, Terminal, Activity
+  ChevronLeft, Globe, UserPlus, Check, Sparkles, Terminal, Activity, FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { PageTransition } from '@/components/PageTransition';
 import ProfileRecommendations from '@/components/profile/ProfileRecommendations';
+import ProfileSkills from '@/components/profile/ProfileSkills';
 import RecommendationModal from '@/components/profile/RecommendationModal';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Space_Grotesk } from 'next/font/google';
+import ConnectionAction from '@/components/profile/ConnectionAction';
 
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] });
 
@@ -29,19 +31,22 @@ export default function UserProfilePage() {
   const t = useTranslations('Profile');
   const tm = useTranslations('Messages');
 
-  const { useGetProfileByUserId, useGetRecommendations, useAddRecommendation, useDeleteRecommendation } = useProfileQueries();
+  const { useGetProfileByUserId, useGetRecommendations, useAddRecommendation, useDeleteRecommendation, useGetCandidateProfile, useGetProfileSkills, useAddEndorsement } = useProfileQueries();
   const { useCreateConversation } = useMessageQueries();
   const { useSendRequest, useGetMyConnections } = useConnectionQueries();
 
   const userId = Number(id);
   const { data: profile, isLoading, error } = useGetProfileByUserId(userId);
+  const { data: candidate } = useGetCandidateProfile(userId);
   const { data: myConnections } = useGetMyConnections();
   const { data: recommendations } = useGetRecommendations(userId);
+  const { data: skills } = useGetProfileSkills(profile?.id || 0);
  
   const createConversation = useCreateConversation();
   const sendRequest = useSendRequest();
   const addRecMutation = useAddRecommendation();
   const deleteRecMutation = useDeleteRecommendation(userId);
+  const addEndorsement = useAddEndorsement();
 
   const [isRecModalOpen, setIsRecModalOpen] = useState(false);
 
@@ -49,26 +54,7 @@ export default function UserProfilePage() {
     (c.requesterId === userId || c.addresseeId === userId) && c.status === 'Accepted'
   );
 
-  const handleMessage = async () => {
-    try {
-      const result = await createConversation.mutateAsync({ otherUserId: userId });
-      if (result && result.id !== undefined && result.id !== null) {
-        toast.success(tm('initiating'));
-        router.push(`/${locale}/messages?id=${result.id}`);
-      }
-    } catch (err) {
-      toast.error('Failed to start conversation');
-    }
-  };
 
-  const handleConnect = async () => {
-    try {
-      await sendRequest.mutateAsync(userId);
-      toast.success('Connection request sent');
-    } catch (err) {
-      toast.error('Failed to send connection request');
-    }
-  };
 
   if (isLoading) {
     return (
@@ -166,31 +152,23 @@ export default function UserProfilePage() {
                 </div>
               </motion.div>
 
-              <div className="flex flex-wrap gap-4 w-full md:w-auto z-10">
-                <Button
-                  onClick={handleConnect}
-                  disabled={sendRequest.isPending || isConnected}
-                  variant={isConnected ? "outline" : "default"}
-                  className={cn(
-                    "flex-1 md:flex-none h-14 px-10 rounded-2xl font-black uppercase tracking-[0.15em] text-[11px] transition-all",
-                    isConnected 
-                      ? "bg-white/5 border-white/10 text-white/40" 
-                      : "bg-primary text-primary-foreground shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95"
-                  )}
-                >
-                  {isConnected ? <Check className="size-4 mr-3" /> : <UserPlus className="size-4 mr-3" />}
-                  {isConnected ? 'Signal Established' : 'Initialize Link'}
-                </Button>
-
-                <Button
-                  onClick={handleMessage}
-                  disabled={createConversation.isPending}
-                  variant="outline"
-                  className="flex-1 md:flex-none h-14 px-10 rounded-2xl glass-card bg-white/5 border-white/10 text-white font-black uppercase tracking-[0.15em] text-[11px] hover:bg-white/10 transition-all hover:scale-105 active:scale-95"
-                >
-                  <MessageSquare className="size-4 mr-3 text-primary" />
-                  Direct Comms
-                </Button>
+              <div className="z-10 w-full md:w-auto flex flex-wrap items-center justify-end gap-4">
+                {candidate?.cvFileUrl && (
+                  <Button
+                    onClick={() => {
+                      const url = candidate.cvFileUrl!.startsWith('http') 
+                        ? candidate.cvFileUrl! 
+                        : `http://157.180.29.248:8090${candidate.cvFileUrl}`;
+                      window.open(url, '_blank');
+                    }}
+                    variant="outline"
+                    className="h-14 px-10 rounded-2xl glass-card bg-primary/10 border-primary/20 text-primary font-black uppercase tracking-[0.15em] text-[11px] hover:bg-primary/20 transition-all hover:scale-105 active:scale-95"
+                  >
+                    <FileText className="size-4 mr-3" />
+                    View Dossier
+                  </Button>
+                )}
+                <ConnectionAction targetUserId={userId} />
               </div>
             </div>
 
@@ -234,6 +212,21 @@ export default function UserProfilePage() {
                     {(profile as any).aboutMe || profile.about || "Data fragments empty for this operative. No Dossier available."}
                   </p>
                 </div>
+
+                {/* Skills Section */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 opacity-30">
+                    <Sparkles className="size-4 text-emerald-500" />
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-500">Skill_Stack_Validation</h3>
+                  </div>
+                  <ProfileSkills 
+                    skills={skills || []} 
+                    isOwnProfile={false} 
+                    onAdd={() => {}} 
+                    onDelete={() => {}} 
+                    onEndorse={(skillId) => addEndorsement.mutate({ profileSkillId: skillId, profileId: profile.id })} 
+                  />
+                </div>
               </div>
 
               <div className="lg:col-span-4 space-y-8">
@@ -243,7 +236,7 @@ export default function UserProfilePage() {
                   <div className="space-y-6">
                     <div className="flex justify-between items-center group cursor-pointer">
                       <span className="text-[10px] font-bold text-white/40 group-hover:text-primary transition-colors">ENDORSEMENTS</span>
-                      <span className="text-sm font-black text-white">--</span>
+                      <span className="text-sm font-black text-white">{skills?.reduce((acc, s) => acc + (s.endorsementsCount || 0), 0) || 0}</span>
                     </div>
                     <div className="flex justify-between items-center group cursor-pointer">
                       <span className="text-[10px] font-bold text-white/40 group-hover:text-primary transition-colors">PROJECTS</span>

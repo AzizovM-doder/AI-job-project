@@ -83,6 +83,7 @@ export const useJobQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['jobs'] });
       },
+      meta: { toast: true, action: 'create' },
     });
   };
 
@@ -96,6 +97,7 @@ export const useJobQueries = () => {
         queryClient.invalidateQueries({ queryKey: ['jobs', id] });
         queryClient.invalidateQueries({ queryKey: ['jobs'] });
       },
+      meta: { toast: true, action: 'sync' },
     });
   };
 
@@ -108,6 +110,7 @@ export const useJobQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['jobs'] });
       },
+      meta: { toast: true, action: 'delete' },
     });
   };
 
@@ -142,6 +145,7 @@ export const useJobQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['applications'] });
       },
+      meta: { toast: true, action: 'sync' },
     });
   };
 
@@ -165,6 +169,7 @@ export const useJobQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['applications'] });
       },
+      meta: { toast: true, action: 'sync' },
     });
   };
 
@@ -242,5 +247,6 @@ export const useJobQueries = () => {
     useGetMatchesForUser,
     useGetCategories,
     useGetJobSkills,
+    useSearchJobs,
   };
 };

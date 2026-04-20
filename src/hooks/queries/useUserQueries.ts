@@ -130,6 +130,7 @@ export const useUserQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["users", "settings"] });
       },
+      meta: { toast: true },
     });
   };
   return {

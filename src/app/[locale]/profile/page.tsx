@@ -21,7 +21,9 @@ import SkillModal from '@/components/profile/SkillModal';
 import LanguageModal from '@/components/profile/LanguageModal';
 import ProfileRecommendations from '@/components/profile/ProfileRecommendations';
 import RecommendationModal from '@/components/profile/RecommendationModal';
+import CvUpload from '@/components/profile/CvUpload';
 import { useState, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import {
   Sparkles,
@@ -46,6 +48,7 @@ import { cn } from '@/lib/utils';
 
 export default function ProfilePage() {
   const { user: authUser } = useAuthStore();
+  const queryClient = useQueryClient();
   const userId = authUser?.userId ? Number(authUser.userId) : 0;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -271,6 +274,9 @@ export default function ProfilePage() {
                 <TabsTrigger value="experience" className="data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-0 font-bold uppercase tracking-widest text-[10px] transition-all">Experience</TabsTrigger>
                 <TabsTrigger value="education" className="data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-0 font-bold uppercase tracking-widest text-[10px] transition-all">Education</TabsTrigger>
                 <TabsTrigger value="skills" className="data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-0 font-bold uppercase tracking-widest text-[10px] transition-all">Skills</TabsTrigger>
+                <TabsTrigger value="dossier" className="data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-0 font-bold uppercase tracking-widest text-[10px] transition-all gap-2">
+                  <FileText className="size-3" /> Dossier
+                </TabsTrigger>
                 <TabsTrigger value="recommendations" className="data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-0 font-bold uppercase tracking-widest text-[10px] transition-all">Recommendations</TabsTrigger>
                 <TabsTrigger value="ai-dna" className="data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-0 font-bold uppercase tracking-widest text-[10px] transition-all gap-2">
                   <BrainCircuit className="size-3" /> AI Analysis
@@ -293,6 +299,42 @@ export default function ProfilePage() {
               </TabsContent>
               <TabsContent value="recommendations" className="m-0 p-8 lg:p-12">
                 <ProfileRecommendations recommendations={recommendations || []} isOwnProfile={true} onAdd={() => setIsRecModalOpen(true)} onDelete={(id) => deleteRec.mutate(id)} />
+              </TabsContent>
+              <TabsContent value="dossier" className="m-0 p-8 lg:p-12 space-y-8">
+                 <div className="max-w-2xl mx-auto">
+                    <div className="flex items-center gap-4 mb-10">
+                       <div className="size-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                          <FileText className="size-6 text-primary" />
+                       </div>
+                       <div>
+                          <h3 className="text-xl font-black uppercase tracking-tighter">Mission Dossier</h3>
+                          <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Permanent tactical file for recruitment protocols</p>
+                       </div>
+                    </div>
+                    
+                    <CvUpload 
+                      userId={userId} 
+                      currentCvUrl={candidate?.cvFileUrl} 
+                      onSuccess={() => {
+                        // Refresh candidate profile to show updated status
+                        queryClient.invalidateQueries({ queryKey: ["profiles", "candidate", userId] });
+                      }}
+                    />
+
+                    <div className="mt-12 p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5">
+                       <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-4">Tactical Benefits</h4>
+                       <ul className="space-y-4">
+                          <li className="flex items-start gap-3">
+                             <div className="size-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                             <p className="text-xs text-white/60 leading-relaxed font-medium">Verified dossiers are prioritized by Command during crew selection missions.</p>
+                          </li>
+                          <li className="flex items-start gap-3">
+                             <div className="size-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                             <p className="text-xs text-white/60 leading-relaxed font-medium">Automatic extraction protocols will sync your credentials to the global registry.</p>
+                          </li>
+                       </ul>
+                    </div>
+                 </div>
               </TabsContent>
 
               <TabsContent value="ai-dna" className="m-0 p-8 lg:p-12 space-y-8">

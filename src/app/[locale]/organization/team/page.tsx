@@ -32,6 +32,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import {
+  DropdownMenu,
   DropdownMenuPortal,
   DropdownMenuContent,
   DropdownMenuItem,

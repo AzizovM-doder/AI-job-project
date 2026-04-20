@@ -144,6 +144,7 @@ export const useFeedQueries = () => {
         queryClient.invalidateQueries({ queryKey: ["feed"] });
         queryClient.invalidateQueries({ queryKey: ["posts"] });
       },
+      meta: { toast: true, action: "create" },
     });
   };
 
@@ -159,6 +160,7 @@ export const useFeedQueries = () => {
         queryClient.invalidateQueries({ queryKey: ["posts", id] });
         queryClient.invalidateQueries({ queryKey: ["posts"] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -172,6 +174,7 @@ export const useFeedQueries = () => {
         queryClient.invalidateQueries({ queryKey: ["feed"] });
         queryClient.invalidateQueries({ queryKey: ["posts"] });
       },
+      meta: { toast: true, action: "delete" },
     });
   };
 
@@ -187,6 +190,7 @@ export const useFeedQueries = () => {
         queryClient.invalidateQueries({ queryKey: ["posts"] });
         queryClient.invalidateQueries({ queryKey: ["posts", postId] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -202,6 +206,7 @@ export const useFeedQueries = () => {
         queryClient.invalidateQueries({ queryKey: ["posts"] });
         queryClient.invalidateQueries({ queryKey: ["posts", postId] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -243,6 +248,7 @@ export const useFeedQueries = () => {
         });
         queryClient.invalidateQueries({ queryKey: ["feed"] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 

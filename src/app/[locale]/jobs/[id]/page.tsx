@@ -26,13 +26,13 @@ export default function JobDetailPage() {
   const { user } = useAuthStore();
   const { useGetJob, useGetJobSkills, useApplyToJob } = useJobQueries();
   const { useMatchExplanation } = useJobMatchingQueries();
-  const { useDraftCoverLetter } = useAiQueries();
+  const { useAiDraftCoverLetter } = useAiQueries();
   const { useMetadataQueries: _m } = { useMetadataQueries: useMetadataQueries };
 
   const { data: job, isLoading } = useGetJob(jobId);
   const { data: skills } = useGetJobSkills(jobId);
   const applyMutation = useApplyToJob();
-  const draftCoverLetter = useDraftCoverLetter();
+  const draftCoverLetter = useAiDraftCoverLetter();
 
   const userId = user?.userId ? Number(user.userId) : null;
   const { data: matchExplanation, isLoading: matchLoading } = useMatchExplanation(userId, jobId);

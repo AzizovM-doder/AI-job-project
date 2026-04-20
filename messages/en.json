@@ -39,7 +39,8 @@
     "register": "Register",
     "theme_light": "Light",
     "theme_dark": "Dark",
-    "theme_system": "System"
+    "theme_system": "System",
+    "organizations": "Orgs"
   },
   "Footer": {
     "tagline": "The professional network for the next generation.",
@@ -157,7 +158,24 @@
     "established": "Established",
     "message_recruiter": "Message Recruiter",
     "edit_organization": "Edit Organization",
-    "view_details": "View Details"
+    "view_details": "View Details",
+    "hero_badge": "DISCOVER INNOVATION",
+    "hero_title_1": "The World's Most",
+    "hero_title_2": "Ambitious",
+    "hero_title_3": "Companies.",
+    "hero_description": "Browse through hundreds of organizations, from disruptive startups to global enterprises. Find where you belong next.",
+    "search_placeholder": "Search by name, industry, or location...",
+    "my_orgs_title": "Your Empire",
+    "my_orgs_subtitle": "Manage the organizations you lead.",
+    "discovery_title": "Discovery Feed",
+    "discovery_subtitle": "Showing {count} results matching your search.",
+    "register_entity": "Register Entity",
+    "no_orgs_title": "No Organizations Found",
+    "no_orgs_desc": "Try adjusting your search query or filters.",
+    "clear_search": "Clear Searches",
+    "footer_cta_title": "Ready to scale your vision?",
+    "footer_cta_desc": "Join the network of top-tier professional organizations and start building your team with AI-powered precision.",
+    "footer_cta_btn": "Launch Your Org"
   },
   "Messages": {
     "title": "Messages",
@@ -181,6 +199,10 @@
     "message_deleted": "Message deleted",
     "chat_deleted": "Chat deleted",
     "chat_archived": "Chat archived",
+    "chat_unarchived": "Chat unarchived",
+    "active_tab": "Active",
+    "archived_tab": "Archived",
+    "unarchive": "Unarchive",
     "confirm_delete_title": "Delete Conversation",
     "confirm_delete_desc": "Are you sure you want to permanently delete this conversation? This action cannot be undone.",
     "confirm_archive_title": "Archive Conversation",
@@ -224,5 +246,36 @@
     "remove_connection": "Remove connection",
     "show_more": "Show more",
     "show_less": "Show less"
+  },
+  "Terminal": {
+    "uplinking": "Uplinking...",
+    "secure_uplink": "ESTABLISHING SECURE UPLINK...",
+    "scanning_nodes": "SCANNING SECTOR 7 NODES...",
+    "decrypting_console": "DECRYPTING ROVER CONSOLE...",
+    "calibrating_models": "CALIBRATING NEURAL MODELS...",
+    "syncing_data": "SYNCING MARS ORBIT DATA...",
+    "overriding_light": "OVERRIDING LIGHT PROTOCOLS...",
+    "interface_ready": "TERMINAL INTERFACE READY.",
+    "status_sequence": "Neural Sequence",
+    "status_complete": "Complete"
+  },
+  "Errors": {
+    "404_title": "404: LOST IN DEEP SPACE",
+    "404_description": "The page you are looking for has drifted into an unreachable sector.",
+    "404_cta": "Return to Baseline",
+    "error_title": "SYSTEM MALFUNCTION",
+    "error_description": "Something went wrong. Technical logs have been dispatched.",
+    "error_cta": "Attempt Recovery"
+  },
+  "Notifications": {
+    "sync_loading": "ESTABLISHING SECURE UPLINK...",
+    "sync_success": "PACKET SYNCHRONIZED SUCCESSFULLY.",
+    "sync_error": "TRANSMISSION FAILED: SECTOR UNREACHABLE.",
+    "delete_loading": "DELETING RECORD FROM MATRIX...",
+    "delete_success": "NODE PURGED SUCCESSFULLY.",
+    "delete_error": "PURGE FAILED: ACCESS DENIED.",
+    "create_loading": "INITIALIZING NEW SECTOR NODE...",
+    "create_success": "NODE CREATED SUCCESSFULLY.",
+    "create_error": "INITIALIZATION FAILED: PARITY ERROR."
   }
 }

@@ -167,7 +167,9 @@ export default function AiWorkspacePage() {
           break;
       }
       
-      setLastResult(response?.data || response);
+      // Safely extract the data payload from the API envelope { statusCode, description, data }
+      const payload = response?.data !== undefined ? response.data : response;
+      setLastResult(payload);
       toast.success('Protocol Executed Successfully', { id: executeToast });
     } catch (err) {
       toast.error('Uplink Synchronous Failure', { id: executeToast });
@@ -447,7 +449,11 @@ export default function AiWorkspacePage() {
                                 {/* TOOL-SPECIFIC RESULT MAPPING */}
                                 
                                 {activeToolId === 'ask' && (
-                                  <p className="text-lg leading-relaxed text-white font-medium">{lastResult}</p>
+                                  <p className="text-lg leading-relaxed text-white font-medium">
+                                    {typeof lastResult === 'object' 
+                                      ? (lastResult.content || lastResult.answer || lastResult.result || lastResult.response || JSON.stringify(lastResult)) 
+                                      : (lastResult || "TRANSMISSION_EMPTY")}
+                                  </p>
                                 )}
 
                                 {activeToolId === 'analyze-cv' && (

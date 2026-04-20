@@ -140,7 +140,7 @@ export default function ChatWindow({ conversationId, onDelete }: ChatWindowProps
       extraContext: "Discussing job opportunity"
     }, {
       onSuccess: (data) => {
-        if (data.content) setInput(data.content);
+        if (data.data?.content) setInput(data.data.content);
       }
     });
   };

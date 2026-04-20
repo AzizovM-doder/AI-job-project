@@ -1,20 +1,8 @@
 'use client';
 
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes';
-import { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import { TerminalBootEffect } from './TerminalBootEffect';
-
-// Workaround for React 19 / Next 15+ emitting console warnings due to next-themes 
-// injecting an inline script to prevent FOUC.
-if (typeof window !== 'undefined') {
-  const originalError = console.error;
-  console.error = (...args: any[]) => {
-    if (typeof args[0] === 'string' && args[0].includes('Encountered a script tag while rendering React component')) {
-      return;
-    }
-    originalError(...args);
-  };
-}
 
 interface TerminalBootContextType {
   isTerminalBooting: boolean;
@@ -29,6 +17,11 @@ export function useTerminalBoot() {
     throw new Error('useTerminalBoot must be used within a TerminalBootProvider');
   }
   return context;
+}
+
+export function TerminalBootManager() {
+  const { isTerminalBooting } = useTerminalBoot();
+  return <TerminalBootEffect isActive={isTerminalBooting} />;
 }
 
 function TerminalBootProviderInternal({ children }: { children: React.ReactNode }) {
@@ -72,18 +65,58 @@ function TerminalBootProviderInternal({ children }: { children: React.ReactNode 
 
   return (
     <TerminalBootContext.Provider value={{ isTerminalBooting, triggerTerminalBoot }}>
-      <TerminalBootEffect isActive={isTerminalBooting} />
       {children}
     </TerminalBootContext.Provider>
   );
 }
 
 export function ThemeProvider({ children, ...props }: React.ComponentProps<typeof NextThemesProvider>) {
+  /**
+   * The hook below is a failsafe for the 'terminal' theme class persistence issue.
+   * While next-themes 0.4.x handles third themes correctly when listed in the 'themes' array,
+   * this explicit cleanup ensures the .terminal class is purged from the <html> element
+   * immediately when switching back to light or dark modes.
+   */
   return (
-    <NextThemesProvider {...props}>
-      <TerminalBootProviderInternal>
-        {children}
-      </TerminalBootProviderInternal>
+    <NextThemesProvider 
+      {...props} 
+      themes={['light', 'dark', 'terminal']}
+      value={{
+        light: 'light',
+        dark: 'dark',
+        terminal: 'terminal'
+      }}
+    >
+      <ThemeSyncWrapper>
+        <TerminalBootProviderInternal>
+          {children}
+        </TerminalBootProviderInternal>
+      </ThemeSyncWrapper>
     </NextThemesProvider>
   );
+}
+
+/**
+ * Internal component to handle theme-dependent class management
+ */
+function ThemeSyncWrapper({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const html = document.documentElement;
+      
+      // Forcefully remove terminal class if we are not in terminal mode
+      if (theme !== 'terminal' && html.classList.contains('terminal')) {
+        html.classList.remove('terminal');
+      }
+      
+      // Ensure current theme class is present
+      if (theme) {
+        html.classList.add(theme);
+      }
+    }
+  }, [theme]);
+
+  return <>{children}</>;
 }

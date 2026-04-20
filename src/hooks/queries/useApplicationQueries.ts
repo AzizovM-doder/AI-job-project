@@ -74,6 +74,7 @@ export const useApplicationQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["applications"] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -99,6 +100,7 @@ export const useApplicationQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["applications"] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -112,6 +114,7 @@ export const useApplicationQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["applications"] });
       },
+      meta: { toast: true, action: "delete" },
     });
   };
 

@@ -58,6 +58,7 @@ export const useMessageQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
       },
+      meta: { toast: true, action: "create" },
     });
   };
 
@@ -71,6 +72,7 @@ export const useMessageQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
       },
+      meta: { toast: true, action: "delete" },
     });
   };
 
@@ -124,6 +126,7 @@ export const useMessageQueries = () => {
         });
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -181,6 +184,7 @@ export const useMessageQueries = () => {
         });
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
       },
+      meta: { toast: true, action: "delete" },
     });
   };
 

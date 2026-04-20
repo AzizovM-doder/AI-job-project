@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '../store/authStore';
 import { UserRole } from '../types/auth';
@@ -15,23 +15,18 @@ export default function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
   const router = useRouter();
   const { locale } = useParams();
   const { user, isAuthenticated, isLoading } = useAuthStore();
-  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
+  // Derive authorization status directly during render to avoid cascading renders
+  const isAuthorized = isAuthenticated && (!allowedRoles || (user && allowedRoles.includes(user.role)));
 
   useEffect(() => {
-    // Wait for hydration/rehydration
+    // Wait for hydration/rehydration from persisted store
     if (isLoading) return;
 
     if (!isAuthenticated) {
       router.push(`/${locale}/login`);
-      return;
-    }
-
-    if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    } else if (allowedRoles && user && !allowedRoles.includes(user.role)) {
       router.push(`/${locale}/unauthorized`);
-      return;
     }
-
-    setIsAuthorized(true);
   }, [isAuthenticated, user, isLoading, allowedRoles, router, locale]);
 
   if (isLoading || !isAuthorized) {

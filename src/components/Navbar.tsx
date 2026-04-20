@@ -12,7 +12,8 @@ import {
   Cpu,
   type LucideIcon,
   Search,
-  Sparkles
+  Sparkles,
+  Building2
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useTerminalBoot } from '@/components/ThemeProvider';
@@ -164,6 +165,7 @@ export default function Navbar() {
   const navLinks = [
     { href: `/${locale}/feed`, icon: Home, label: t('feed') || "Baseline", badge: 0 },
     { href: `/${locale}/networking`, icon: Network, label: "Crew", badge: 0 },
+    { href: `/${locale}/organizations`, icon: Building2, label: t('organizations') || "Orgs", badge: 0 },
     { href: `/${locale}/jobs`, icon: Briefcase, label: "Missions", badge: 0 },
     { href: `/${locale}/messages`, icon: MessageSquare, label: "Comms", badge: unreadMessages },
     { href: `/${locale}/ai`, icon: Sparkles, label: "Synthetics", badge: 0 },
@@ -208,15 +210,19 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Central Expando Navigation */}
+          {/* Central Expando Navigation (Desktop only) */}
           <nav className="hidden lg:flex items-center gap-1 bg-white/[0.03] rounded-2xl p-1 border border-white/5 backdrop-blur-md">
             {navLinks.map((link) => (
               <NavLink key={link.href} {...link} pathname={pathname} mounted={mounted} />
             ))}
           </nav>
 
-          <div className="flex items-center gap-4 shrink-0">
-            {user?.role === 'Organization' && <OrganizationSwitcher />}
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            {user?.role === 'Organization' && (
+              <div className="hidden md:block">
+                <OrganizationSwitcher />
+              </div>
+            )}
 
             <div className="hidden sm:flex items-center gap-2 p-1 bg-white/[0.03] rounded-2xl border border-white/5">
               <GlobalSearch />
@@ -229,7 +235,7 @@ export default function Navbar() {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex items-center gap-3 pl-1.5 pr-4 h-12 rounded-2xl glass-card transition-all group overflow-hidden outline-none border-white/5 active:bg-white/[0.05]"
+                    className="flex items-center gap-2 sm:gap-3 pl-1.5 pr-2 sm:pr-4 h-12 rounded-2xl glass-card transition-all group overflow-hidden outline-none border-white/5 active:bg-white/[0.05]"
                   >
                     <div className="size-9 rounded-xl bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/20 shadow-inner group-hover:scale-105 transition-transform z-10">
                       {user.avatarUrl ? (
@@ -244,7 +250,7 @@ export default function Navbar() {
                         {user.role === 'Organization' ? 'MISSION CMDR' : 'EXP ENGINEER'}
                       </span>
                     </div>
-                    <ChevronDown className="size-3.5 opacity-30 group-hover:translate-y-0.5 transition-all z-10 group-hover:opacity-100" />
+                    <ChevronDown className="size-3.5 opacity-30 group-hover:translate-y-0.5 transition-all z-10 group-hover:opacity-100 hidden sm:block" />
                   </motion.button>
                 </DropdownMenuTrigger>
 
@@ -324,12 +330,12 @@ export default function Navbar() {
                 </DropdownMenuPortal>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => router.push(`/${locale}/login`)}
-                  className="h-10 px-5 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/5 transition-colors hidden sm:flex border-none"
+                  className="h-10 px-4 sm:px-5 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/5 transition-colors border-none hidden sm:flex"
                 >
                   Sign In
                 </Button>
@@ -337,25 +343,27 @@ export default function Navbar() {
                   <Button
                     size="sm"
                     onClick={() => router.push(`/${locale}/register`)}
-                    className="h-10 bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] font-heading font-black uppercase tracking-[0.2em] rounded-xl px-7 shadow-lg shadow-primary/20 relative overflow-hidden group border-none"
+                    className="h-10 bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] font-heading font-black uppercase tracking-[0.2em] rounded-xl px-5 sm:px-7 shadow-lg shadow-primary/20 relative overflow-hidden group border-none"
                   >
-                    <span className="relative z-10">Join Crew</span>
+                    <span className="relative z-10 hidden sm:inline">Join Crew</span>
+                    <span className="relative z-10 sm:hidden">Join</span>
                     <div className="absolute inset-x-0 bottom-0 h-1/2 bg-white/10 group-hover:h-full transition-all" />
                   </Button>
                 </motion.div>
               </div>
             )}
 
+            {/* Mobile Hamburger Toggle */}
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden size-10 rounded-xl bg-white/[0.03] border border-white/5"
+              className="lg:hidden size-10 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/10 active:scale-95 transition-all outline-none"
               onClick={() => setIsDrawerOpen(true)}
             >
               <div className="flex flex-col gap-1 items-center group">
-                <div className="w-4 h-0.5 bg-foreground rounded-full group-hover:w-5 transition-all" />
-                <div className="w-4 h-0.5 bg-primary rounded-full translate-x-0.5 group-hover:translate-x-0 transition-all" />
-                <div className="w-4 h-0.5 bg-foreground rounded-full group-hover:w-5 transition-all" />
+                <div className={cn("w-4 h-0.5 bg-foreground rounded-full transition-all group-hover:w-5", isDrawerOpen && "rotate-45 translate-y-1.5")} />
+                <div className={cn("w-4 h-0.5 bg-primary rounded-full translate-x-0.5 transition-all group-hover:translate-x-0", isDrawerOpen && "opacity-0")} />
+                <div className={cn("w-4 h-0.5 bg-foreground rounded-full transition-all group-hover:w-5", isDrawerOpen && "-rotate-45 -translate-y-1.5")} />
               </div>
             </Button>
           </div>

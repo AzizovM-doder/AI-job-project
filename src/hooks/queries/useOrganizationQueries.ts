@@ -63,6 +63,7 @@ export const useOrganizationQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["organizations"] });
       },
+      meta: { toast: true, action: "create" },
     });
   };
 
@@ -76,6 +77,7 @@ export const useOrganizationQueries = () => {
         queryClient.invalidateQueries({ queryKey: ["organizations", data.id] });
         queryClient.invalidateQueries({ queryKey: ["organizations"] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -88,6 +90,7 @@ export const useOrganizationQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["organizations"] });
       },
+      meta: { toast: true, action: "delete" },
     });
   };
 
@@ -130,6 +133,7 @@ export const useOrganizationQueries = () => {
           queryKey: ["organizations", variables.organizationId, "members"],
         });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -149,6 +153,7 @@ export const useOrganizationQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["organizations"] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -163,6 +168,7 @@ export const useOrganizationQueries = () => {
           queryKey: ["organizations", variables.organizationId, "members"],
         });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -177,6 +183,7 @@ export const useOrganizationQueries = () => {
           queryKey: ["organizations", organizationId, "members"],
         });
       },
+      meta: { toast: true, action: "delete" },
     });
   };
 

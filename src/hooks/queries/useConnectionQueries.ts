@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { Connection, ConnectionStatus } from "@/types/connection";
+import { useAuthStore } from "@/store/authStore";
 
 export const useConnectionQueries = () => {
   const queryClient = useQueryClient();
@@ -47,9 +48,36 @@ export const useConnectionQueries = () => {
         const res = await api.post(`/Connection/send/${addresseeId}`);
         return res.data?.data ?? res.data;
       },
-      onSuccess: () => {
+      onMutate: async (addresseeId) => {
+        await queryClient.cancelQueries({ queryKey: ["connections", "all"] });
+        const previousConnections = queryClient.getQueryData<Connection[]>(["connections", "all"]);
+        
+        if (previousConnections) {
+          const { user } = useAuthStore.getState();
+          const myId = user?.userId ? Number(user.userId) : 0;
+          
+          queryClient.setQueryData<Connection[]>(["connections", "all"], [
+            ...previousConnections,
+            {
+              id: Math.random(), // Temporary ID
+              requesterId: myId,
+              addresseeId: addresseeId,
+              status: ConnectionStatus.Pending,
+              createdAt: new Date().toISOString()
+            }
+          ]);
+        }
+        return { previousConnections };
+      },
+      onError: (err, variables, context) => {
+        if (context?.previousConnections) {
+          queryClient.setQueryData(["connections", "all"], context.previousConnections);
+        }
+      },
+      onSettled: () => {
         queryClient.invalidateQueries({ queryKey: ["connections"] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -63,6 +91,7 @@ export const useConnectionQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["connections"] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -79,9 +108,29 @@ export const useConnectionQueries = () => {
         });
         return res.data;
       },
-      onSuccess: () => {
+      onMutate: async ({ connectionId, status }) => {
+        await queryClient.cancelQueries({ queryKey: ["connections", "all"] });
+        const previousConnections = queryClient.getQueryData<Connection[]>(["connections", "all"]);
+        
+        if (previousConnections) {
+          queryClient.setQueryData<Connection[]>(
+            ["connections", "all"],
+            previousConnections.map(c => 
+              c.id === connectionId ? { ...c, status } : c
+            )
+          );
+        }
+        return { previousConnections };
+      },
+      onError: (err, variables, context) => {
+        if (context?.previousConnections) {
+          queryClient.setQueryData(["connections", "all"], context.previousConnections);
+        }
+      },
+      onSettled: () => {
         queryClient.invalidateQueries({ queryKey: ["connections"] });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -92,9 +141,27 @@ export const useConnectionQueries = () => {
         const res = await api.delete(`/Connection/${connectionId}`);
         return res.data;
       },
-      onSuccess: () => {
+      onMutate: async (connectionId) => {
+        await queryClient.cancelQueries({ queryKey: ["connections", "all"] });
+        const previousConnections = queryClient.getQueryData<Connection[]>(["connections", "all"]);
+        
+        if (previousConnections) {
+          queryClient.setQueryData<Connection[]>(
+            ["connections", "all"],
+            previousConnections.filter(c => c.id !== connectionId)
+          );
+        }
+        return { previousConnections };
+      },
+      onError: (err, variables, context) => {
+        if (context?.previousConnections) {
+          queryClient.setQueryData(["connections", "all"], context.previousConnections);
+        }
+      },
+      onSettled: () => {
         queryClient.invalidateQueries({ queryKey: ["connections"] });
       },
+      meta: { toast: true, action: "delete" },
     });
   };
 

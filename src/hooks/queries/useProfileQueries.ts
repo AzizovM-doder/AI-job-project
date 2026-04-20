@@ -73,6 +73,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", "basic", "user"],
         });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -90,11 +91,14 @@ export const useProfileQueries = () => {
   };
 
   const useUpdateCandidateProfile = () => {
-    return useMutation<UserCandidateProfile, Error, CreateCandidateProfileDto>({
+    return useMutation<UserCandidateProfile, Error, CreateCandidateProfileDto & { id?: number }>({
       mutationFn: async (data) => {
-        // FindUser uses userId in the URL or body depending on implementation
-        // Usually it's PUT /UserProfile/{id}
-        // For now using the existing endpoint from Swagger dump
+        // If an ID exists, use PUT to update the record
+        if (data.id && data.id !== 0) {
+          const res = await api.put(`/UserProfile/${data.id}`, data);
+          return res.data?.data ?? res.data;
+        }
+        // Otherwise, use POST to create a new record
         const res = await api.post("/UserProfile", data);
         return res.data?.data ?? res.data;
       },
@@ -103,6 +107,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", "candidate", variables.userId],
         });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -130,6 +135,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", "user", variables.userId, "education"],
         });
       },
+      meta: { toast: true, action: "create" },
     });
   };
 
@@ -144,6 +150,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", "user", variables.userId, "education"],
         });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -157,6 +164,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", "user", userId, "education"],
         });
       },
+      meta: { toast: true, action: "delete" },
     });
   };
 
@@ -184,6 +192,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", "user", variables.userId, "experience"],
         });
       },
+      meta: { toast: true, action: "create" },
     });
   };
 
@@ -198,6 +207,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", "user", variables.userId, "experience"],
         });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -211,6 +221,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", "user", userId, "experience"],
         });
       },
+      meta: { toast: true, action: "delete" },
     });
   };
 
@@ -249,6 +260,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", variables.profileId, "skills"],
         });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -262,6 +274,39 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", profileId, "skills"],
         });
       },
+      meta: { toast: true, action: "delete" },
+    });
+  };
+
+  const useAddEndorsement = () => {
+    return useMutation<Endorsement, Error, { profileSkillId: number; profileId: number }>({
+      mutationFn: async ({ profileSkillId }) => {
+        const res = await api.post("/Endorsement", { profileSkillId });
+        return res.data?.data ?? res.data;
+      },
+      onMutate: async ({ profileSkillId, profileId }) => {
+        await queryClient.cancelQueries({ queryKey: ["profiles", profileId, "skills"] });
+        const previousSkills = queryClient.getQueryData<ProfileSkill[]>(["profiles", profileId, "skills"]);
+
+        if (previousSkills) {
+          queryClient.setQueryData<ProfileSkill[]>(
+            ["profiles", profileId, "skills"],
+            previousSkills.map(s => 
+              s.id === profileSkillId ? { ...s, endorsementsCount: (s.endorsementsCount || 0) + 1 } : s
+            )
+          );
+        }
+        return { previousSkills };
+      },
+      onError: (err, variables, context) => {
+        if (context?.previousSkills) {
+          queryClient.setQueryData(["profiles", variables.profileId, "skills"], context.previousSkills);
+        }
+      },
+      onSettled: (data, error, variables) => {
+        queryClient.invalidateQueries({ queryKey: ["profiles", variables.profileId, "skills"] });
+      },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -289,6 +334,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", variables.profileId, "languages"],
         });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -302,6 +348,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", profileId, "languages"],
         });
       },
+      meta: { toast: true, action: "delete" },
     });
   };
 
@@ -347,6 +394,7 @@ export const useProfileQueries = () => {
           ],
         });
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -360,6 +408,7 @@ export const useProfileQueries = () => {
           queryKey: ["profiles", "user", recipientId, "recommendations"],
         });
       },
+      meta: { toast: true, action: "delete" },
     });
   };
 
@@ -375,6 +424,7 @@ export const useProfileQueries = () => {
         });
         return res.data?.data ?? res.data;
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -388,6 +438,7 @@ export const useProfileQueries = () => {
         });
         return res.data?.data ?? res.data;
       },
+      meta: { toast: true, action: "sync" },
     });
   };
 
@@ -416,6 +467,7 @@ export const useProfileQueries = () => {
     useGetRecommendationById,
     useAddRecommendation,
     useDeleteRecommendation,
+    useAddEndorsement,
     useUploadPhoto,
     useUploadCV,
   };

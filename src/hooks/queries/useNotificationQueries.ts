@@ -50,6 +50,7 @@ export const useNotificationQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['notifications'] });
       },
+      meta: { toast: true, action: 'create' },
     });
   };
 
@@ -61,6 +62,7 @@ export const useNotificationQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['notifications'] });
       },
+      meta: { toast: true, action: 'sync' },
     });
   };
 
@@ -73,6 +75,7 @@ export const useNotificationQueries = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['notifications'] });
       },
+      meta: { toast: true, action: 'delete' },
     });
   };
 
